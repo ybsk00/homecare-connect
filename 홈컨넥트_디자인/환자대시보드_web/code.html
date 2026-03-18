@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;family=Public+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#1a365d", // Deep Blue
+              "secondary": "#006a63", // Soft Mint
+              "background": "#f8fafc",
+              "surface": "#ffffff",
+              "outline-variant": "#e2e8f0",
+              "on-surface": "#1e293b",
+              "on-surface-variant": "#64748b",
+              "error": "#ef4444",
+              "warning": "#f59e0b"
+            },
+            fontFamily: {
+              "headline": ["Manrope", "sans-serif"],
+              "body": ["Public Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Public Sans', sans-serif; background-color: #f8fafc; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="text-on-surface antialiased">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 bg-white border-b border-outline-variant/50 h-16 flex justify-between items-center px-8">
+<div class="flex items-center gap-8">
+<div class="text-xl font-extrabold text-primary tracking-tight">Serene Care</div>
+<div class="hidden md:flex gap-6">
+<a class="text-sm font-semibold text-primary" href="#">대시보드</a>
+<a class="text-sm font-medium text-on-surface-variant hover:text-primary transition-colors" href="#">기관 관리</a>
+<a class="text-sm font-medium text-on-surface-variant hover:text-primary transition-colors" href="#">본인 인증</a>
+<a class="text-sm font-medium text-on-surface-variant hover:text-primary transition-colors" href="#">AI 모니터링</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-slate-100 rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-white"></span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-outline-variant">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-bold text-on-surface">관리자 김진희</p>
+<p class="text-[10px] text-on-surface-variant">중앙관리센터</p>
+</div>
+<img alt="Admin" class="w-8 h-8 rounded-full bg-slate-200" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFW98L8nsqPEgfgPKiXuTHq7D97GweB0rnUVYtrTG4VjllNRxuKRK8P4OS2alsbNk8KaHPoPs8g9YYhKXql6JilQbw1tM_WYytXKuG9NUHNR7I2mNV5nDv6jFLwsjHyhMB2X-UOc0dZszS_ZzbgqfaPWHcuiPcobSj3iX9-0avs9kvZaul-mKVhURxTraa4ZQBnVC7_DETqkIlAOrptvko3GE9XY3LwRUkgP2RAqohI8ib8U6fCEzwJbMogQb2PqtET2P4QVGgZOE"/>
+</div>
+</div>
+</nav>
+<!-- Dashboard Main Layout -->
+<main class="pt-24 px-8 pb-12 max-w-[1600px] mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left Sidebar: Profile Summary (Col 1-3) -->
+<aside class="lg:col-span-3 space-y-6">
+<div class="bg-white rounded-xl shadow-sm border border-outline-variant/50 p-6">
+<div class="flex flex-col items-center text-center">
+<div class="relative mb-4">
+<img alt="Patient Profile" class="w-32 h-32 rounded-full object-cover ring-4 ring-slate-50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqpCofR_5cTL65G2ZI7Ar7EvWckaQDJpkrEY384rJPXFUKVEqSnpSUTI22P3YfbtM12CtIgvMvX_qp89Y_nh0b5CFcJqxx1cDfp7e1Ug_ecBstoGQ1gf2Kf4FwN1ivgqW3pGmyWexALd0iXNh8_vKNJBCgAPzYP5kSmou_w2qiwk8l9mUY4I3Phn9UKXO-NOnHvG3-hvC1rn3GRNvuk9-x-r8QoOPFEN2DA8sOiLZtXYfCpRt1ONOT9ti3c7UUF-QuLbDHZLCJCf0"/>
+<span class="absolute bottom-2 right-2 w-4 h-4 bg-secondary border-2 border-white rounded-full"></span>
+</div>
+<h2 class="text-xl font-bold text-on-surface">박정희 <span class="text-base font-medium text-on-surface-variant ml-1">82세</span></h2>
+<p class="text-sm text-secondary font-semibold mt-1">장기요양 1등급</p>
+<p class="text-xs text-on-surface-variant mt-2">서울시 서초구 | 자택 거주</p>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant/50 space-y-4">
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-2">핵심 건강 정보</p>
+<div class="space-y-2">
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface-variant">주요 질환</span>
+<span class="font-semibold text-on-surface">고혈압, 당뇨</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface-variant">혈액형</span>
+<span class="font-semibold text-on-surface">A Rh+</span>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface-variant">복용 약물</span>
+<span class="font-semibold text-on-surface text-right">혈압약 외 3종</span>
+</div>
+</div>
+</div>
+<button class="w-full py-2.5 bg-slate-50 text-primary border border-primary/20 rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-all">전체 프로필 보기</button>
+</div>
+</div>
+<!-- Quick Stats Card -->
+<div class="bg-primary text-white rounded-xl p-6 shadow-sm">
+<p class="text-xs font-medium text-white/70 mb-4">오늘의 케어 상태</p>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-white/10 p-3 rounded-lg">
+<span class="material-symbols-outlined text-sm mb-1">restaurant</span>
+<p class="text-[10px] opacity-80">식사량</p>
+<p class="text-sm font-bold">2/3공기</p>
+</div>
+<div class="bg-white/10 p-3 rounded-lg">
+<span class="material-symbols-outlined text-sm mb-1">bed</span>
+<p class="text-[10px] opacity-80">수면</p>
+<p class="text-sm font-bold">7.5시간</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Center Area: Vital Charts (Col 4-9) -->
+<div class="lg:col-span-6 space-y-6">
+<div class="bg-white rounded-xl shadow-sm border border-outline-variant/50 p-8">
+<div class="flex justify-between items-center mb-8">
+<div>
+<h3 class="text-lg font-bold text-on-surface">바이탈 사인 트렌드</h3>
+<p class="text-sm text-on-surface-variant">최근 7일간의 건강 지표 변화</p>
+</div>
+<div class="flex bg-slate-100 p-1 rounded-lg">
+<button class="px-4 py-1.5 text-xs font-bold rounded-md bg-white text-primary shadow-sm">혈압</button>
+<button class="px-4 py-1.5 text-xs font-medium rounded-md text-on-surface-variant hover:text-on-surface">혈당</button>
+</div>
+</div>
+<!-- Chart Area (Visual Representation) -->
+<div class="h-64 relative">
+<div class="absolute inset-0 flex flex-col justify-between py-2">
+<div class="border-b border-slate-50 w-full h-0"></div>
+<div class="border-b border-slate-50 w-full h-0"></div>
+<div class="border-b border-slate-50 w-full h-0"></div>
+<div class="border-b border-slate-50 w-full h-0"></div>
+<div class="border-b border-slate-100 w-full h-0"></div>
+</div>
+<svg class="absolute inset-0 w-full h-full" preserveaspectratio="none">
+<path d="M0,140 L100,120 L200,130 L300,90 L400,100 L500,70 L600,85" fill="none" stroke="#1a365d" stroke-linecap="round" stroke-width="3"></path>
+<path d="M0,180 L100,175 L200,190 L300,170 L400,175 L500,165 L600,160" fill="none" stroke="#006a63" stroke-dasharray="4,4" stroke-linecap="round" stroke-width="2"></path>
+<!-- Dots -->
+<circle cx="500" cy="70" fill="#1a365d" r="4"></circle>
+<circle cx="600" cy="85" fill="#1a365d" r="4"></circle>
+</svg>
+<div class="absolute -bottom-6 w-full flex justify-between text-[10px] text-on-surface-variant font-bold px-2">
+<span>05/10</span><span>05/11</span><span>05/12</span><span>05/13</span><span>05/14</span><span>05/15</span><span>오늘</span>
+</div>
+</div>
+<div class="mt-12 grid grid-cols-3 gap-6 pt-6 border-t border-outline-variant/30">
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">평균 수축기 혈압</p>
+<div class="flex items-baseline gap-1 mt-1">
+<span class="text-2xl font-bold text-primary">124</span>
+<span class="text-xs text-on-surface-variant">mmHg</span>
+</div>
+</div>
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">공복 혈당 평균</p>
+<div class="flex items-baseline gap-1 mt-1">
+<span class="text-2xl font-bold text-secondary">108</span>
+<span class="text-xs text-on-surface-variant">mg/dL</span>
+</div>
+</div>
+<div>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase">심박수</p>
+<div class="flex items-baseline gap-1 mt-1">
+<span class="text-2xl font-bold text-on-surface">72</span>
+<span class="text-xs text-on-surface-variant">bpm</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Red Flag & Alert Section (Integrated in Main Flow) -->
+<div class="bg-red-50 border border-red-100 rounded-xl p-6 flex items-start gap-4">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div>
+<h4 class="text-sm font-bold text-error">주의: 영양 섭취 이상 감지</h4>
+<p class="text-xs text-red-700 mt-1 leading-relaxed">최근 3일간 평소 대비 식사량이 20% 감소하였습니다. 보호자 및 담당 간호사의 확인이 필요합니다.</p>
+</div>
+<button class="ml-auto text-xs font-bold text-error underline">조치 확인</button>
+</div>
+</div>
+<!-- Right Sidebar: AI Report (Col 10-12) -->
+<aside class="lg:col-span-3 space-y-6">
+<div class="bg-white rounded-xl shadow-sm border border-outline-variant/50 p-6 flex flex-col h-full">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary">psychology</span>
+<h3 class="font-headline font-bold text-on-surface">AI 월간 경과 리포트</h3>
+</div>
+<div class="space-y-6 flex-grow">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-secondary shrink-0" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div>
+<p class="text-sm font-bold text-on-surface">상태 안정적 개선 중</p>
+<p class="text-[11px] text-on-surface-variant mt-1 leading-normal">지난달 대비 거동 능력이 약 12% 향상되었습니다.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-secondary shrink-0" style="font-variation-settings: 'FILL' 1;">trending_down</span>
+<div>
+<p class="text-sm font-bold text-on-surface">혈압 안정화 추세</p>
+<p class="text-[11px] text-on-surface-variant mt-1 leading-normal">혈압 변동폭이 표준 범위 내에서 매우 안정적입니다.</p>
+</div>
+</div>
+<div class="p-4 bg-slate-50 rounded-lg border border-slate-100">
+<p class="text-xs font-bold text-primary mb-2">AI 통합 분석 의견</p>
+<p class="text-[11px] text-on-surface-variant leading-relaxed">전반적인 바이탈은 우수하나 일시적인 식욕 부진이 관찰됩니다. 약물 부작용 검토를 권장합니다.</p>
+</div>
+</div>
+<button class="mt-8 w-full py-3 bg-primary text-white rounded-lg text-sm font-bold active:scale-95 transition-all shadow-md shadow-primary/20">상세 리포트 보기</button>
+</div>
+</aside>
+<!-- Bottom Section: Timeline (Col 1-12) -->
+<section class="lg:col-span-12">
+<div class="bg-white rounded-xl shadow-sm border border-outline-variant/50 p-8">
+<div class="flex justify-between items-center mb-10">
+<h3 class="text-lg font-bold text-on-surface">최근 방문 기록 타임라인</h3>
+<button class="text-primary text-xs font-bold flex items-center gap-1 hover:underline">
+                        전체 기록 보기 <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:h-full before:w-0.5 before:bg-slate-100">
+<!-- Entry 1 -->
+<div class="relative flex gap-12 items-start">
+<div class="absolute left-0 mt-1 w-10 h-10 bg-primary rounded-full border-4 border-white flex items-center justify-center z-10 shadow-sm">
+<span class="material-symbols-outlined text-white text-lg">medical_services</span>
+</div>
+<div class="ml-12 flex-grow bg-slate-50 rounded-xl p-5 border border-slate-100/50">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="md:col-span-1">
+<span class="block text-sm font-bold text-primary">2024년 5월 15일</span>
+<span class="text-[11px] text-on-surface-variant">오후 2:30 | 방문 간호</span>
+</div>
+<div class="md:col-span-3">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-bold text-sm text-on-surface">정기 건강 검진 및 욕창 드레싱</h4>
+<span class="text-[11px] px-2 py-0.5 bg-white border border-slate-200 rounded text-on-surface-variant font-medium">담당: 김순희 간호사</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">욕창 부위 소독 및 드레싱 완료. 환자분 컨디션 매우 좋으며, 가벼운 대화 가능함. 혈압 125/80 측정됨. 다음 방문 시 당뇨 수치 정밀 체크 예정.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Entry 2 -->
+<div class="relative flex gap-12 items-start">
+<div class="absolute left-0 mt-1 w-10 h-10 bg-secondary rounded-full border-4 border-white flex items-center justify-center z-10 shadow-sm">
+<span class="material-symbols-outlined text-white text-lg">exercise</span>
+</div>
+<div class="ml-12 flex-grow bg-slate-50 rounded-xl p-5 border border-slate-100/50">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="md:col-span-1">
+<span class="block text-sm font-bold text-secondary">2024년 5월 13일</span>
+<span class="text-[11px] text-on-surface-variant">오전 10:00 | 물리 치료</span>
+</div>
+<div class="md:col-span-3">
+<div class="flex justify-between items-start mb-2">
+<h4 class="font-bold text-sm text-on-surface">하지 근력 강화 및 보행 훈련</h4>
+<span class="text-[11px] px-2 py-0.5 bg-white border border-slate-200 rounded text-on-surface-variant font-medium">담당: 이민호 치료사</span>
+</div>
+<p class="text-xs text-on-surface-variant leading-relaxed">무릎 관절 가동 범위 훈련 실시. 왼쪽 다리 근력이 소폭 강화됨. 통증 호소 없었으며 20분간 실내 보행 보조 성공.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Contextual Floating Action Button -->
+<button class="fixed bottom-10 right-10 w-14 h-14 bg-primary text-white rounded-full shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+</body></html>

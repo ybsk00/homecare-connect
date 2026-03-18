@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "홈케어커넥트 간호사",
+    "slug": "homecare-nurse",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "homecare-nurse",
+    "splash": { "backgroundColor": "#10B981" },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "kr.homecare-connect.nurse",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "GPS 체크인/체크아웃을 위해 위치 정보를 사용합니다.",
+        "NSCameraUsageDescription": "환자 상태 사진 촬영을 위해 카메라를 사용합니다.",
+        "NSMicrophoneUsageDescription": "음성 메모 녹음을 위해 마이크를 사용합니다."
+      }
+    },
+    "android": {
+      "adaptiveIcon": { "backgroundColor": "#10B981" },
+      "package": "kr.homecareconnect.nurse",
+      "permissions": ["ACCESS_FINE_LOCATION", "CAMERA", "RECORD_AUDIO"]
+    },
+    "plugins": ["expo-router", "expo-secure-store", "expo-location", "expo-camera", "expo-av"]
+  }
+}

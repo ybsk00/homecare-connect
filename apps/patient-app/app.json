@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "홈케어커넥트",
+    "slug": "homecare-patient",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "homecare-patient",
+    "splash": { "backgroundColor": "#0EA5E9" },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "kr.homecare-connect.patient",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "방문 매칭을 위해 위치 정보를 사용합니다."
+      }
+    },
+    "android": {
+      "adaptiveIcon": { "backgroundColor": "#0EA5E9" },
+      "package": "kr.homecareconnect.patient",
+      "permissions": ["ACCESS_FINE_LOCATION"]
+    },
+    "plugins": ["expo-router", "expo-secure-store", "expo-location"]
+  }
+}

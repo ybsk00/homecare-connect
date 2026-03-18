@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Public+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed-variant": "#00504a",
+              "on-surface-variant": "#43474e",
+              "tertiary-container": "#4f2e00",
+              "primary-fixed-dim": "#adc7f7",
+              "error": "#ba1a1a",
+              "on-secondary-container": "#007169",
+              "on-error-container": "#93000a",
+              "surface-tint": "#455f88",
+              "on-surface": "#181c1e",
+              "inverse-surface": "#2d3133",
+              "on-primary-fixed": "#001b3c",
+              "on-background": "#181c1e",
+              "background": "#f7fafc",
+              "tertiary-fixed-dim": "#ffb866",
+              "tertiary": "#321b00",
+              "on-tertiary-fixed-variant": "#673d00",
+              "inverse-on-surface": "#eef1f3",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "outline": "#74777f",
+              "primary-container": "#1a365d",
+              "tertiary-fixed": "#ffddba",
+              "surface": "#f7fafc",
+              "surface-container": "#ebeef0",
+              "on-secondary-fixed": "#00201d",
+              "secondary-fixed": "#79f7ea",
+              "primary-fixed": "#d6e3ff",
+              "inverse-primary": "#adc7f7",
+              "on-primary-container": "#86a0cd",
+              "on-primary": "#ffffff",
+              "surface-container-low": "#f1f4f6",
+              "on-tertiary-container": "#d4903b",
+              "primary": "#002045",
+              "surface-container-highest": "#e0e3e5",
+              "secondary-container": "#79f7ea",
+              "surface-dim": "#d7dadc",
+              "surface-container-lowest": "#ffffff",
+              "secondary": "#006a63",
+              "on-tertiary-fixed": "#2b1700",
+              "surface-variant": "#e0e3e5",
+              "surface-bright": "#f7fafc",
+              "secondary-fixed-dim": "#5adace",
+              "on-secondary": "#ffffff",
+              "surface-container-high": "#e5e9eb",
+              "on-error": "#ffffff",
+              "on-primary-fixed-variant": "#2d476f",
+              "outline-variant": "#c4c6cf"
+            },
+            fontFamily: {
+              "headline": ["Manrope", "sans-serif"],
+              "body": ["Public Sans", "sans-serif"],
+              "label": ["Public Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-effect {
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      body {
+        font-family: 'Public Sans', sans-serif;
+        background-color: #f7fafc;
+        color: #181c1e;
+      }
+      h1, h2, h3 {
+        font-family: 'Manrope', sans-serif;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high">
+<img alt="사용자 프로필" class="w-full h-full object-cover" data-alt="Close up portrait of a smiling middle-aged man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9Ll0lJiY3B8kzwt02CNMJ9z7830zBfO6Rntgv3E50My6cCp6qpua0PVRPWXNlGwQN_rzBEUXF_GpNGRYCVEOuFZm-jUs2UPe6s03Ctqrv3lDMZjZJwmByP75LjaXavUFlp4uSbHk6EHAfofRkDPG2HYFafrvaqeOdTQe8AVYSZ6GMmiNHS-Y9S5d3_baMNqf8Pl3HsH46Ta0CoWerxHyQjVqrQ9iUVknS1io4mE7uAul-cd2oELXgV1N7ZetBOsc-IztTjzT_RcY"/>
+</div>
+<span class="text-xl font-extrabold text-primary tracking-tight font-headline">HomeCare Connect</span>
+</div>
+<button class="p-2 rounded-full hover:bg-surface-container-high transition-colors scale-95 active:duration-100">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+</header>
+<main class="pt-24 px-6 space-y-8">
+<!-- Welcome Section -->
+<section class="space-y-1">
+<h1 class="text-3xl font-extrabold text-primary tracking-tight">안녕하세요, 김철수님</h1>
+<p class="text-on-surface-variant body-lg">오늘의 케어 일정을 확인하세요.</p>
+</section>
+<!-- Hero Section: Visit Summary Card -->
+<section class="relative group">
+<div class="absolute inset-0 bg-gradient-to-br from-primary to-primary-container rounded-2xl blur-xl opacity-10 group-hover:opacity-20 transition-opacity"></div>
+<div class="relative bg-gradient-to-br from-primary to-primary-container text-white p-6 rounded-2xl shadow-lg">
+<div class="flex justify-between items-start mb-6">
+<div>
+<span class="label-md font-semibold tracking-wider text-on-primary-container bg-white/10 px-3 py-1 rounded-full uppercase">Today's Visit</span>
+<h2 class="text-2xl font-bold mt-4">방문 간호 서비스</h2>
+</div>
+<div class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">directions_run</span>
+                        이동중
+                    </div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/10">
+<p class="text-on-primary-container text-xs font-semibold mb-1">담당 간호사</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary-fixed">person</span>
+<span class="font-bold text-lg">김간호사</span>
+</div>
+</div>
+<div class="bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/10">
+<p class="text-on-primary-container text-xs font-semibold mb-1">방문 예정 시간</p>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary-fixed">schedule</span>
+<span class="font-bold text-lg">14:00</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Body: Recent Vitals & Next Visit Bento -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Vitals Card -->
+<div class="bg-surface-container-lowest p-6 rounded-2xl space-y-4">
+<div class="flex justify-between items-center">
+<h3 class="text-lg font-bold text-primary">최근 건강 지표</h3>
+<span class="text-xs text-on-surface-variant">어제 18:30 업데이트</span>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">favorite</span>
+</div>
+<div>
+<p class="text-xs text-on-surface-variant font-semibold">혈압 (BP)</p>
+<p class="font-bold text-lg">120/80 <span class="text-sm font-normal text-on-surface-variant">mmHg</span></p>
+</div>
+</div>
+<span class="bg-secondary/10 text-secondary px-2 py-0.5 rounded text-[10px] font-bold">NORMAL</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed-dim/20 flex items-center justify-center text-tertiary-fixed-dim">
+<span class="material-symbols-outlined">device_thermostat</span>
+</div>
+<div>
+<p class="text-xs text-on-surface-variant font-semibold">체온 (Temp)</p>
+<p class="font-bold text-lg">36.5<span class="text-sm font-normal text-on-surface-variant">°C</span></p>
+</div>
+</div>
+<span class="bg-secondary/10 text-secondary px-2 py-0.5 rounded text-[10px] font-bold">NORMAL</span>
+</div>
+</div>
+</div>
+<!-- Next Doctor Visit -->
+<div class="bg-surface-container-low p-6 rounded-2xl flex flex-col justify-between">
+<div>
+<h3 class="text-lg font-bold text-primary mb-4">다음 정기 검진</h3>
+<div class="flex items-center gap-4 mb-6">
+<div class="bg-surface-container-lowest w-14 h-14 rounded-xl flex flex-col items-center justify-center shadow-sm">
+<span class="text-[10px] font-bold text-on-surface-variant">3월</span>
+<span class="text-xl font-extrabold text-primary">25</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">종합 내과 정기 검진</p>
+<p class="text-sm text-on-surface-variant">오전 10:30 • 서울성모병원</p>
+</div>
+</div>
+</div>
+<button class="w-full py-3 bg-surface-container-lowest text-primary font-bold rounded-xl hover:bg-white transition-colors border border-outline-variant/15">
+                    예정된 일정 전체보기
+                </button>
+</div>
+</section>
+<!-- Care Activity Summary (Asymmetric Layout) -->
+<section class="space-y-4 pb-8">
+<h3 class="text-lg font-bold text-primary">최근 케어 기록</h3>
+<div class="flex flex-col space-y-3">
+<div class="flex items-start gap-4 p-4 bg-surface-container-low rounded-xl border-l-4 border-primary">
+<div class="flex-1">
+<p class="text-sm font-bold">오전 투약 관리 완료</p>
+<p class="text-xs text-on-surface-variant mt-1">혈압약 및 영양제 복용 확인 완료되었습니다.</p>
+</div>
+<span class="text-[10px] font-semibold text-on-surface-variant">09:00</span>
+</div>
+<div class="flex items-start gap-4 p-4 bg-surface-container-low rounded-xl">
+<div class="flex-1">
+<p class="text-sm font-bold">식단 기록 작성</p>
+<p class="text-xs text-on-surface-variant mt-1">점심 식사(저염식) 80% 섭취하셨습니다.</p>
+</div>
+<span class="text-[10px] font-semibold text-on-surface-variant">어제</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full rounded-t-2xl z-50 bg-surface-container-lowest shadow-[0_-10px_40px_rgba(24,28,30,0.05)]">
+<div class="flex justify-around items-center w-full px-4 pb-safe pt-2 h-20">
+<!-- Active Home Tab -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-3 py-1.5 scale-98 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-[11px] font-semibold font-public-sans mt-1">홈</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container-high rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">handshake</span>
+<span class="text-[11px] font-semibold font-public-sans mt-1">매칭</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container-high rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-[11px] font-semibold font-public-sans mt-1">일정</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container-high rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="text-[11px] font-semibold font-public-sans mt-1">기록</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container-high rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[11px] font-semibold font-public-sans mt-1">마이페이지</span>
+</a>
+</div>
+</nav>
+</body></html>

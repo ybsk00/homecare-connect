@@ -1,0 +1,14 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@homecare/shared-types": ["../../packages/shared-types/src"],
+      "@homecare/shared-utils": ["../../packages/shared-utils/src"],
+      "@homecare/supabase-client": ["../../packages/supabase-client/src"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"]
+}

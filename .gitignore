@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+dist/
+.expo/
+*.tsbuildinfo
+.turbo/
+coverage/
+
+# Environment variables (NEVER commit API keys)
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+!.env.example
+
+# Platform builds
+ios/
+android/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Vercel
+.vercel
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Secrets (extra safety)
+**/secrets/
+*.pem
+*.key

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>HomeCare Connect - Dashboard</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Public+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed-variant": "#00504a",
+                        "on-surface-variant": "#43474e",
+                        "tertiary-container": "#4f2e00",
+                        "primary-fixed-dim": "#adc7f7",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#007169",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#455f88",
+                        "on-surface": "#181c1e",
+                        "inverse-surface": "#2d3133",
+                        "on-primary-fixed": "#001b3c",
+                        "on-background": "#181c1e",
+                        "background": "#f7fafc",
+                        "tertiary-fixed-dim": "#ffb866",
+                        "tertiary": "#321b00",
+                        "on-tertiary-fixed-variant": "#673d00",
+                        "inverse-on-surface": "#eef1f3",
+                        "error-container": "#ffdad6",
+                        "on-tertiary": "#ffffff",
+                        "outline": "#74777f",
+                        "primary-container": "#1a365d",
+                        "tertiary-fixed": "#ffddba",
+                        "surface": "#f7fafc",
+                        "surface-container": "#ebeef0",
+                        "on-secondary-fixed": "#00201d",
+                        "secondary-fixed": "#79f7ea",
+                        "primary-fixed": "#d6e3ff",
+                        "inverse-primary": "#adc7f7",
+                        "on-primary-container": "#86a0cd",
+                        "on-primary": "#ffffff",
+                        "surface-container-low": "#f1f4f6",
+                        "on-tertiary-container": "#d4903b",
+                        "primary": "#002045",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-container": "#79f7ea",
+                        "surface-dim": "#d7dadc",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#006a63",
+                        "on-tertiary-fixed": "#2b1700",
+                        "surface-variant": "#e0e3e5",
+                        "surface-bright": "#f7fafc",
+                        "secondary-fixed-dim": "#5adace",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e5e9eb",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "outline-variant": "#c4c6cf"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Public Sans"],
+                        "label": ["Public Sans"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "16px", "md": "12px", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Public Sans', sans-serif;
+            background-color: #f7fafc;
+        }
+        h1, h2, h3, .brand-font {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+</head>
+<body class="text-on-surface">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 z-40 bg-surface-container-high flex flex-col py-6 font-manrope text-sm font-medium tracking-wide">
+<div class="px-6 mb-10">
+<div class="text-xl font-bold text-primary tracking-tight flex items-center gap-3">
+<div class="w-8 h-8 rounded-md bg-gradient-to-br from-primary to-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-lg" data-icon="home_health">home_health</span>
+</div>
+                HomeCare Connect
+            </div>
+<div class="text-[10px] uppercase tracking-[0.2em] text-on-surface-variant/60 mt-2 pl-11">병원 관리 콘솔</div>
+</div>
+<nav class="flex-1 space-y-1 px-3">
+<!-- Active: Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 text-primary font-bold border-r-4 border-primary bg-surface-container-low transition-all duration-200 scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span>대시보드</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span>환자 관리</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span>직원 관리</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span>일정</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="hail">hail</span>
+<span>서비스 요청</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="medical_services">medical_services</span>
+<span>의사 방문</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span>청구 및 수납</span>
+</a>
+</nav>
+<div class="px-3 pt-6 border-t border-outline-variant/10">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>설정</span>
+</a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] z-30 bg-surface/80 backdrop-blur-md flex justify-between items-center h-16 px-8 font-manrope font-semibold">
+<div class="flex items-center bg-surface-container-highest rounded-full px-4 py-1.5 w-96">
+<span class="material-symbols-outlined text-on-surface-variant mr-2 text-sm" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-on-surface-variant/50" placeholder="환자 이름 또는 진료 예약 검색..." type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-on-surface-variant">
+<button class="hover:text-primary cursor-pointer transition-opacity hover:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="hover:text-primary cursor-pointer transition-opacity hover:opacity-80">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+</div>
+<div class="flex items-center gap-3 cursor-pointer group">
+<div class="text-right">
+<div class="text-xs text-on-surface-variant font-medium">관리자</div>
+<div class="text-sm text-primary font-bold">김지민 실장</div>
+</div>
+<img alt="사용자 계정" class="w-10 h-10 rounded-full object-cover" data-alt="Professional profile picture of a female medical administrator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChrUi6QI8oZ4fuBvYY1QQTAtNsKzXrB_Yh-mfEeVJVbjOCgPrpAvGuq2RpC32ZenPXiy53weBjU00QajMHRGl2l9HtIXmd7GMWoLR0no3VGblklzS-pKZXVhBXWjRJaQHuGRNskcyUKRobnlR8_-K0L7lbSrRKT1yh2wx4NQ4A0iKrV10lqZMgr6GkMbP5P3BqyeLV9gOGgzby0fp4YZnonu6HEiq8C7VANBriHsiJXZFWikQnsnkM7nBlhK-WNJz1HkfqMC089V8"/>
+</div>
+</div>
+</header>
+<!-- Content Area -->
+<div class="pt-24 px-12 pb-12">
+<!-- Welcome Section -->
+<section class="mb-12">
+<h1 class="text-4xl font-extrabold text-primary tracking-tight mb-2">대시보드</h1>
+<p class="text-on-surface-variant text-lg">안녕하세요, 김지민님. 오늘의 주요 현황입니다.</p>
+</section>
+<!-- Status Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+<div class="bg-surface-container-lowest p-6 rounded-lg flex flex-col justify-between min-h-[140px]">
+<div class="flex justify-between items-start">
+<span class="text-on-surface-variant font-medium">진료 예약</span>
+<div class="w-10 h-10 rounded-md bg-primary/5 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="event_note">event_note</span>
+</div>
+</div>
+<div>
+<div class="text-3xl font-extrabold text-primary">12</div>
+<div class="text-xs text-secondary mt-1 font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="trending_up">trending_up</span>
+                            어제보다 2건 증가
+                        </div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-lg flex flex-col justify-between min-h-[140px]">
+<div class="flex justify-between items-start">
+<span class="text-on-surface-variant font-medium">진행 중</span>
+<div class="w-10 h-10 rounded-md bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="clinical_notes">clinical_notes</span>
+</div>
+</div>
+<div>
+<div class="text-3xl font-extrabold text-primary">3</div>
+<div class="text-xs text-on-surface-variant mt-1">현재 방문 및 처치 중</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-lg flex flex-col justify-between min-h-[140px]">
+<div class="flex justify-between items-start">
+<span class="text-on-surface-variant font-medium">완료됨</span>
+<div class="w-10 h-10 rounded-md bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="task_alt">task_alt</span>
+</div>
+</div>
+<div>
+<div class="text-3xl font-extrabold text-primary">8</div>
+<div class="text-xs text-on-surface-variant mt-1">오늘 전체 누적 완료</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-lg flex flex-col justify-between min-h-[140px]">
+<div class="flex justify-between items-start">
+<span class="text-on-surface-variant font-medium">취소건</span>
+<div class="w-10 h-10 rounded-md bg-tertiary/5 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-icon="cancel">cancel</span>
+</div>
+</div>
+<div>
+<div class="text-3xl font-extrabold text-primary">1</div>
+<div class="text-xs text-error mt-1 font-medium">재스케줄링 필요</div>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-12 gap-8">
+<!-- Main Activity (Left Column) -->
+<div class="col-span-8 space-y-8">
+<!-- Red Flag Alert Panel -->
+<div class="bg-white rounded-lg overflow-hidden">
+<div class="bg-tertiary px-6 py-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-white" data-icon="warning" data-weight="fill" style="font-variation-settings: 'FILL' 1;">warning</span>
+<span class="text-white font-bold">실시간 주의 환자 알림 (긴급)</span>
+</div>
+<span class="text-white/70 text-xs">최종 업데이트: 2분 전</span>
+</div>
+<div class="p-6">
+<div class="flex items-center justify-between p-4 rounded-md bg-error/5 border-l-4 border-error">
+<div class="flex items-center gap-5">
+<img alt="환자 사진" class="w-12 h-12 rounded-full object-cover" data-alt="Senior Asian female patient portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkanf2wkZZAlWBNDtBayj9uW4dUDtEf5noLfKwWwsAnTK06yAIMrjvE-ZYP6yLR5ejeWtRbTABxWPA-dx5GzABQsKDT82UlD7mZ8QbBU4wa1sJxhXw2IFrwEySgwMW6ZpKIS_DSbfn_iQk9GL_WT4pTh8MbpwJWcuuj8SC0YUsG2KumeGKBG9WOlF5Gb_PNbJTYS1BRuxJ8puPW6iRbpj3pbvyn8CD0YXg0VULm1H3BPyY2XjFapW7EbGkz6vsZeg6XIq-Hr5a2fY"/>
+<div>
+<div class="font-bold text-lg text-primary">박영희 (82세, 여성)</div>
+<div class="text-error font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="heart_broken">heart_broken</span>
+                                            고혈압 경고: 수축기 175mmHg 감지
+                                        </div>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 bg-primary text-white text-sm font-bold rounded-md hover:opacity-90 transition-opacity">긴급 연락</button>
+<button class="px-4 py-2 border border-outline-variant/30 text-on-surface-variant text-sm font-bold rounded-md hover:bg-surface-container-low transition-colors">상세 정보</button>
+</div>
+</div>
+</div>
+</div>
+<!-- New Requests List -->
+<div class="bg-surface-container-low p-8 rounded-lg">
+<div class="flex justify-between items-end mb-6">
+<div>
+<h3 class="text-xl font-bold text-primary mb-1">신규 서비스 요청</h3>
+<p class="text-on-surface-variant text-sm">확인이 필요한 신규 신청 4건</p>
+</div>
+<button class="text-primary text-sm font-bold flex items-center gap-1 hover:underline">
+                                전체 보기
+                                <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="space-y-4">
+<!-- Request 1 -->
+<div class="bg-surface-container-lowest p-5 rounded-md flex items-center justify-between hover:shadow-sm transition-shadow">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="home_health">home_health</span>
+</div>
+<div>
+<div class="font-bold text-primary">이철수 <span class="text-on-surface-variant font-normal text-sm ml-2">가정 방문 간호 요청</span></div>
+<div class="text-xs text-on-surface-variant mt-0.5">요청 시간: 오늘 오전 10:24</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-xs px-2 py-1 bg-surface-container-high text-on-surface-variant rounded-full">일반</span>
+<button class="text-primary font-bold text-sm">수락</button>
+</div>
+</div>
+<!-- Request 2 -->
+<div class="bg-surface-container-lowest p-5 rounded-md flex items-center justify-between hover:shadow-sm transition-shadow">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="pill">pill</span>
+</div>
+<div>
+<div class="font-bold text-primary">김정숙 <span class="text-on-surface-variant font-normal text-sm ml-2">처방전 대리 수령 서비스</span></div>
+<div class="text-xs text-on-surface-variant mt-0.5">요청 시간: 오늘 오전 09:15</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-xs px-2 py-1 bg-surface-container-high text-on-surface-variant rounded-full">일반</span>
+<button class="text-primary font-bold text-sm">수락</button>
+</div>
+</div>
+<!-- Request 3 -->
+<div class="bg-surface-container-lowest p-5 rounded-md flex items-center justify-between hover:shadow-sm transition-shadow">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-tertiary-fixed-dim/20 flex items-center justify-center text-on-tertiary-fixed-variant">
+<span class="material-symbols-outlined" data-icon="emergency">emergency</span>
+</div>
+<div>
+<div class="font-bold text-primary">최영호 <span class="text-on-surface-variant font-normal text-sm ml-2">응급 이송 후 사후 관리</span></div>
+<div class="text-xs text-on-surface-variant mt-0.5">요청 시간: 어제 오후 11:45</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-xs px-2 py-1 bg-tertiary-fixed text-on-tertiary-fixed rounded-full">긴급</span>
+<button class="text-primary font-bold text-sm">수락</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Widgets (Right Column) -->
+<div class="col-span-4 space-y-8">
+<!-- Scheduling Calendar Widget -->
+<div class="bg-surface-container-lowest p-6 rounded-lg">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-bold text-primary">오늘의 일정</h3>
+<div class="text-xs font-bold text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="today">today</span>
+                                2023. 11. 24 (금)
+                            </div>
+</div>
+<!-- Timeline -->
+<div class="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[1px] before:bg-outline-variant/30">
+<!-- Item 1 -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-[22px] h-[22px] bg-white border-4 border-primary rounded-full z-10"></div>
+<div class="text-xs font-bold text-primary">13:30 - 14:30</div>
+<div class="mt-1">
+<div class="text-sm font-bold">정기 검진: 김현우 환자</div>
+<div class="text-xs text-on-surface-variant">담당의: 이재훈 전문의</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-[22px] h-[22px] bg-white border-4 border-secondary rounded-full z-10"></div>
+<div class="text-xs font-bold text-secondary">15:00 - 16:00</div>
+<div class="mt-1">
+<div class="text-sm font-bold">홈케어 교육: 이영자 보호자</div>
+<div class="text-xs text-on-surface-variant">담당: 박소윤 간호사</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-[22px] h-[22px] bg-white border-4 border-outline-variant rounded-full z-10"></div>
+<div class="text-xs font-bold text-on-surface-variant">16:30 - 17:00</div>
+<div class="mt-1">
+<div class="text-sm font-bold opacity-60 text-on-surface">환자 컨퍼런스</div>
+<div class="text-xs text-on-surface-variant">회의실 A</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-8 py-3 rounded-md bg-surface-container-low text-primary font-bold text-sm hover:bg-surface-container-high transition-colors">
+                            전체 일정표 열기
+                        </button>
+</div>
+<!-- Staff Status Widget -->
+<div class="bg-surface-container-lowest p-6 rounded-lg">
+<h3 class="text-lg font-bold text-primary mb-4">근무 현황</h3>
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="의사" class="w-8 h-8 rounded-full object-cover" data-alt="Male doctor profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWGyBPZ0y9VK053ISj1jIy4Uw3hQnZLMrAmiTnzW40HnGBpTbQVE3F2kTrqLrX83NiAzu0TrwmNj4SNLrgZqQihhRIo2-RdagAQf_eqMPUITOVma0Fxw_kcdQHYPDRztVi9yj9xv_fS3EV_fgNWfca_cdT_RpVoNxm9vv6pKEp3uB4vXxc-V6FsVHt4b4bbHAkkvdbhcrwsgvPmlinMrURmlDjU48P0IjRLScHbQuTBbHXfLC3nLpZqFYlBbxNbLFI8YrA3DHIvjU"/>
+<div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-secondary border-2 border-white rounded-full"></div>
+</div>
+<div class="text-sm font-medium">강진호 원장</div>
+</div>
+<span class="text-[10px] px-2 py-0.5 bg-secondary/10 text-secondary rounded uppercase font-bold">근무중</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="간호사" class="w-8 h-8 rounded-full object-cover" data-alt="Female nurse profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvF3Uipi0lBIHo0nEb3rM_uDRzQI51Znwpa9iqhRTXY2Ch9H_pjjdgPaCrIJs1iu6N1YqyJiRE0ij3R1_gNHFpY3BjNVITSUw31wtoLuSmUP0zGBF4-Ag_pUXstvkJKocpo6VwaEGCbWTiuo85PIaHmamP7ykdb_ZlhsPFY1iBDwsy_tn61sxygYsWX11GYPFrTFy4OGa4ya-Vdue4jG_h0lWeedW3jM5Xns89VL4Xx2pxwNkT29nwAgadp6mJoIL84Xh7nbkKOLw"/>
+<div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-secondary border-2 border-white rounded-full"></div>
+</div>
+<div class="text-sm font-medium">박소윤 간호사</div>
+</div>
+<span class="text-[10px] px-2 py-0.5 bg-secondary/10 text-secondary rounded uppercase font-bold">방문중</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="물리치료사" class="w-8 h-8 rounded-full object-cover" data-alt="Male physical therapist profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmbbhMCxPyNprf_GYTRyzmeqDWwKV1v8VzdDUXIcUeiImTqkvY6WZb-7E0vetE_wJ2ZNit3tOBuAdHKk-qsuN5ZvUwOfGsCQnlIVb9SLjrjWyjaaL9_091nB9cxpbIOY2dC__SOil1I2PhcrSOTDPOt4Dx-1Fvk9AmmvPPrBe8IeykJwNsXOGCvPzDr2olHea5O5zBnG6AbPq9aUxRy043OUWCIfWpC74azExH0gkEG34DDwd15_174dXHuEwLoHRgKEi6FHkVCmA"/>
+<div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-outline-variant border-2 border-white rounded-full"></div>
+</div>
+<div class="text-sm font-medium text-on-surface-variant">정민우 치료사</div>
+</div>
+<span class="text-[10px] px-2 py-0.5 bg-surface-container-high text-on-surface-variant rounded uppercase font-bold">휴게</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Action Button -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-gradient-to-br from-primary to-primary-container text-white rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+</button>
+</main>
+</body></html>

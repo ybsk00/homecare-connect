@@ -1,0 +1,3 @@
+-- HomeCare Connect 시드 데이터
+-- 개발 환경에서 사용할 테스트 데이터를 여기에 추가합니다.
+-- 실행: supabase db reset (로컬 개발 환경에서)

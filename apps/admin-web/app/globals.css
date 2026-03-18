@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@theme {
+  /* Primary: Deep Navy */
+  --color-primary-50: #f0f4f8;
+  --color-primary-100: #d9e2ec;
+  --color-primary-200: #bcccdc;
+  --color-primary-300: #9fb3c8;
+  --color-primary-400: #627d98;
+  --color-primary-500: #334e68;
+  --color-primary-600: #243b53;
+  --color-primary-700: #102a43;
+  --color-primary-800: #0a1628;
+  --color-primary-900: #002045;
+
+  /* Secondary: Sanctuary Teal */
+  --color-secondary-50: #f0fdfb;
+  --color-secondary-100: #ccfbf1;
+  --color-secondary-200: #99f6e4;
+  --color-secondary-300: #5eead4;
+  --color-secondary-400: #2dd4bf;
+  --color-secondary-500: #14b8a6;
+  --color-secondary-600: #0d9488;
+  --color-secondary-700: #006A63;
+  --color-secondary-800: #065f56;
+  --color-secondary-900: #134e4a;
+
+  /* Tertiary: Warm Brown */
+  --color-tertiary-50: #fdfaf5;
+  --color-tertiary-100: #f5edd6;
+  --color-tertiary-200: #e8d5a3;
+  --color-tertiary-300: #d4a96c;
+  --color-tertiary-400: #b8863a;
+  --color-tertiary-500: #96671d;
+  --color-tertiary-600: #7a5315;
+  --color-tertiary-700: #5e3f10;
+  --color-tertiary-800: #422c0a;
+  --color-tertiary-900: #321B00;
+
+  /* Surface & Neutral */
+  --color-surface: #F7FAFC;
+  --color-surface-raised: #FFFFFF;
+  --color-surface-overlay: rgba(0, 32, 69, 0.04);
+
+  /* Success / Danger / Warning */
+  --color-success-50: #ecfdf5;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+
+  --color-danger-50: #fef2f2;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+
+  --color-warning-50: #fffbeb;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+
+  /* Shadows */
+  --shadow-soft: 0 1px 3px 0 rgba(0, 32, 69, 0.06), 0 1px 2px -1px rgba(0, 32, 69, 0.06);
+  --shadow-card: 0 4px 24px -4px rgba(0, 32, 69, 0.08);
+  --shadow-elevated: 0 12px 40px -8px rgba(0, 32, 69, 0.12);
+  --shadow-glow-teal: 0 0 24px rgba(0, 106, 99, 0.15);
+}
+
+body {
+  font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #F7FAFC;
+  color: #102a43;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Premium scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 32, 69, 0.15);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 32, 69, 0.25);
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Gradient utilities */
+.gradient-primary {
+  background: linear-gradient(135deg, #002045 0%, #0A1628 100%);
+}
+
+.gradient-button {
+  background: linear-gradient(135deg, #002045 0%, #243b53 100%);
+}
+
+.gradient-teal {
+  background: linear-gradient(135deg, #006A63 0%, #0d9488 100%);
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(0, 106, 99, 0.15);
+  color: #002045;
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid #006A63;
+  outline-offset: 2px;
+}
+
+/* Smooth transitions */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}

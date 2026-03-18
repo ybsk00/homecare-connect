@@ -1,0 +1,18 @@
+{
+  "name": "@homecare/supabase-client",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "lint": "echo 'No lint configured'"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.0",
+    "@homecare/shared-types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

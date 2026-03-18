@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&amp;family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed-variant": "#00504a",
+              "on-surface-variant": "#43474e",
+              "tertiary-container": "#4f2e00",
+              "primary-fixed-dim": "#adc7f7",
+              "error": "#ba1a1a",
+              "on-secondary-container": "#007169",
+              "on-error-container": "#93000a",
+              "surface-tint": "#455f88",
+              "on-surface": "#181c1e",
+              "inverse-surface": "#2d3133",
+              "on-primary-fixed": "#001b3c",
+              "on-background": "#181c1e",
+              "background": "#f7fafc",
+              "tertiary-fixed-dim": "#ffb866",
+              "tertiary": "#321b00",
+              "on-tertiary-fixed-variant": "#673d00",
+              "inverse-on-surface": "#eef1f3",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "outline": "#74777f",
+              "primary-container": "#1a365d",
+              "tertiary-fixed": "#ffddba",
+              "surface": "#f7fafc",
+              "surface-container": "#ebeef0",
+              "on-secondary-fixed": "#00201d",
+              "secondary-fixed": "#79f7ea",
+              "primary-fixed": "#d6e3ff",
+              "inverse-primary": "#adc7f7",
+              "on-primary-container": "#86a0cd",
+              "on-primary": "#ffffff",
+              "surface-container-low": "#f1f4f6",
+              "on-tertiary-container": "#d4903b",
+              "primary": "#002045",
+              "surface-container-highest": "#e0e3e5",
+              "secondary-container": "#79f7ea",
+              "surface-dim": "#d7dadc",
+              "surface-container-lowest": "#ffffff",
+              "secondary": "#006a63",
+              "on-tertiary-fixed": "#2b1700",
+              "surface-variant": "#e0e3e5",
+              "surface-bright": "#f7fafc",
+              "secondary-fixed-dim": "#5adace",
+              "on-secondary": "#ffffff",
+              "surface-container-high": "#e5e9eb",
+              "on-error": "#ffffff",
+              "on-primary-fixed-variant": "#2d476f",
+              "outline-variant": "#c4c6cf"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Public Sans"],
+              "label": ["Public Sans"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body {
+        font-family: 'Public Sans', sans-serif;
+      }
+      h1, h2, h3 {
+        font-family: 'Manrope', sans-serif;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl flex justify-between items-center px-6 h-16">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-highest">
+<img alt="사용자 프로필" class="w-full h-full object-cover" data-alt="Female nurse professional profile photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbecGI7MrQIGeeqQ71IjRDIb30xCHkZZ9EEl_CIztrGa-2Z8rx340FZWWFB5FmASRnOpBD_q8OnLuTGpZNJh3YOG2heY_ktj07M0aHgdKVIwxzuePeGOf2zt4eq3wgn0MJTxTq7BUr288xZ2IUqhR95eO78QnGJljXreb-kE8tdG76kVRl8lgoqHI0zvCkzTqoVgnBqqQv_MtMOUoZAFzHGnUUhwP3nNgKc2jhih7cmzrpZDPFr2AgoKqV7j__m9HWNBAYeZkBcUE"/>
+</div>
+<span class="text-xl font-extrabold text-primary tracking-tight">HomeCare Connect</span>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-surface-container-high transition-colors active:scale-95 duration-100">
+<span class="material-symbols-outlined text-on-surface">notifications</span>
+</button>
+</header>
+<main class="pt-20 px-4 space-y-6">
+<!-- Date and Summary Header -->
+<section class="mt-4">
+<div class="flex justify-between items-end mb-4">
+<div class="space-y-1">
+<p class="text-on-surface-variant font-medium">2023년 10월 24일 (화)</p>
+<h1 class="text-3xl font-extrabold text-primary tracking-tight">오늘의 방문 일정</h1>
+</div>
+<div class="flex gap-2">
+<div class="bg-secondary/10 px-3 py-1 rounded-full">
+<span class="text-[12px] font-bold text-secondary">완료 2</span>
+</div>
+<div class="bg-primary/5 px-3 py-1 rounded-full">
+<span class="text-[12px] font-bold text-primary">잔여 4</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid: Map & Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Map Preview -->
+<div class="md:col-span-2 relative h-48 rounded-xl overflow-hidden shadow-sm bg-surface-container-low">
+<img class="w-full h-full object-cover opacity-80" data-alt="Simplified map view of Gangnam district Seoul" data-location="Seoul, Gangnam-gu" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMLmGVO8j71OWeKek1P-m5kjgyvJG7jH_lDU_EmIIV2qYMymQfkvdJxAE-12G-gC10Bh5XUoDBkYMD7pKKvpFZ-8gT5Ug3xkRCte44atw54VBlzQiLEVi7RgSDAIMmFCUP3vSBnv1MxHlemBClLG48lgWvPYgFM-ijJ4AvWbwEkTZP7fU_mUrRbSN4bDDi9vmuIAqumoGcFL-oMjIDFIHUo1NdP_oXO_PU5dfjdHynZaAMnsb8KjOxlxCGpMrHgKZW-_XDOzamNAk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+<!-- Map Markers Mockup -->
+<div class="absolute top-1/2 left-1/3 w-4 h-4 bg-primary border-2 border-white rounded-full shadow-lg"></div>
+<div class="absolute top-1/4 left-2/3 w-4 h-4 bg-secondary border-2 border-white rounded-full shadow-lg"></div>
+<div class="absolute bottom-1/4 left-1/2 w-4 h-4 bg-primary/40 border-2 border-white rounded-full shadow-lg"></div>
+<div class="absolute bottom-3 left-3 bg-surface-container-lowest/90 backdrop-blur px-3 py-1.5 rounded-lg text-xs font-bold text-primary">
+                        최적 경로 탐색 완료
+                    </div>
+</div>
+<!-- Quick Metric -->
+<div class="bg-primary-container p-5 rounded-xl flex flex-col justify-between text-on-primary-container relative overflow-hidden">
+<div class="relative z-10">
+<p class="text-on-primary-container/70 text-sm font-semibold mb-1">총 이동 거리</p>
+<h2 class="text-2xl font-bold">12.4 km</h2>
+</div>
+<div class="relative z-10 mt-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary-fixed">route</span>
+<span class="text-xs font-medium">예상 완료 시간 18:30</span>
+</div>
+<!-- Abstract texture decoration -->
+<div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/5 rounded-full blur-2xl"></div>
+</div>
+</div>
+</section>
+<!-- Visit List Section -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-bold text-on-surface">다음 방문 예정</h3>
+<span class="text-xs font-bold text-secondary uppercase tracking-wider">Live Updates</span>
+</div>
+<!-- Active Visit Card -->
+<div class="bg-surface-container-lowest p-5 rounded-xl shadow-[0_10px_40px_rgba(24,28,30,0.05)] border-l-4 border-secondary transition-transform active:scale-98">
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-4">
+<div class="w-14 h-14 rounded-xl bg-surface-container-low flex items-center justify-center">
+<span class="material-symbols-outlined text-primary scale-125">person</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h4 class="text-lg font-bold text-on-surface">이환자님</h4>
+<span class="bg-secondary/10 text-secondary text-[11px] font-extrabold px-2 py-0.5 rounded-md">집중 관리</span>
+</div>
+<p class="text-on-surface-variant text-sm mt-0.5">강남구 역삼동 825-13</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-xs font-bold text-primary/60 uppercase">ETA</p>
+<p class="text-xl font-extrabold text-primary">14:00</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-primary text-white py-3 rounded-xl font-bold text-sm shadow-md active:scale-95 transition-all">
+                        방문 시작
+                    </button>
+<button class="w-12 h-12 flex items-center justify-center bg-surface-container-low rounded-xl text-primary active:scale-95 transition-all">
+<span class="material-symbols-outlined">directions_car</span>
+</button>
+</div>
+</div>
+<!-- Upcoming Visits -->
+<div class="space-y-3">
+<div class="bg-surface-container-low p-4 rounded-xl flex items-center justify-between opacity-80">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">김동훈님</p>
+<p class="text-xs text-on-surface-variant">강남구 논현동 142-2</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-on-surface-variant">15:30</p>
+<span class="text-[10px] font-bold text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded">정기 방문</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl flex items-center justify-between opacity-80">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</div>
+<div>
+<p class="font-bold text-on-surface">박지성님</p>
+<p class="text-xs text-on-surface-variant">강남구 도곡동 467</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-sm font-bold text-on-surface-variant">17:00</p>
+<span class="text-[10px] font-bold text-on-surface-variant bg-surface-container-high px-2 py-0.5 rounded">상담</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Completed Hint -->
+<div class="py-6 flex flex-col items-center">
+<button class="text-sm font-bold text-on-surface-variant flex items-center gap-1 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+                완료된 방문 2건 보기
+            </button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full rounded-t-2xl z-50 bg-surface-container-lowest shadow-[0_-10px_40px_rgba(24,28,30,0.05)] flex justify-around items-center px-4 pb-safe pt-2 h-20">
+<!-- Tab: 오늘 (Today) - ACTIVE -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1.5 scale-98 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">today</span>
+<span class="text-[11px] font-semibold font-public-sans mt-1">오늘</span>
+</a>
+<!-- Tab: 환자 (Patients) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container-high rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[11px] font-semibold font-public-sans mt-1">환자</span>
+</a>
+<!-- Tab: 알림 (Alerts) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container-high rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">notifications_active</span>
+<span class="text-[11px] font-semibold font-public-sans mt-1">알림</span>
+</a>
+<!-- Tab: 마이페이지 (My Page) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:bg-surface-container-high rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[11px] font-semibold font-public-sans mt-1">마이페이지</span>
+</a>
+</nav>
+<!-- FAB (Contextual) -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-white rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-105 active:scale-90 z-40">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</body></html>

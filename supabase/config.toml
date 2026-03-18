@@ -1,0 +1,28 @@
+[project]
+id = "hviqeyrnstgwumqiacwh"
+name = "homecare-connect"
+
+[api]
+port = 54321
+schemas = ["public"]
+
+[db]
+port = 54322
+major_version = 16
+
+[studio]
+port = 54323
+
+[auth]
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/**", "exp://localhost:8081"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.external.kakao]
+enabled = true
+client_id = ""
+secret = ""
+
+[storage]
+file_size_limit = "10MB"
