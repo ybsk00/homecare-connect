@@ -43,9 +43,9 @@ export async function searchOrganizations(
   client: SupabaseClient,
   params: {
     query?: string;
-    org_type?: string;
+    org_type?: 'home_nursing' | 'home_care' | 'rehab_center' | 'clinic' | 'hospital';
     services?: string[];
-    verification_status?: string;
+    verification_status?: 'pending' | 'verified' | 'rejected' | 'suspended';
     limit?: number;
     offset?: number;
   },

@@ -90,8 +90,9 @@ export default function MatchingRequestScreen() {
             ),
         },
       ]);
-    } catch (error: any) {
-      Alert.alert('오류', error?.message ?? '매칭 요청에 실패했습니다.');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : '매칭 요청에 실패했습니다.';
+      Alert.alert('오류', message);
     }
   };
 
@@ -119,7 +120,7 @@ export default function MatchingRequestScreen() {
                 style={[
                   styles.patientOption,
                   patient.id === patientId && styles.patientSelected,
-                ]}
+                ] as any}
               >
                 <Text style={styles.patientName}>{patient.full_name}</Text>
                 <Text style={styles.patientInfo}>

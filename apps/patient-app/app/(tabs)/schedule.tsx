@@ -22,6 +22,16 @@ import {
   getVisitDayLabel,
   isToday,
 } from '@homecare/shared-utils';
+import type { Tables } from '@homecare/shared-types';
+
+type Visit = Tables<'visits'> & {
+  nurse?: {
+    id: string;
+    staff_type: string;
+    user?: { full_name: string; avatar_url: string | null } | null;
+  } | null;
+  visit_record?: { id: string }[] | null;
+};
 
 export default function ScheduleScreen() {
   const router = useRouter();
@@ -42,8 +52,8 @@ export default function ScheduleScreen() {
 
   const visitsForDate = useMemo(() => {
     if (!visitsQuery.data?.data) return [];
-    return visitsQuery.data.data.filter(
-      (v: any) => v.scheduled_date === selectedDate,
+    return (visitsQuery.data.data as any[]).filter(
+      (v: Visit) => v.scheduled_date === selectedDate,
     );
   }, [visitsQuery.data, selectedDate]);
 
@@ -75,8 +85,8 @@ export default function ScheduleScreen() {
             const isTodayDate = isToday(date);
             const dayIdx = date.getDay();
 
-            const hasVisit = visitsQuery.data?.data?.some(
-              (v: any) => v.scheduled_date === dateStr,
+            const hasVisit = (visitsQuery.data?.data as any[] | undefined)?.some(
+              (v: Visit) => v.scheduled_date === dateStr,
             );
 
             return (
@@ -148,7 +158,7 @@ export default function ScheduleScreen() {
             title="해당 날짜에 예정된 방문이 없습니다"
           />
         ) : (
-          visitsForDate.map((visit: any) => (
+          (visitsForDate as Visit[]).map((visit: Visit) => (
             <VisitCard
               key={visit.id}
               visitId={visit.id}
@@ -159,7 +169,7 @@ export default function ScheduleScreen() {
               nurseName={visit.nurse?.user?.full_name}
               nurseType={visit.nurse?.staff_type}
               hasRecord={
-                visit.visit_record && visit.visit_record.length > 0
+                !!(visit.visit_record && visit.visit_record.length > 0)
               }
               onPress={(id) => router.push(`/visit/${id}`)}
             />

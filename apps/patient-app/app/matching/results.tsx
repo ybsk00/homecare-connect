@@ -13,6 +13,17 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { useMatchingResults } from '@/hooks/useMatching';
 import { colors, spacing, typography } from '@/constants/theme';
 
+interface MatchingResultItem {
+  org_id: string;
+  org_name: string;
+  distance_km: number;
+  total_score: number;
+  service_match_score: number;
+  capacity_score: number;
+  reputation_score: number;
+  response_score: number;
+}
+
 export default function MatchingResultsScreen() {
   const router = useRouter();
   const { requestId, patientId } = useLocalSearchParams<{
@@ -58,7 +69,7 @@ export default function MatchingResultsScreen() {
           <Text style={styles.count}>
             {results.length}개 기관이 추천되었습니다
           </Text>
-          {results.map((result: any) => (
+          {results.map((result: MatchingResultItem) => (
             <OrgCard
               key={result.org_id}
               orgId={result.org_id}

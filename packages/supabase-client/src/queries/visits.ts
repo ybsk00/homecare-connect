@@ -157,7 +157,7 @@ export async function getVisitDetail(client: SupabaseClient, visitId: string) {
 export async function updateVisitStatus(
   client: SupabaseClient,
   visitId: string,
-  status: string,
+  status: 'scheduled' | 'en_route' | 'checked_in' | 'in_progress' | 'checked_out' | 'completed' | 'cancelled' | 'no_show',
   extras?: TablesUpdate<'visits'>,
 ) {
   const { data, error } = await client

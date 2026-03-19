@@ -9,8 +9,10 @@ interface AuthState {
   profile: Tables<'profiles'> | null;
   isLoading: boolean;
   isInitialized: boolean;
+  _authUnsubscribe: (() => void) | null;
 
   initialize: () => Promise<void>;
+  cleanup: () => void;
   setSession: (session: Session | null) => void;
   fetchProfile: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<void>;
@@ -25,6 +27,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   profile: null,
   isLoading: true,
   isInitialized: false,
+  _authUnsubscribe: null,
 
   initialize: async () => {
     try {
@@ -35,8 +38,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         await get().fetchProfile();
       }
 
-      // 세션 변경 리스너
-      supabase.auth.onAuthStateChange((_event, session) => {
+      // 세션 변경 리스너 - 기존 구독 해제 후 새로 구독
+      const existingUnsubscribe = get()._authUnsubscribe;
+      if (existingUnsubscribe) {
+        existingUnsubscribe();
+      }
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
         set({ session, user: session?.user ?? null });
         if (session?.user) {
           get().fetchProfile();
@@ -44,10 +52,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           set({ profile: null });
         }
       });
+
+      set({ _authUnsubscribe: () => subscription.unsubscribe() });
     } catch (error) {
       console.error('Auth initialization error:', error);
     } finally {
       set({ isLoading: false, isInitialized: true });
+    }
+  },
+
+  cleanup: () => {
+    const unsubscribe = get()._authUnsubscribe;
+    if (unsubscribe) {
+      unsubscribe();
+      set({ _authUnsubscribe: null });
     }
   },
 

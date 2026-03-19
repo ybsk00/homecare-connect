@@ -5,14 +5,7 @@ import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge, getStatusBadgeVariant } from '@/components/ui/Badge';
 import { Clock, MapPin, User } from 'lucide-react';
-
-interface VisitSummary {
-  id: string;
-  scheduled_time: string | null;
-  status: string;
-  patient_name: string;
-  nurse_name: string;
-}
+import type { VisitSummary } from '@homecare/shared-types';
 
 export function TodayVisitSummary() {
   const { data: visits = [], isLoading } = useQuery({

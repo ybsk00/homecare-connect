@@ -8,7 +8,7 @@ import {
   createPatient,
   updatePatient,
 } from '@homecare/supabase-client';
-import type { TablesInsert, TablesUpdate } from '@homecare/shared-types';
+import type { Tables, TablesInsert, TablesUpdate } from '@homecare/shared-types';
 import { useEffect } from 'react';
 
 export function usePatientsList() {
@@ -29,7 +29,7 @@ export function usePatientsList() {
       const patients = query.data
         .map((link) => link.patient)
         .filter((p): p is NonNullable<typeof p> => p !== null);
-      setPatients(patients as any[]);
+      setPatients(patients as unknown as Tables<'patients'>[]);
     }
   }, [query.data, setPatients]);
 

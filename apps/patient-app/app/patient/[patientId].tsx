@@ -23,6 +23,11 @@ import {
   getTimeSlotLabel,
   formatPhoneNumber,
 } from '@homecare/shared-utils';
+import type { Tables } from '@homecare/shared-types';
+
+type VisitWithRecord = Tables<'visits'> & {
+  visit_record?: Tables<'visit_records'>[];
+};
 
 export default function PatientDetailScreen() {
   const { patientId } = useLocalSearchParams<{ patientId: string }>();
@@ -48,11 +53,11 @@ export default function PatientDetailScreen() {
   const age = new Date().getFullYear() - new Date(patient.birth_date).getFullYear();
   const genderLabel = patient.gender === 'male' ? '남성' : '여성';
 
-  const latestVisitWithRecord = (visitsQuery.data?.data ?? []).find(
-    (v: any) => v.visit_record && v.visit_record.length > 0,
-  );
+  const latestVisitWithRecord = ((visitsQuery.data?.data ?? []) as any[]).find(
+    (v: VisitWithRecord) => v.visit_record && v.visit_record.length > 0,
+  ) as VisitWithRecord | undefined;
   const latestVitals = latestVisitWithRecord
-    ? (latestVisitWithRecord as any).visit_record?.[0]?.vitals
+    ? latestVisitWithRecord.visit_record?.[0]?.vitals
     : null;
 
   const statusVariant =

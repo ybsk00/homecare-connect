@@ -14,6 +14,9 @@ import { VisitTimeline } from '@/components/visit/VisitTimeline';
 import { usePatientStore } from '@/stores/patient-store';
 import { useVisitsByPatient } from '@/hooks/useVisits';
 import { colors, spacing, typography } from '@/constants/theme';
+import type { Tables } from '@homecare/shared-types';
+
+type Visit = Tables<'visits'>;
 
 export default function RecordsScreen() {
   const router = useRouter();
@@ -22,8 +25,8 @@ export default function RecordsScreen() {
   const selectedPatient = patients.find((p) => p.id === selectedPatientId);
   const visitsQuery = useVisitsByPatient(selectedPatientId, 30, 0);
 
-  const completedVisits = (visitsQuery.data?.data ?? []).filter(
-    (v: any) => v.status === 'completed' || v.status === 'checked_out',
+  const completedVisits = ((visitsQuery.data?.data ?? []) as any[]).filter(
+    (v: Visit) => v.status === 'completed' || v.status === 'checked_out',
   );
 
   return (

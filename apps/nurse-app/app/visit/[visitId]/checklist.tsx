@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { getServicePlanCareItems } from '@homecare/supabase-client';
 import { useVisitFlow } from '@/hooks/useVisitFlow';
 import { useVisitStore } from '@/stores/visit-store';
 import { ChecklistItem } from '@/components/visit/ChecklistItem';
@@ -19,14 +20,7 @@ export default function ChecklistScreen() {
     queryKey: ['visitPlan', visit?.plan_id],
     queryFn: async () => {
       if (!visit?.plan_id) return null;
-      const { data, error } = await supabase
-        .from('service_plans')
-        .select('care_items')
-        .eq('id', visit.plan_id)
-        .single();
-
-      if (error) throw error;
-      return data;
+      return await getServicePlanCareItems(supabase, visit.plan_id);
     },
     enabled: !!visit?.plan_id,
   });
@@ -42,7 +36,7 @@ export default function ChecklistScreen() {
         if (typeof ci === 'string') {
           items.push({ item: ci, done: false });
         } else if (typeof ci === 'object' && ci !== null && 'item' in ci) {
-          items.push({ item: (ci as any).item, done: false });
+          items.push({ item: (ci as { item: string }).item, done: false });
         }
       }
     } else if (typeof careItems === 'object' && careItems !== null) {

@@ -38,7 +38,18 @@ Thumbs.db
 *.log
 npm-debug.log*
 
-# Secrets (extra safety)
+# Claude Code local settings (contains secrets - NEVER commit)
+.claude/settings.local.json
+
+# Secrets (extra safety - NEVER commit)
 **/secrets/
 *.pem
 *.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.credential*
+**/service-account*.json
+*secret*.json
+!package*.json

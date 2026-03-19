@@ -6,21 +6,7 @@ import Badge from '@/components/ui/Badge';
 import Card from '@/components/ui/Card';
 import { formatOrgType, formatDate } from '@homecare/shared-utils';
 import { CheckCircle2 } from 'lucide-react';
-
-interface Organization {
-  id: string;
-  name: string;
-  business_number: string;
-  license_number: string | null;
-  org_type: string;
-  address: string;
-  phone: string;
-  email: string | null;
-  services: string[];
-  description: string | null;
-  verification_status: string;
-  created_at: string;
-}
+import type { OrgReviewData as Organization } from '@homecare/shared-types';
 
 interface OrgReviewPanelProps {
   organization: Organization;

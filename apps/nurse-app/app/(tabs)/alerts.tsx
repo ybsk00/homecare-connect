@@ -16,6 +16,11 @@ import { Button } from '@/components/ui/Button';
 import { Loading } from '@/components/ui/Loading';
 import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
 import { formatRelativeTime } from '@homecare/shared-utils';
+import type { Tables } from '@homecare/shared-types';
+
+type RedFlagAlertWithPatient = Tables<'red_flag_alerts'> & {
+  patient?: { id: string; full_name: string; care_grade: string | null } | null;
+};
 
 const severityOrder = { red: 0, orange: 1, yellow: 2 };
 const severityConfig: Record<
@@ -54,7 +59,7 @@ export default function AlertsScreen() {
   const [resolveId, setResolveId] = useState<string | null>(null);
   const [resolveNote, setResolveNote] = useState('');
 
-  const sortedAlerts = [...alerts].sort((a: any, b: any) => {
+  const sortedAlerts = ([...alerts] as unknown as RedFlagAlertWithPatient[]).sort((a: RedFlagAlertWithPatient, b: RedFlagAlertWithPatient) => {
     const sa = severityOrder[a.severity as keyof typeof severityOrder] ?? 3;
     const sb = severityOrder[b.severity as keyof typeof severityOrder] ?? 3;
     if (sa !== sb) return sa - sb;
@@ -91,15 +96,15 @@ export default function AlertsScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <FlatList
-        data={sortedAlerts}
-        keyExtractor={(item: any) => item.id}
-        renderItem={({ item }: { item: any }) => {
+        data={sortedAlerts as RedFlagAlertWithPatient[]}
+        keyExtractor={(item: RedFlagAlertWithPatient) => item.id}
+        renderItem={({ item }: { item: RedFlagAlertWithPatient }) => {
           const config =
             severityConfig[item.severity] ?? severityConfig.yellow;
           const isResolving = resolveId === item.id;
 
           return (
-            <Card style={[styles.alertCard, { backgroundColor: config.bg }]}>
+            <Card style={[styles.alertCard, { backgroundColor: config.bg }] as any}>
               <View style={styles.alertHeader}>
                 <Badge
                   label={config.label}

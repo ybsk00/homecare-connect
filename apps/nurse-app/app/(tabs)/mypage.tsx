@@ -14,37 +14,40 @@ import { useAuth } from '@/hooks/useAuth';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
+import { getNurseMonthlyVisits } from '@homecare/supabase-client';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Colors, Spacing, FontSize, BorderRadius, Shadow } from '@/constants/theme';
-import { getMonthRange } from '@homecare/shared-utils';
+// getMonthRange returns strings, but getNurseMonthlyVisits expects year/month numbers
+
+interface VisitStat {
+  id: string;
+  status: string;
+  actual_duration_min: number | null;
+  scheduled_date: string;
+}
 
 export default function MyPageScreen() {
   const { profile, staffInfo, signOut } = useAuth();
   const { pendingSyncCount, manualSync, isSyncing, isOnline } = useOfflineSync();
 
-  const monthRange = getMonthRange();
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
 
   const statsQuery = useQuery({
-    queryKey: ['nurseMonthlyStats', staffInfo?.id, monthRange.start],
+    queryKey: ['nurseMonthlyStats', staffInfo?.id, currentYear, currentMonth],
     queryFn: async () => {
       if (!staffInfo?.id) return null;
 
-      const { data: visits, error } = await supabase
-        .from('visits')
-        .select('id, status, actual_duration_min, scheduled_date')
-        .eq('nurse_id', staffInfo.id)
-        .gte('scheduled_date', monthRange.start)
-        .lte('scheduled_date', monthRange.end);
-
-      if (error) throw error;
+      const visits = await getNurseMonthlyVisits(supabase, staffInfo.id, currentYear, currentMonth);
 
       const total = visits?.length ?? 0;
       const completed =
-        visits?.filter((v: any) => v.status === 'completed').length ?? 0;
+        visits?.filter((v: VisitStat) => v.status === 'completed').length ?? 0;
       const totalMinutes =
         visits?.reduce(
-          (sum: number, v: any) => sum + (v.actual_duration_min ?? 0),
+          (sum: number, v: VisitStat) => sum + (v.actual_duration_min ?? 0),
           0,
         ) ?? 0;
       const avgMinutes =

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
+import { getVisitDetail } from '@homecare/supabase-client';
 import { PatientBrief } from '@/components/patient/PatientBrief';
 import { VisitStatusBadge } from '@/components/visit/VisitStatusBadge';
 import { Button } from '@/components/ui/Button';
@@ -11,33 +12,36 @@ import { Loading } from '@/components/ui/Loading';
 import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
 import { formatDate, formatDuration } from '@homecare/shared-utils';
 
+interface VisitPatient {
+  id: string;
+  full_name: string;
+  birth_date: string;
+  gender: 'male' | 'female';
+  address: string;
+  address_detail: string | null;
+  care_grade: string | null;
+  mobility: string | null;
+  primary_diagnosis: string | null;
+  current_medications: unknown[];
+  allergies: unknown[];
+  special_notes: string | null;
+  phone: string | null;
+}
+
+interface VisitServicePlan {
+  id: string;
+  care_items: unknown;
+  goals: string | null;
+  precautions: string | null;
+}
+
 export default function VisitDetailScreen() {
   const { visitId } = useLocalSearchParams<{ visitId: string }>();
 
   const query = useQuery({
     queryKey: ['visitDetail', visitId],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('visits')
-        .select(
-          `
-          *,
-          patient:patients (
-            id, full_name, birth_date, gender, address, address_detail,
-            care_grade, mobility, primary_diagnosis, current_medications,
-            allergies, special_notes, phone
-          ),
-          service_plan:service_plans (
-            id, care_items, goals, precautions
-          ),
-          visit_record:visit_records (*)
-        `,
-        )
-        .eq('id', visitId)
-        .single();
-
-      if (error) throw error;
-      return data;
+      return await getVisitDetail(supabase, visitId!);
     },
     enabled: !!visitId,
   });
@@ -57,8 +61,8 @@ export default function VisitDetailScreen() {
     );
   }
 
-  const patient = visit.patient as any;
-  const plan = visit.service_plan as any;
+  const patient = (visit as any).patient as VisitPatient | null;
+  const plan = (visit as any).service_plan as VisitServicePlan | null;
   const isActionable =
     visit.status === 'scheduled' || visit.status === 'en_route';
   const isInProgress =
@@ -115,7 +119,7 @@ export default function VisitDetailScreen() {
           careGrade={patient.care_grade}
           mobility={patient.mobility}
           diagnosis={patient.primary_diagnosis}
-          allergies={patient.allergies}
+          allergies={patient.allergies as string[]}
           specialNotes={patient.special_notes}
         />
       )}

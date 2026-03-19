@@ -104,7 +104,7 @@ export default function RegisterPage() {
         role: 'org_admin',
         full_name: fullName,
         phone,
-      });
+      } as never);
 
       if (profileError) {
         setError('프로필 생성 실패: ' + profileError.message);
@@ -120,7 +120,7 @@ export default function RegisterPage() {
         address,
         location: 'POINT(127.0 37.5)',
         services: selectedServices,
-      });
+      } as never);
 
       if (orgError) {
         setError('기관 등록 실패: ' + orgError.message);

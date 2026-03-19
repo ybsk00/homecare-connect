@@ -99,7 +99,7 @@ export default function BillingPage() {
         .from('organizations')
         .select('id')
         .eq('owner_id', user.id)
-        .single();
+        .single() as { data: { id: string } | null };
 
       if (!org) return null;
 
@@ -127,7 +127,7 @@ export default function BillingPage() {
         .from('organizations')
         .select('id')
         .eq('owner_id', user.id)
-        .single();
+        .single() as { data: { id: string } | null };
 
       if (!org) return [];
 

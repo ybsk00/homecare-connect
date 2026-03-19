@@ -39,6 +39,7 @@ export interface Database {
           avatar_url?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -113,6 +114,7 @@ export interface Database {
           status?: 'active' | 'paused' | 'discharged';
           updated_at?: string;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -145,6 +147,7 @@ export interface Database {
           is_primary?: boolean;
           notification_mode?: 'all' | 'summary' | 'alert_only';
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -240,6 +243,7 @@ export interface Database {
           subscription_plan?: 'free' | 'basic' | 'pro' | 'enterprise';
           updated_at?: string;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -281,6 +285,7 @@ export interface Database {
           current_patient_count?: number;
           is_active?: boolean;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -373,6 +378,7 @@ export interface Database {
           expires_at?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -441,6 +447,7 @@ export interface Database {
           end_date?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -533,6 +540,7 @@ export interface Database {
           reschedule_from?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -646,6 +654,7 @@ export interface Database {
           synced_at?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -711,6 +720,7 @@ export interface Database {
           resolution_note?: string | null;
           resolved_at?: string | null;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -794,6 +804,7 @@ export interface Database {
           doctor_visit_date?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -841,6 +852,7 @@ export interface Database {
           push_sent?: boolean;
           kakao_sent?: boolean;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -876,6 +888,7 @@ export interface Database {
           attachments?: string[];
           read_by?: string[];
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -926,6 +939,7 @@ export interface Database {
           is_visible?: boolean;
           updated_at?: string;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -978,6 +992,7 @@ export interface Database {
           cancelled_at?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -1019,6 +1034,7 @@ export interface Database {
           paid_at?: string | null;
           receipt_url?: string | null;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -1069,6 +1085,7 @@ export interface Database {
           is_active?: boolean;
           updated_at?: string;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -1110,6 +1127,7 @@ export interface Database {
           is_active?: boolean;
           updated_at?: string;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -1142,6 +1160,7 @@ export interface Database {
           is_active?: boolean;
           updated_at?: string;
         };
+        Relationships: [];
       };
 
       // =====================================================
@@ -1180,8 +1199,11 @@ export interface Database {
           user_agent?: string | null;
           details?: Record<string, unknown>;
         };
+        Relationships: [];
       };
     };
+
+    Views: Record<string, never>;
 
     Functions: {
       find_matching_organizations: {

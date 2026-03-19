@@ -21,21 +21,7 @@ import {
   getVitalUnit,
   type VitalRanges,
 } from '@homecare/shared-utils';
-
-function getSanctuaryColor(status: string): string {
-  switch (status) {
-    case 'normal':
-      return Colors.secondary;
-    case 'warning':
-    case 'caution':
-      return Colors.tertiary;
-    case 'critical':
-    case 'danger':
-      return '#BA1A1A';
-    default:
-      return Colors.onSurfaceVariant;
-  }
-}
+import { getSanctuaryVitalColor } from '@/utils/colors';
 
 export default function CheckoutScreen() {
   const { visitId } = useLocalSearchParams<{ visitId: string }>();
@@ -118,7 +104,7 @@ export default function CheckoutScreen() {
               }
               const vitalKey = key as keyof VitalRanges;
               const status = getVitalStatus(vitalKey, value);
-              const statusColor = getSanctuaryColor(status);
+              const statusColor = getSanctuaryVitalColor(status);
 
               return (
                 <View key={key} style={styles.vitalItem}>

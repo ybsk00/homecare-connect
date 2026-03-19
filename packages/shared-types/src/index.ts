@@ -24,6 +24,36 @@ export type {
   ApiError,
 } from './api';
 
+// View/UI 타입
+export type {
+  BadgeColor,
+  DashboardStats,
+  DailyChartData,
+  VisitSummary,
+  VisitSlotData,
+  VisitWithPatient,
+  VisitFormData,
+  NurseSchedule,
+  StaffRow,
+  StaffMember,
+  VitalDataPoint,
+  Vitals,
+  OrganizationView,
+  OrgDetail,
+  OrgReviewData,
+  ServiceStats,
+  SupportTicket,
+  SubscriptionView,
+  AdvertisementView,
+  RedFlagStats,
+  ReportStats,
+  ChatStats,
+  AiCostEstimate,
+  RagDocument,
+  DocumentGroup,
+  ChatMessage,
+} from './views';
+
 // Enum 타입 및 상수
 export {
   UserRole,

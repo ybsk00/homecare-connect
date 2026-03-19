@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import AdminTopBar from '@/components/layout/AdminTopBar';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -9,29 +10,10 @@ import Input from '@/components/ui/Input';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { formatDate } from '@homecare/shared-utils';
 import { Upload, BookOpen, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
-
-interface RagDocument {
-  id: string;
-  title: string;
-  source: string;
-  content: string;
-  chunk_index: number;
-  is_active: boolean;
-  metadata: Record<string, unknown>;
-  created_at: string;
-}
-
-interface DocumentGroup {
-  title: string;
-  source: string;
-  chunks: RagDocument[];
-  is_active: boolean;
-  created_at: string;
-}
+import type { RagDocument, DocumentGroup } from '@homecare/shared-types';
 
 export default function RagPage() {
-  const [documentGroups, setDocumentGroups] = useState<DocumentGroup[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [uploadTitle, setUploadTitle] = useState('');
@@ -39,13 +21,9 @@ export default function RagPage() {
   const [uploadContent, setUploadContent] = useState('');
   const [uploading, setUploading] = useState(false);
 
-  useEffect(() => {
-    fetchDocuments();
-  }, []);
-
-  async function fetchDocuments() {
-    setLoading(true);
-    try {
+  const { data: documentGroups = [], isLoading: loading, error } = useQuery({
+    queryKey: ['admin-rag-documents'],
+    queryFn: async () => {
       const supabase = createBrowserSupabaseClient();
       const { data, error } = await supabase
         .from('rag_documents')
@@ -70,12 +48,12 @@ export default function RagPage() {
         groups.get(key)!.chunks.push(doc);
       });
 
-      setDocumentGroups(Array.from(groups.values()));
-    } catch (err) {
-      console.error('RAG 문서 조회 실패:', err);
-    } finally {
-      setLoading(false);
-    }
+      return Array.from(groups.values());
+    },
+  });
+
+  function invalidateDocuments() {
+    queryClient.invalidateQueries({ queryKey: ['admin-rag-documents'] });
   }
 
   async function handleToggleActive(group: DocumentGroup) {
@@ -86,11 +64,11 @@ export default function RagPage() {
       const chunkIds = group.chunks.map((c) => c.id);
       const { error } = await supabase
         .from('rag_documents')
-        .update({ is_active: newActive })
+        .update({ is_active: newActive } as never)
         .in('id', chunkIds);
 
       if (error) throw error;
-      fetchDocuments();
+      invalidateDocuments();
     } catch (err) {
       console.error('문서 상태 변경 실패:', err);
     }
@@ -109,7 +87,7 @@ export default function RagPage() {
         .in('id', chunkIds);
 
       if (error) throw error;
-      fetchDocuments();
+      invalidateDocuments();
     } catch (err) {
       console.error('문서 삭제 실패:', err);
     }
@@ -142,14 +120,14 @@ export default function RagPage() {
         metadata: { total_chunks: chunks.length, uploaded_by: 'admin' },
       }));
 
-      const { error } = await supabase.from('rag_documents').insert(records);
+      const { error } = await supabase.from('rag_documents').insert(records as never[]);
       if (error) throw error;
 
       setUploadTitle('');
       setUploadSource('');
       setUploadContent('');
       setShowUploadForm(false);
-      fetchDocuments();
+      invalidateDocuments();
     } catch (err) {
       console.error('문서 업로드 실패:', err);
     } finally {
@@ -225,8 +203,18 @@ export default function RagPage() {
           </Card>
         )}
 
+        {/* Error state */}
+        {error && (
+          <Card>
+            <div className="flex flex-col items-center justify-center py-16 text-primary-400">
+              <p className="text-sm font-semibold text-danger-600 mb-2">RAG 문서를 불러오지 못했습니다.</p>
+              <p className="text-xs text-primary-300">{(error as Error).message}</p>
+            </div>
+          </Card>
+        )}
+
         {/* Document Cards Grid */}
-        {loading ? (
+        {!error && loading ? (
           <div className="flex items-center justify-center py-16">
             <div className="w-8 h-8 border-[3px] border-primary-100 border-t-secondary-600 rounded-full animate-spin" />
           </div>

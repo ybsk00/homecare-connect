@@ -251,7 +251,7 @@ export default function MemoScreen() {
       {/* Voice memo */}
       <Card style={styles.section}>
         <VoiceMemo
-          voiceMemoUri={formData.voiceMemoUri}
+          voiceMemoUri={formData.voiceMemoUri ?? null}
           onVoiceMemoChange={(uri) => saveMemo({ voiceMemoUri: uri })}
         />
       </Card>

@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
 import { useVisitStore, type VisitWithPatient } from '@/stores/visit-store';
 import { getToday } from '@homecare/shared-utils';
+import { getVisitsByNurseDate } from '@homecare/supabase-client';
 
 export function useTodayVisits() {
   const staffInfo = useAuthStore((s) => s.staffInfo);
@@ -18,37 +19,8 @@ export function useTodayVisits() {
     queryFn: async () => {
       if (!staffInfo?.id) return [];
 
-      const { data, error } = await supabase
-        .from('visits')
-        .select(
-          `
-          *,
-          patient:patients (
-            id,
-            full_name,
-            address,
-            address_detail,
-            care_grade,
-            mobility,
-            primary_diagnosis,
-            special_notes,
-            phone
-          ),
-          visit_record:visit_records (
-            id,
-            vitals,
-            performed_items,
-            nurse_note
-          )
-        `,
-        )
-        .eq('nurse_id', staffInfo.id)
-        .eq('scheduled_date', today)
-        .neq('status', 'cancelled')
-        .order('visit_order', { ascending: true, nullsFirst: false });
-
-      if (error) throw error;
-      return (data ?? []) as VisitWithPatient[];
+      const data = await getVisitsByNurseDate(supabase, staffInfo.id, today);
+      return (data ?? []) as unknown as VisitWithPatient[];
     },
     enabled: !!staffInfo?.id,
     staleTime: 1000 * 60,

@@ -2,20 +2,9 @@
 
 import { clsx } from 'clsx';
 import { VisitSlot } from './VisitSlot';
+import type { NurseSchedule } from '@homecare/shared-types';
 
 const DAY_LABELS = ['월', '화', '수', '목', '금', '토', '일'];
-
-interface NurseSchedule {
-  nurse_id: string;
-  nurse_name: string;
-  visits: {
-    id: string;
-    patient_name: string;
-    scheduled_time: string | null;
-    scheduled_date: string;
-    status: string;
-  }[];
-}
 
 interface ScheduleCalendarProps {
   nurses: NurseSchedule[];

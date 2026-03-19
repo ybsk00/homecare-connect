@@ -132,7 +132,7 @@ export default function SettingsPage() {
           service_area_km: Number(serviceAreaKm),
           services,
           operating_hours: operatingHours,
-        })
+        } as never)
         .eq('id', org.id)
         .select()
         .single();

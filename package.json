@@ -11,10 +11,17 @@
     "gen-types": "turbo gen-types"
   },
   "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.4.0",
     "turbo": "^2.4.0",
     "typescript": "^5.7.0",
-    "prettier": "^3.4.0",
-    "eslint": "^9.0.0"
+    "vitest": "^4.1.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@types/react": "~18.3.0"
+    }
   },
   "packageManager": "pnpm@9.15.0",
   "engines": {

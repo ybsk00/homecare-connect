@@ -1,13 +1,7 @@
 'use client';
 
 import { clsx } from 'clsx';
-
-interface VisitSlotData {
-  id: string;
-  patient_name: string;
-  scheduled_time: string | null;
-  status: string;
-}
+import type { VisitSlotData } from '@homecare/shared-types';
 
 const statusColors: Record<string, string> = {
   scheduled: 'bg-primary/10 text-primary',

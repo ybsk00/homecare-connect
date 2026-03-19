@@ -38,7 +38,7 @@ export default function AdminLoginPage() {
         .eq('id', data.user.id)
         .single();
 
-      if (profileError || profile?.role !== 'platform_admin') {
+      if (profileError || (profile as { role: string } | null)?.role !== 'platform_admin') {
         await supabase.auth.signOut();
         setError('플랫폼 관리자 권한이 없습니다.');
         return;

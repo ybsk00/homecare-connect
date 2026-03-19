@@ -43,3 +43,24 @@ export {
   markAllAsRead,
   getUnreadCount,
 } from './queries/notifications';
+
+// Queries - Alerts (Red Flags)
+export {
+  getRedFlagAlerts,
+  acknowledgeRedFlagAlert,
+  resolveRedFlagAlert,
+} from './queries/alerts';
+
+// Queries - Profiles
+export {
+  getProfile,
+  updateProfile,
+} from './queries/profiles';
+
+// Queries - Records
+export {
+  getLatestVitalsByPatients,
+  getServicePlanCareItems,
+  getNurseMonthlyVisits,
+  getPatientsByNurse,
+} from './queries/records';

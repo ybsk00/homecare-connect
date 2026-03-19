@@ -3,6 +3,9 @@
 import { useRouter } from 'next/navigation';
 import { Table, type Column } from '@/components/ui/Table';
 import { Badge } from '@/components/ui/Badge';
+import type { StaffRow } from '@homecare/shared-types';
+
+export type { StaffRow };
 
 const staffTypeLabels: Record<string, string> = {
   nurse: '간호사',
@@ -10,19 +13,6 @@ const staffTypeLabels: Record<string, string> = {
   physio: '물리치료사',
   caregiver: '요양보호사',
 };
-
-export interface StaffRow {
-  id: string;
-  user_id: string;
-  staff_type: string;
-  full_name: string;
-  phone: string;
-  specialties: string[];
-  current_patient_count: number;
-  max_patients: number;
-  is_active: boolean;
-  today_visits: number;
-}
 
 interface StaffTableProps {
   staff: StaffRow[];

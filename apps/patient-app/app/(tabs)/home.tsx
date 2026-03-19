@@ -24,6 +24,15 @@ import {
   formatDateWithDay,
   formatServiceType,
 } from '@homecare/shared-utils';
+import type { Tables } from '@homecare/shared-types';
+
+type VisitWithNurse = Tables<'visits'> & {
+  nurse?: {
+    id: string;
+    staff_type: string;
+    user?: { full_name: string; avatar_url: string | null } | null;
+  } | null;
+};
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -93,7 +102,7 @@ export default function HomeScreen() {
               {todayVisits.isLoading ? (
                 <Loading message="방문 정보 로딩..." size="small" />
               ) : todayVisits.data?.data && todayVisits.data.data.length > 0 ? (
-                todayVisits.data.data.map((visit: any) => {
+                (todayVisits.data.data as any[]).map((visit: VisitWithNurse) => {
                   const nurseName = visit.nurse?.user?.full_name;
                   const statusLabel = formatVisitStatus(visit.status);
                   return (
@@ -195,7 +204,7 @@ export default function HomeScreen() {
               {upcomingVisits.isLoading ? (
                 <Loading size="small" />
               ) : upcomingVisits.data && upcomingVisits.data.length > 0 ? (
-                upcomingVisits.data.slice(0, 3).map((visit: any) => (
+                (upcomingVisits.data as any[]).slice(0, 3).map((visit: VisitWithNurse) => (
                   <TouchableOpacity
                     key={visit.id}
                     onPress={() => router.push(`/visit/${visit.id}`)}

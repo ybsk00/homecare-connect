@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import AdminTopBar from '@/components/layout/AdminTopBar';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -9,24 +10,7 @@ import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { formatDateTime } from '@homecare/shared-utils';
 import { clsx } from 'clsx';
 import { MessageSquare, Send } from 'lucide-react';
-
-type BadgeColor = 'gray' | 'green' | 'yellow' | 'red' | 'blue' | 'navy' | 'teal' | 'brown' | 'purple';
-
-interface SupportTicket {
-  id: string;
-  user_id: string;
-  type: string;
-  title: string;
-  body: string;
-  data: Record<string, unknown>;
-  read: boolean;
-  created_at: string;
-  profile?: {
-    full_name: string;
-    role: string;
-    phone: string;
-  };
-}
+import type { BadgeColor, SupportTicket } from '@homecare/shared-types';
 
 type StatusKey = 'unread' | 'in_progress' | 'resolved';
 
@@ -37,16 +21,15 @@ const statusConfig: Record<StatusKey, { label: string; color: BadgeColor }> = {
 };
 
 export default function SupportPage() {
-  const [tickets, setTickets] = useState<SupportTicket[]>([]);
-  const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<StatusKey | 'all'>('all');
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
   const [reply, setReply] = useState('');
   const [replyLoading, setReplyLoading] = useState(false);
+  const queryClient = useQueryClient();
 
-  const fetchTickets = useCallback(async () => {
-    setLoading(true);
-    try {
+  const { data: tickets = [], isLoading: loading, error } = useQuery({
+    queryKey: ['admin-support-tickets', activeFilter],
+    queryFn: async () => {
       const supabase = createBrowserSupabaseClient();
 
       let query = supabase
@@ -65,17 +48,9 @@ export default function SupportPage() {
 
       const { data, error } = await query;
       if (error) throw error;
-      setTickets((data as unknown as SupportTicket[]) || []);
-    } catch (err) {
-      console.error('민원 목록 조회 실패:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [activeFilter]);
-
-  useEffect(() => {
-    fetchTickets();
-  }, [fetchTickets]);
+      return (data as unknown as SupportTicket[]) || [];
+    },
+  });
 
   function getTicketStatus(ticket: SupportTicket): StatusKey {
     const status = (ticket.data?.status as string) || '';
@@ -100,9 +75,9 @@ export default function SupportPage() {
       await supabase
         .from('notifications')
         .update({
-          read: true,
-          data: updatedData,
-        })
+          read: true as const,
+          data: updatedData as Record<string, unknown>,
+        } as never)
         .eq('id', selectedTicket.id);
 
       await supabase.from('notifications').insert({
@@ -112,11 +87,11 @@ export default function SupportPage() {
         body: reply,
         data: { original_ticket_id: selectedTicket.id },
         channels: ['in_app', 'push'],
-      });
+      } as never);
 
       setReply('');
       setSelectedTicket(null);
-      fetchTickets();
+      queryClient.invalidateQueries({ queryKey: ['admin-support-tickets'] });
     } catch (err) {
       console.error('답변 등록 실패:', err);
     } finally {
@@ -133,11 +108,11 @@ export default function SupportPage() {
       await supabase
         .from('notifications')
         .update({
-          data: { ...ticket.data, status: 'in_progress' },
-        })
+          data: { ...ticket.data, status: 'in_progress' } as Record<string, unknown>,
+        } as never)
         .eq('id', ticketId);
 
-      fetchTickets();
+      queryClient.invalidateQueries({ queryKey: ['admin-support-tickets'] });
     } catch (err) {
       console.error('상태 변경 실패:', err);
     }
@@ -184,7 +159,12 @@ export default function SupportPage() {
 
             {/* Ticket List */}
             <div className="space-y-2 max-h-[calc(100vh-240px)] overflow-y-auto pr-1">
-              {loading ? (
+              {error ? (
+                <div className="text-center py-16">
+                  <p className="text-sm font-semibold text-danger-600 mb-2">민원 목록을 불러오지 못했습니다.</p>
+                  <p className="text-xs text-primary-300">{(error as Error).message}</p>
+                </div>
+              ) : loading ? (
                 <div className="flex items-center justify-center py-16">
                   <div className="w-6 h-6 border-[3px] border-primary-100 border-t-secondary-600 rounded-full animate-spin" />
                 </div>

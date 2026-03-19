@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import AdminTopBar from '@/components/layout/AdminTopBar';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -10,26 +11,9 @@ import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { formatDate, formatCurrency } from '@homecare/shared-utils';
 import { clsx } from 'clsx';
 import { DollarSign, BarChart3, CheckCircle, CheckCircle2 } from 'lucide-react';
+import type { BadgeColor, AdvertisementView as Advertisement } from '@homecare/shared-types';
 
-type BadgeColor = 'gray' | 'green' | 'yellow' | 'red' | 'blue' | 'navy' | 'teal' | 'brown' | 'purple';
 type TabKey = 'pending' | 'approved' | 'rejected';
-
-interface Advertisement {
-  id: string;
-  org_id: string;
-  ad_type: string;
-  target_area: string | null;
-  content: unknown;
-  review_status: string;
-  start_date: string | null;
-  end_date: string | null;
-  monthly_fee: number | null;
-  is_active: boolean;
-  created_at: string;
-  organization?: {
-    name: string;
-  };
-}
 
 const adTypeLabels: Record<string, string> = {
   search_top: '검색 상위 노출',
@@ -61,19 +45,15 @@ const adRegulationChecklist = [
 
 export default function AdsPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('pending');
-  const [ads, setAds] = useState<Advertisement[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [counts, setCounts] = useState<Record<TabKey, number>>({ pending: 0, approved: 0, rejected: 0 });
-  const [totalRevenue, setTotalRevenue] = useState(0);
   const [selectedAd, setSelectedAd] = useState<Advertisement | null>(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [checkedItems, setCheckedItems] = useState<boolean[]>(new Array(adRegulationChecklist.length).fill(false));
+  const queryClient = useQueryClient();
 
-  const fetchAds = useCallback(async () => {
-    setLoading(true);
-    try {
+  const { data: ads = [], isLoading: loading, error } = useQuery({
+    queryKey: ['admin-ads', activeTab],
+    queryFn: async () => {
       const supabase = createBrowserSupabaseClient();
-
       const { data, error } = await supabase
         .from('advertisements')
         .select('*, organization:organizations (name)')
@@ -81,8 +61,14 @@ export default function AdsPage() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setAds((data as unknown as Advertisement[]) || []);
+      return (data as unknown as Advertisement[]) || [];
+    },
+  });
 
+  const { data: counts = { pending: 0, approved: 0, rejected: 0 } } = useQuery({
+    queryKey: ['admin-ads-counts'],
+    queryFn: async () => {
+      const supabase = createBrowserSupabaseClient();
       const countPromises = tabs.map(async (tab) => {
         const { count } = await supabase
           .from('advertisements')
@@ -94,26 +80,29 @@ export default function AdsPage() {
       const countResults = await Promise.all(countPromises);
       const newCounts: Record<TabKey, number> = { pending: 0, approved: 0, rejected: 0 };
       countResults.forEach((r) => { newCounts[r.key] = r.count; });
-      setCounts(newCounts);
+      return newCounts;
+    },
+  });
 
+  const { data: totalRevenue = 0 } = useQuery({
+    queryKey: ['admin-ads-revenue'],
+    queryFn: async () => {
+      const supabase = createBrowserSupabaseClient();
       const { data: activeAds } = await supabase
         .from('advertisements')
         .select('monthly_fee')
         .eq('review_status', 'approved')
         .eq('is_active', true);
 
-      const revenue = activeAds?.reduce((sum, ad) => sum + (ad.monthly_fee ?? 0), 0) ?? 0;
-      setTotalRevenue(revenue);
-    } catch (err) {
-      console.error('광고 목록 조회 실패:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [activeTab]);
+      return (activeAds as { monthly_fee: number | null }[] | null)?.reduce((sum: number, ad: { monthly_fee: number | null }) => sum + (ad.monthly_fee ?? 0), 0) ?? 0;
+    },
+  });
 
-  useEffect(() => {
-    fetchAds();
-  }, [fetchAds]);
+  function invalidateAds() {
+    queryClient.invalidateQueries({ queryKey: ['admin-ads'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-ads-counts'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-ads-revenue'] });
+  }
 
   async function handleApprove(adId: string) {
     try {
@@ -124,12 +113,12 @@ export default function AdsPage() {
           review_status: 'approved',
           reviewed_at: new Date().toISOString(),
           is_active: true,
-        })
+        } as never)
         .eq('id', adId);
       setShowReviewModal(false);
       setSelectedAd(null);
       setCheckedItems(new Array(adRegulationChecklist.length).fill(false));
-      fetchAds();
+      invalidateAds();
     } catch (err) {
       console.error('광고 승인 실패:', err);
     }
@@ -144,12 +133,12 @@ export default function AdsPage() {
           review_status: 'rejected',
           reviewed_at: new Date().toISOString(),
           is_active: false,
-        })
+        } as never)
         .eq('id', adId);
       setShowReviewModal(false);
       setSelectedAd(null);
       setCheckedItems(new Array(adRegulationChecklist.length).fill(false));
-      fetchAds();
+      invalidateAds();
     } catch (err) {
       console.error('광고 거절 실패:', err);
     }
@@ -222,8 +211,18 @@ export default function AdsPage() {
           ))}
         </div>
 
+        {/* Error state */}
+        {error && (
+          <Card>
+            <div className="flex flex-col items-center justify-center py-16 text-primary-400">
+              <p className="text-sm font-semibold text-danger-600 mb-2">광고 목록을 불러오지 못했습니다.</p>
+              <p className="text-xs text-primary-300">{(error as Error).message}</p>
+            </div>
+          </Card>
+        )}
+
         {/* Ads Table */}
-        <Card padding={false}>
+        {!error && <Card padding={false}>
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <div className="w-8 h-8 border-[3px] border-primary-100 border-t-secondary-600 rounded-full animate-spin" />
@@ -297,7 +296,7 @@ export default function AdsPage() {
               </table>
             </div>
           )}
-        </Card>
+        </Card>}
 
         {/* Review Modal with Regulation Checklist */}
         <Modal

@@ -105,7 +105,7 @@ export default function RouteScreen() {
           return (
             <Card
               key={visit.id}
-              style={[styles.routeCard, isCompleted && styles.completedCard]}
+              style={[styles.routeCard, isCompleted && styles.completedCard] as any}
               onPress={() => router.push(`/visit/${visit.id}`)}
             >
               <View style={styles.routeHeader}>

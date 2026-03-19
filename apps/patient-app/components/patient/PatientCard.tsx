@@ -37,7 +37,7 @@ export function PatientCard({ patient, relationship, selected, onPress }: Patien
         style={[
           styles.card,
           selected && styles.selected,
-        ]}
+        ] as any}
       >
         <View style={styles.header}>
           <View style={styles.nameRow}>

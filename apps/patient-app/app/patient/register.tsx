@@ -15,6 +15,9 @@ import { Button } from '@/components/ui/Button';
 import { useAuthStore } from '@/stores/auth-store';
 import { useCreatePatient } from '@/hooks/usePatients';
 import { colors, spacing, radius, typography } from '@/constants/theme';
+import type { CareGrade, Mobility } from '@homecare/shared-types';
+
+type PreferredTime = 'morning' | 'afternoon' | 'any';
 
 const GENDER_OPTIONS = [
   { value: 'male', label: '남성' },
@@ -112,8 +115,8 @@ export default function PatientRegisterScreen() {
         address: address.trim(),
         address_detail: addressDetail.trim() || null,
         location: 'POINT(127.0 37.5)',
-        care_grade: (careGrade || null) as any,
-        mobility: (mobility || null) as any,
+        care_grade: (careGrade || null) as CareGrade | null,
+        mobility: (mobility || null) as Mobility | null,
         primary_diagnosis: primaryDiagnosis.trim() || null,
         medical_history: medicalHistory
           .split(',')
@@ -128,7 +131,7 @@ export default function PatientRegisterScreen() {
           .map((s) => s.trim())
           .filter(Boolean),
         needed_services: neededServices,
-        preferred_time: (preferredTime || null) as any,
+        preferred_time: (preferredTime || null) as PreferredTime | null,
         special_notes: specialNotes.trim() || null,
       };
 
@@ -140,8 +143,9 @@ export default function PatientRegisterScreen() {
       Alert.alert('등록 완료', '환자가 등록되었습니다.', [
         { text: '확인', onPress: () => router.back() },
       ]);
-    } catch (error: any) {
-      Alert.alert('오류', error?.message ?? '환자 등록에 실패했습니다.');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : '환자 등록에 실패했습니다.';
+      Alert.alert('오류', message);
     }
   };
 

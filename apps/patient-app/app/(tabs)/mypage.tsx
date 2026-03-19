@@ -100,7 +100,7 @@ export default function MyPageScreen() {
                   style={[
                     styles.patientItem,
                     patient.id === selectedPatientId && styles.patientSelected,
-                  ]}
+                  ] as any}
                 >
                   <View style={styles.patientRow}>
                     <View>

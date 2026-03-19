@@ -18,6 +18,11 @@ import { Badge } from '@/components/ui/Badge';
 import { Loading } from '@/components/ui/Loading';
 import { Colors, Spacing, FontSize, BorderRadius, Shadow } from '@/constants/theme';
 import { formatDateWithDay, formatDuration } from '@homecare/shared-utils';
+import type { Tables } from '@homecare/shared-types';
+
+type RedFlagAlertWithPatient = Tables<'red_flag_alerts'> & {
+  patient?: { id: string; full_name: string; care_grade: string | null } | null;
+};
 
 export default function TodayScreen() {
   const {
@@ -97,7 +102,7 @@ export default function TodayScreen() {
                 <RedFlagBanner
                   severity={latestRedAlert.severity}
                   title={latestRedAlert.title}
-                  patientName={(latestRedAlert as any).patient?.full_name}
+                  patientName={(latestRedAlert as unknown as RedFlagAlertWithPatient).patient?.full_name}
                 />
               </View>
             )}

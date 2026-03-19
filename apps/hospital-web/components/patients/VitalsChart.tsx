@@ -11,17 +11,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
-
-interface VitalDataPoint {
-  date: string;
-  systolic_bp?: number;
-  diastolic_bp?: number;
-  heart_rate?: number;
-  temperature?: number;
-  blood_sugar?: number;
-  spo2?: number;
-  weight?: number;
-}
+import type { VitalDataPoint } from '@homecare/shared-types';
 
 interface VitalsChartProps {
   data: VitalDataPoint[];

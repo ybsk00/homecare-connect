@@ -18,39 +18,54 @@ import {
 } from 'recharts';
 import { BarChart3, TrendingUp, Clock, Star } from 'lucide-react';
 import { clsx } from 'clsx';
+import type { Tables } from '@homecare/shared-types';
 
 export default function StatsPage() {
   const { data: monthlyVisits = [], isLoading: visitsLoading } = useQuery({
     queryKey: ['stats-monthly-visits'],
     queryFn: async () => {
       const supabase = createBrowserSupabaseClient();
-      const months = [];
       const now = new Date();
 
+      // Calculate 6-month date range
+      const rangeStart = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+      const rangeEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      const startStr = rangeStart.toISOString().split('T')[0];
+      const endStr = rangeEnd.toISOString().split('T')[0];
+
+      // Fetch all visits in range with a single query
+      const { data: visits } = await supabase
+        .from('visits')
+        .select('scheduled_date, status')
+        .gte('scheduled_date', startStr)
+        .lte('scheduled_date', endStr);
+
+      // Aggregate by month
+      const monthMap = new Map<string, { total: number; completed: number }>();
       for (let i = 5; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const start = d.toISOString().split('T')[0];
-        const end = new Date(d.getFullYear(), d.getMonth() + 1, 0)
-          .toISOString()
-          .split('T')[0];
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        monthMap.set(key, { total: 0, completed: 0 });
+      }
 
-        const { count: total } = await supabase
-          .from('visits')
-          .select('*', { count: 'exact', head: true })
-          .gte('scheduled_date', start)
-          .lte('scheduled_date', end);
+      ((visits || []) as Pick<Tables<'visits'>, 'scheduled_date' | 'status'>[]).forEach((v) => {
+        const key = v.scheduled_date.substring(0, 7); // "YYYY-MM"
+        const entry = monthMap.get(key);
+        if (entry) {
+          entry.total++;
+          if (v.status === 'completed') entry.completed++;
+        }
+      });
 
-        const { count: completed } = await supabase
-          .from('visits')
-          .select('*', { count: 'exact', head: true })
-          .gte('scheduled_date', start)
-          .lte('scheduled_date', end)
-          .eq('status', 'completed');
-
+      const months: { month: string; total: number; completed: number }[] = [];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        const entry = monthMap.get(key) || { total: 0, completed: 0 };
         months.push({
           month: `${d.getMonth() + 1}월`,
-          total: total || 0,
-          completed: completed || 0,
+          total: entry.total,
+          completed: entry.completed,
         });
       }
 
@@ -66,41 +81,41 @@ export default function StatsPage() {
       monthStart.setDate(1);
       const start = monthStart.toISOString().split('T')[0];
 
-      const { data: staffList } = await supabase
-        .from('staff')
-        .select('id, profiles!inner(full_name)')
-        .eq('is_active', true);
+      // Fetch staff and this month's visits in parallel
+      const [{ data: staffList }, { data: monthVisits }] = await Promise.all([
+        supabase
+          .from('staff')
+          .select('id, profiles!inner(full_name)')
+          .eq('is_active', true),
+        supabase
+          .from('visits')
+          .select('nurse_id, status')
+          .gte('scheduled_date', start),
+      ]);
 
       if (!staffList) return [];
 
-      return Promise.all(
-        staffList.map(async (s: Record<string, unknown>) => {
-          const profile = s.profiles as { full_name: string } | null;
+      // Aggregate visits by nurse_id
+      const visitsByNurse = new Map<string, { total: number; completed: number }>();
+      ((monthVisits || []) as Pick<Tables<'visits'>, 'nurse_id' | 'status'>[]).forEach((v) => {
+        if (!v.nurse_id) return;
+        const entry = visitsByNurse.get(v.nurse_id) || { total: 0, completed: 0 };
+        entry.total++;
+        if (v.status === 'completed') entry.completed++;
+        visitsByNurse.set(v.nurse_id, entry);
+      });
 
-          const { count: totalVisits } = await supabase
-            .from('visits')
-            .select('*', { count: 'exact', head: true })
-            .eq('nurse_id', s.id as string)
-            .gte('scheduled_date', start);
+      return staffList.map((s: Record<string, unknown>) => {
+        const profile = s.profiles as { full_name: string } | null;
+        const stats = visitsByNurse.get(s.id as string) || { total: 0, completed: 0 };
 
-          const { count: completedVisits } = await supabase
-            .from('visits')
-            .select('*', { count: 'exact', head: true })
-            .eq('nurse_id', s.id as string)
-            .gte('scheduled_date', start)
-            .eq('status', 'completed');
-
-          return {
-            name: profile?.full_name || '-',
-            total: totalVisits || 0,
-            completed: completedVisits || 0,
-            rate:
-              totalVisits && totalVisits > 0
-                ? Math.round(((completedVisits || 0) / totalVisits) * 100)
-                : 0,
-          };
-        })
-      );
+        return {
+          name: profile?.full_name || '-',
+          total: stats.total,
+          completed: stats.completed,
+          rate: stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0,
+        };
+      });
     },
   });
 
@@ -119,16 +134,17 @@ export default function StatsPage() {
         .eq('owner_id', user.id)
         .single();
 
-      return org;
+      return org as Pick<Tables<'organizations'>, 'punctuality_rate' | 'rating_avg' | 'review_count'> | null;
     },
   });
 
+  // Rating trend - show current org rating as flat line (no fake random data)
   const ratingTrend = Array.from({ length: 6 }, (_, i) => {
     const d = new Date();
     d.setMonth(d.getMonth() - (5 - i));
     return {
       month: `${d.getMonth() + 1}월`,
-      rating: Number((3.5 + Math.random() * 1.5).toFixed(1)),
+      rating: orgStats?.rating_avg ? Number(orgStats.rating_avg.toFixed(1)) : 0,
     };
   });
 

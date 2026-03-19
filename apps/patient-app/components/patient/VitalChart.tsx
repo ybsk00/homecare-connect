@@ -8,17 +8,7 @@ import {
   getVitalUnit,
 } from '@homecare/shared-utils';
 import type { VitalRanges } from '@homecare/shared-utils';
-
-interface Vitals {
-  systolic_bp?: number;
-  diastolic_bp?: number;
-  heart_rate?: number;
-  temperature?: number;
-  blood_sugar?: number;
-  spo2?: number;
-  weight?: number;
-  respiration_rate?: number;
-}
+import type { Vitals } from '@homecare/shared-types';
 
 interface VitalChartProps {
   vitals: Vitals;

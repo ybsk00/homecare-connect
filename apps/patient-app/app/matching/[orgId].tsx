@@ -19,6 +19,11 @@ import {
   formatPhoneNumber,
   formatDate,
 } from '@homecare/shared-utils';
+import type { Tables } from '@homecare/shared-types';
+
+type ReviewWithGuardian = Tables<'reviews'> & {
+  guardian?: { full_name: string } | null;
+};
 
 export default function OrgDetailScreen() {
   const router = useRouter();
@@ -47,8 +52,9 @@ export default function OrgDetailScreen() {
               Alert.alert('요청 전송', '기관에 요청이 전송되었습니다. 48시간 내 응답을 기다려 주세요.', [
                 { text: '확인', onPress: () => router.replace('/(tabs)/matching') },
               ]);
-            } catch (error: any) {
-              Alert.alert('오류', error?.message ?? '기관 선택에 실패했습니다.');
+            } catch (error: unknown) {
+              const message = error instanceof Error ? error.message : '기관 선택에 실패했습니다.';
+              Alert.alert('오류', message);
             }
           },
         },
@@ -68,7 +74,7 @@ export default function OrgDetailScreen() {
     );
   }
 
-  const reviews = org.reviews ?? [];
+  const reviews = ((org as any).reviews ?? []) as ReviewWithGuardian[];
 
   return (
     <ScrollView
@@ -135,7 +141,7 @@ export default function OrgDetailScreen() {
               <View key={day} style={styles.hoursRow}>
                 <Text style={styles.hoursDay}>{day}</Text>
                 <Text style={styles.hoursTime}>
-                  {(hours as any).start} - {(hours as any).end}
+                  {(hours as { start: string; end: string }).start} - {(hours as { start: string; end: string }).end}
                 </Text>
               </View>
             ))}
@@ -151,7 +157,7 @@ export default function OrgDetailScreen() {
             <Text style={styles.noReview}>아직 리뷰가 없습니다</Text>
           </Card>
         ) : (
-          reviews.slice(0, 5).map((review: any) => (
+          reviews.slice(0, 5).map((review: ReviewWithGuardian) => (
             <Card key={review.id} style={styles.reviewCard}>
               <View style={styles.reviewHeader}>
                 <Text style={styles.reviewAuthor}>

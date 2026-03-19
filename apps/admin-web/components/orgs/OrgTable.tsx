@@ -4,19 +4,7 @@ import { useRouter } from 'next/navigation';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { formatDate, formatOrgType } from '@homecare/shared-utils';
-
-type BadgeColor = 'gray' | 'green' | 'yellow' | 'red' | 'blue' | 'navy' | 'teal' | 'brown' | 'purple';
-
-interface Organization {
-  id: string;
-  name: string;
-  business_number: string;
-  org_type: string;
-  verification_status: string;
-  subscription_plan: string;
-  active_patient_count: number;
-  created_at: string;
-}
+import type { BadgeColor, OrganizationView as Organization } from '@homecare/shared-types';
 
 interface OrgTableProps {
   organizations: Organization[];

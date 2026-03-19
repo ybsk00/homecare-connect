@@ -9,6 +9,8 @@ import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
 import { formatCareGrade, formatDuration } from '@homecare/shared-utils';
 import type { VisitWithPatient } from '@/stores/visit-store';
 
+type VisitWithCareType = VisitWithPatient & { care_type?: string };
+
 interface TodayVisitCardProps {
   visit: VisitWithPatient;
   index: number;
@@ -44,7 +46,7 @@ export function TodayVisitCard({ visit, index }: TodayVisitCardProps) {
   return (
     <Card
       onPress={handlePress}
-      style={[styles.card, isCompleted && styles.completedCard]}
+      style={[styles.card, isCompleted && styles.completedCard] as any}
     >
       {/* Header: Order number + patient info + status */}
       <View style={styles.header}>
@@ -73,9 +75,9 @@ export function TodayVisitCard({ visit, index }: TodayVisitCardProps) {
             size="sm"
           />
         )}
-        {(visit as any).care_type && (
+        {(visit as VisitWithCareType).care_type && (
           <Badge
-            label={careTypeMap[(visit as any).care_type] ?? (visit as any).care_type}
+            label={careTypeMap[(visit as VisitWithCareType).care_type ?? ''] ?? (visit as VisitWithCareType).care_type}
             variant="teal"
             size="sm"
           />

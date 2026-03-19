@@ -10,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
+import { getPatientsByNurse, getLatestVitalsByPatients } from '@homecare/supabase-client';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Loading } from '@/components/ui/Loading';
@@ -21,20 +22,30 @@ import {
   getVitalUnit,
   type VitalRanges,
 } from '@homecare/shared-utils';
+import { getSanctuaryVitalColor } from '@/utils/colors';
 
-function getSanctuaryVitalColor(status: string): string {
-  switch (status) {
-    case 'normal':
-      return Colors.secondary;
-    case 'warning':
-    case 'caution':
-      return Colors.tertiary;
-    case 'critical':
-    case 'danger':
-      return '#BA1A1A';
-    default:
-      return Colors.onSurfaceVariant;
-  }
+interface PatientFromPlan {
+  id: string;
+  full_name: string;
+  birth_date: string;
+  gender: 'male' | 'female';
+  address: string;
+  care_grade: string | null;
+  mobility: string | null;
+  primary_diagnosis: string | null;
+  status: string;
+}
+
+interface PatientWithVitals extends PatientFromPlan {
+  latestVitals: {
+    systolic_bp?: number;
+    diastolic_bp?: number;
+    heart_rate?: number;
+    temperature?: number;
+    blood_sugar?: number;
+    spo2?: number;
+    weight?: number;
+  } | null;
 }
 
 export default function PatientsScreen() {
@@ -45,53 +56,27 @@ export default function PatientsScreen() {
     queryFn: async () => {
       if (!staffInfo?.id) return [];
 
-      const { data: plans, error } = await supabase
-        .from('service_plans')
-        .select(
-          `
-          id,
-          patient:patients (
-            id,
-            full_name,
-            birth_date,
-            gender,
-            address,
-            care_grade,
-            mobility,
-            primary_diagnosis,
-            status
-          )
-        `,
-        )
-        .eq('nurse_id', staffInfo.id)
-        .eq('status', 'active');
+      const plans = await getPatientsByNurse(supabase, staffInfo.id);
 
-      if (error) throw error;
-
-      const patients = (plans ?? [])
-        .map((p: any) => p.patient)
-        .filter(Boolean);
+      const patients = ((plans ?? []) as any[])
+        .map((p: { patient: PatientFromPlan | null }) => p.patient)
+        .filter((p): p is PatientFromPlan => p !== null);
 
       const uniquePatients = Array.from(
-        new Map(patients.map((p: any) => [p.id, p])).values(),
-      ) as any[];
+        new Map(patients.map((p) => [p.id, p])).values(),
+      );
 
-      const patientIds = uniquePatients.map((p: any) => p.id);
-      const { data: recentRecords } = await supabase
-        .from('visit_records')
-        .select('patient_id, vitals, created_at')
-        .in('patient_id', patientIds)
-        .order('created_at', { ascending: false })
-        .limit(patientIds.length);
+      const patientIds = uniquePatients.map((p) => p.id);
+      const recentRecords = await getLatestVitalsByPatients(supabase, patientIds);
 
-      const vitalsMap = new Map<string, any>();
+      const vitalsMap = new Map<string, Record<string, number | undefined>>();
       for (const record of recentRecords ?? []) {
         if (!vitalsMap.has(record.patient_id)) {
           vitalsMap.set(record.patient_id, record.vitals);
         }
       }
 
-      return uniquePatients.map((p: any) => ({
+      return uniquePatients.map((p): PatientWithVitals => ({
         ...p,
         latestVitals: vitalsMap.get(p.id) ?? null,
       }));
@@ -142,8 +127,8 @@ export default function PatientsScreen() {
     <SafeAreaView style={styles.container} edges={['top']}>
       <FlatList
         data={patients}
-        keyExtractor={(item: any) => item.id}
-        renderItem={({ item }: { item: any }) => (
+        keyExtractor={(item: PatientWithVitals) => item.id}
+        renderItem={({ item }: { item: PatientWithVitals }) => (
           <Card style={styles.patientCard}>
             <View style={styles.patientHeader}>
               <View style={styles.avatar}>

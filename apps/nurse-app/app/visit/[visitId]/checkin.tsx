@@ -14,6 +14,10 @@ export default function CheckinScreen() {
   const { visit, checkin } = useVisitFlow(visitId!);
   const todayVisits = useVisitStore((s) => s.todayVisits);
 
+  // TODO: patientLocationWkt는 현재 항상 undefined입니다.
+  // 환자의 실제 주소 좌표(location_geo 컬럼 등)를 patients 테이블에서 가져와
+  // WKT 형식(예: 'POINT(127.0 37.5)')으로 변환하여 전달해야 합니다.
+  // 이 값이 없으면 useLocation의 거리 계산 및 범위 체크가 동작하지 않습니다.
   const patientLocationWkt = useMemo(() => {
     if (!visit?.patient_id) return undefined;
     return undefined;

@@ -10,49 +10,7 @@ import Button from '@/components/ui/Button';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { formatDate, formatOrgType } from '@homecare/shared-utils';
 import { ArrowLeft, Users, Calendar, MapPin } from 'lucide-react';
-
-interface OrgDetail {
-  id: string;
-  name: string;
-  business_number: string;
-  license_number: string | null;
-  org_type: string;
-  address: string;
-  address_detail: string | null;
-  phone: string;
-  email: string | null;
-  website: string | null;
-  description: string | null;
-  services: string[];
-  service_area_km: number;
-  rating_avg: number;
-  review_count: number;
-  active_patient_count: number;
-  verification_status: string;
-  subscription_plan: string;
-  created_at: string;
-  logo_url: string | null;
-}
-
-interface StaffMember {
-  id: string;
-  staff_type: string;
-  license_number: string | null;
-  specialties: string[];
-  current_patient_count: number;
-  max_patients: number;
-  is_active: boolean;
-  user: {
-    full_name: string;
-    phone: string;
-  };
-}
-
-interface ServiceStats {
-  totalPatients: number;
-  activeVisitsThisMonth: number;
-  completedVisitsThisMonth: number;
-}
+import type { OrgDetail, StaffMember, ServiceStats } from '@homecare/shared-types';
 
 export default function OrgDetailPage() {
   const params = useParams();
@@ -142,7 +100,7 @@ export default function OrgDetailPage() {
       const supabase = createBrowserSupabaseClient();
       await supabase
         .from('organizations')
-        .update({ verification_status: 'verified', verified_at: new Date().toISOString() })
+        .update({ verification_status: 'verified', verified_at: new Date().toISOString() } as never)
         .eq('id', id);
       setOrg((prev) => prev ? { ...prev, verification_status: 'verified' } : prev);
     } catch (err) {
@@ -158,7 +116,7 @@ export default function OrgDetailPage() {
       const supabase = createBrowserSupabaseClient();
       await supabase
         .from('organizations')
-        .update({ verification_status: 'rejected' })
+        .update({ verification_status: 'rejected' } as never)
         .eq('id', id);
       setOrg((prev) => prev ? { ...prev, verification_status: 'rejected' } : prev);
     } catch (err) {
@@ -174,7 +132,7 @@ export default function OrgDetailPage() {
       const supabase = createBrowserSupabaseClient();
       await supabase
         .from('organizations')
-        .update({ verification_status: 'suspended' })
+        .update({ verification_status: 'suspended' } as never)
         .eq('id', id);
       setOrg((prev) => prev ? { ...prev, verification_status: 'suspended' } : prev);
     } catch (err) {

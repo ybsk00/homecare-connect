@@ -31,24 +31,24 @@ export default function StaffDetailPage() {
 
       if (!data) return null;
 
+      const staffData = data as Tables<'staff'> & { profiles: { full_name: string; phone: string } | null };
+
       const { count: todayVisitCount } = await supabase
         .from('visits')
         .select('*', { count: 'exact', head: true })
         .eq('nurse_id', staffId)
         .eq('scheduled_date', today);
 
-      const profile = (data as Record<string, unknown>).profiles as { full_name: string; phone: string } | null;
-
       return {
-        id: data.id,
-        user_id: data.user_id,
-        staff_type: data.staff_type,
-        full_name: profile?.full_name || '-',
-        phone: profile?.phone || '-',
-        specialties: data.specialties || [],
-        current_patient_count: data.current_patient_count || 0,
-        max_patients: data.max_patients || 0,
-        is_active: data.is_active ?? true,
+        id: staffData.id,
+        user_id: staffData.user_id,
+        staff_type: staffData.staff_type,
+        full_name: staffData.profiles?.full_name || '-',
+        phone: staffData.profiles?.phone || '-',
+        specialties: staffData.specialties || [],
+        current_patient_count: staffData.current_patient_count || 0,
+        max_patients: staffData.max_patients || 0,
+        is_active: staffData.is_active ?? true,
         today_visits: todayVisitCount || 0,
       } as StaffRow;
     },

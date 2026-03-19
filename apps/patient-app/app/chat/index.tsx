@@ -14,15 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
 import { colors, spacing, radius, typography } from '@/constants/theme';
-
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  sources?: { title: string; source: string }[];
-  actions?: { type: string; label: string; url?: string }[];
-  createdAt: Date;
-}
+import type { ChatMessage as Message } from '@homecare/shared-types';
 
 export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([

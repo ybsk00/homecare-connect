@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import AdminTopBar from '@/components/layout/AdminTopBar';
 import Card from '@/components/ui/Card';
 import StatCard from '@/components/ui/StatCard';
@@ -25,33 +25,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-
-interface RedFlagStats {
-  total: number;
-  red: number;
-  orange: number;
-  yellow: number;
-  falsePositiveRate: number;
-}
-
-interface ReportStats {
-  generating: number;
-  generated: number;
-  doctorReviewed: number;
-  sent: number;
-  error: number;
-}
-
-interface ChatStats {
-  totalConversations: number;
-  escalationRate: number;
-}
-
-interface AiCostEstimate {
-  totalCalls: number;
-  estimatedCost: number;
-  avgCallsPerDay: number;
-}
+import type { RedFlagStats, ReportStats, ChatStats, AiCostEstimate } from '@homecare/shared-types';
 
 /* Warm palette for red flags */
 const SEVERITY_COLORS = {
@@ -67,121 +41,91 @@ const tooltipStyle = {
   padding: '12px 16px',
 };
 
+interface MonitoringData {
+  redFlagStats: RedFlagStats;
+  reportStats: ReportStats;
+  chatStats: ChatStats;
+  aiCost: AiCostEstimate;
+}
+
 export default function MonitoringPage() {
-  const [redFlagStats, setRedFlagStats] = useState<RedFlagStats>({
-    total: 0, red: 0, orange: 0, yellow: 0, falsePositiveRate: 0,
-  });
-  const [reportStats, setReportStats] = useState<ReportStats>({
-    generating: 0, generated: 0, doctorReviewed: 0, sent: 0, error: 0,
-  });
-  const [chatStats, setChatStats] = useState<ChatStats>({
-    totalConversations: 0, escalationRate: 0,
-  });
-  const [aiCost, setAiCost] = useState<AiCostEstimate>({
-    totalCalls: 0, estimatedCost: 0, avgCallsPerDay: 0,
-  });
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading: loading, error } = useQuery<MonitoringData>({
+    queryKey: ['admin-monitoring'],
+    queryFn: async () => {
+      const supabase = createBrowserSupabaseClient();
 
-  useEffect(() => {
-    async function fetchMonitoringData() {
-      try {
-        const supabase = createBrowserSupabaseClient();
+      const [
+        { count: totalAlerts },
+        { count: redCount },
+        { count: orangeCount },
+        { count: yellowCount },
+        { count: falsePositiveCount },
+        { data: reports },
+        { count: chatCount },
+        { count: escalationCount },
+        { count: visitRecordCount },
+      ] = await Promise.all([
+        supabase.from('red_flag_alerts').select('*', { count: 'exact', head: true }),
+        supabase.from('red_flag_alerts').select('*', { count: 'exact', head: true }).eq('severity', 'red'),
+        supabase.from('red_flag_alerts').select('*', { count: 'exact', head: true }).eq('severity', 'orange'),
+        supabase.from('red_flag_alerts').select('*', { count: 'exact', head: true }).eq('severity', 'yellow'),
+        supabase.from('red_flag_alerts').select('*', { count: 'exact', head: true }).eq('status', 'false_positive'),
+        supabase.from('ai_reports').select('status'),
+        supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('type', 'chat_message'),
+        supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('type', 'chat_escalation'),
+        supabase.from('visit_records').select('*', { count: 'exact', head: true }),
+      ]);
 
-        const { count: totalAlerts } = await supabase
-          .from('red_flag_alerts')
-          .select('*', { count: 'exact', head: true });
+      const total = totalAlerts ?? 0;
+      const fpRate = total > 0 ? ((falsePositiveCount ?? 0) / total) * 100 : 0;
 
-        const { count: redCount } = await supabase
-          .from('red_flag_alerts')
-          .select('*', { count: 'exact', head: true })
-          .eq('severity', 'red');
+      const statusCounts = { generating: 0, generated: 0, doctor_reviewed: 0, sent: 0, error: 0 };
+      ((reports || []) as { status: string }[]).forEach((r) => {
+        const key = r.status as keyof typeof statusCounts;
+        if (key in statusCounts) statusCounts[key]++;
+      });
 
-        const { count: orangeCount } = await supabase
-          .from('red_flag_alerts')
-          .select('*', { count: 'exact', head: true })
-          .eq('severity', 'orange');
+      const totalChats = chatCount ?? 0;
+      const escalations = escalationCount ?? 0;
+      const escRate = totalChats > 0 ? (escalations / totalChats) * 100 : 0;
 
-        const { count: yellowCount } = await supabase
-          .from('red_flag_alerts')
-          .select('*', { count: 'exact', head: true })
-          .eq('severity', 'yellow');
+      const totalRecords = visitRecordCount ?? 0;
+      const costPerCall = 50;
+      const estimatedCalls = totalRecords * 2 + totalChats + (reports?.length ?? 0);
+      const estimatedCost = estimatedCalls * costPerCall;
 
-        const { count: falsePositiveCount } = await supabase
-          .from('red_flag_alerts')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'false_positive');
-
-        const total = totalAlerts ?? 0;
-        const fpRate = total > 0 ? ((falsePositiveCount ?? 0) / total) * 100 : 0;
-
-        setRedFlagStats({
+      return {
+        redFlagStats: {
           total,
           red: redCount ?? 0,
           orange: orangeCount ?? 0,
           yellow: yellowCount ?? 0,
           falsePositiveRate: Math.round(fpRate * 10) / 10,
-        });
-
-        const statusCounts = { generating: 0, generated: 0, doctor_reviewed: 0, sent: 0, error: 0 };
-        const { data: reports } = await supabase
-          .from('ai_reports')
-          .select('status');
-
-        (reports || []).forEach((r) => {
-          const key = r.status as keyof typeof statusCounts;
-          if (key in statusCounts) statusCounts[key]++;
-        });
-
-        setReportStats({
+        },
+        reportStats: {
           generating: statusCounts.generating,
           generated: statusCounts.generated,
           doctorReviewed: statusCounts.doctor_reviewed,
           sent: statusCounts.sent,
           error: statusCounts.error,
-        });
-
-        const { count: chatCount } = await supabase
-          .from('notifications')
-          .select('*', { count: 'exact', head: true })
-          .eq('type', 'chat_message');
-
-        const { count: escalationCount } = await supabase
-          .from('notifications')
-          .select('*', { count: 'exact', head: true })
-          .eq('type', 'chat_escalation');
-
-        const totalChats = chatCount ?? 0;
-        const escalations = escalationCount ?? 0;
-        const escRate = totalChats > 0 ? (escalations / totalChats) * 100 : 0;
-
-        setChatStats({
+        },
+        chatStats: {
           totalConversations: totalChats,
           escalationRate: Math.round(escRate * 10) / 10,
-        });
-
-        const { count: visitRecordCount } = await supabase
-          .from('visit_records')
-          .select('*', { count: 'exact', head: true });
-
-        const totalRecords = visitRecordCount ?? 0;
-        const costPerCall = 50;
-        const estimatedCalls = totalRecords * 2 + totalChats + (reports?.length ?? 0);
-        const estimatedCost = estimatedCalls * costPerCall;
-
-        setAiCost({
+        },
+        aiCost: {
           totalCalls: estimatedCalls,
           estimatedCost,
           avgCallsPerDay: Math.round(estimatedCalls / 30),
-        });
-      } catch (err) {
-        console.error('모니터링 데이터 로딩 실패:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
+        },
+      };
+    },
+  });
 
-    fetchMonitoringData();
-  }, []);
+  const redFlagStats = data?.redFlagStats ?? { total: 0, red: 0, orange: 0, yellow: 0, falsePositiveRate: 0 };
+  const reportStats = data?.reportStats ?? { generating: 0, generated: 0, doctorReviewed: 0, sent: 0, error: 0 };
+  const chatStats = data?.chatStats ?? { totalConversations: 0, escalationRate: 0 };
+  const aiCost = data?.aiCost ?? { totalCalls: 0, estimatedCost: 0, avgCallsPerDay: 0 };
 
   const severityPieData = [
     { name: 'RED (긴급)', value: redFlagStats.red, color: SEVERITY_COLORS.red },
@@ -196,6 +140,22 @@ export default function MonitoringPage() {
     { name: '발송완료', count: reportStats.sent },
     { name: '오류', count: reportStats.error },
   ];
+
+  if (error) {
+    return (
+      <div>
+        <AdminTopBar title="AI 모니터링" subtitle="AI 기능별 성능과 비용을 모니터링합니다." />
+        <div className="p-8">
+          <Card>
+            <div className="flex flex-col items-center justify-center py-16 text-primary-400">
+              <p className="text-sm font-semibold text-danger-600 mb-2">모니터링 데이터를 불러오지 못했습니다.</p>
+              <p className="text-xs text-primary-300">{(error as Error).message}</p>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

@@ -32,8 +32,9 @@ export default function LoginScreen() {
     try {
       await signInWithEmail(email.trim(), password);
       router.replace('/(tabs)/home');
-    } catch (error: any) {
-      Alert.alert('로그인 실패', error?.message ?? '이메일 또는 비밀번호를 확인해주세요.');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : '이메일 또는 비밀번호를 확인해주세요.';
+      Alert.alert('로그인 실패', message);
     }
   };
 

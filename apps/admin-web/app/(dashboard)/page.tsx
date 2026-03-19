@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   Building2,
   Heart,
@@ -17,32 +17,13 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from 'recharts';
 import AdminTopBar from '@/components/layout/AdminTopBar';
 import StatCard from '@/components/ui/StatCard';
 import Card from '@/components/ui/Card';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { formatCurrency } from '@homecare/shared-utils';
-
-interface DashboardStats {
-  totalOrgs: number;
-  totalPatients: number;
-  mrr: number;
-  totalStaff: number;
-  orgGrowth: string;
-  patientGrowth: string;
-  mrrGrowth: string;
-  staffGrowth: string;
-}
-
-interface DailyChartData {
-  date: string;
-  matchings: number;
-  visits: number;
-  dau: number;
-  mau: number;
-}
+import type { DashboardStats, DailyChartData } from '@homecare/shared-types';
 
 const tooltipStyle = {
   borderRadius: '16px',
@@ -51,102 +32,157 @@ const tooltipStyle = {
   padding: '12px 16px',
 };
 
-export default function KPIDashboardPage() {
-  const [stats, setStats] = useState<DashboardStats>({
-    totalOrgs: 0,
-    totalPatients: 0,
-    mrr: 0,
-    totalStaff: 0,
-    orgGrowth: '',
-    patientGrowth: '',
-    mrrGrowth: '',
-    staffGrowth: '',
+function getDateRange30Days() {
+  const now = new Date();
+  const end = new Date(now);
+  end.setHours(23, 59, 59, 999);
+  const start = new Date(now);
+  start.setDate(start.getDate() - 29);
+  start.setHours(0, 0, 0, 0);
+  return { start, end };
+}
+
+async function fetchDashboardStats(): Promise<DashboardStats> {
+  const supabase = createBrowserSupabaseClient();
+
+  const now = new Date();
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
+  const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999).toISOString();
+
+  const [
+    { count: orgCount },
+    { count: orgCountLastMonth },
+    { count: patientCount },
+    { count: patientCountLastMonth },
+    { data: subscriptions },
+    { data: subscriptionsLastMonth },
+    { count: staffCount },
+    { count: staffCountLastMonth },
+  ] = await Promise.all([
+    supabase.from('organizations').select('*', { count: 'exact', head: true }).eq('verification_status', 'verified'),
+    supabase.from('organizations').select('*', { count: 'exact', head: true }).eq('verification_status', 'verified').lte('created_at', lastMonthEnd),
+    supabase.from('patients').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('patients').select('*', { count: 'exact', head: true }).eq('status', 'active').lte('created_at', lastMonthEnd),
+    supabase.from('subscriptions').select('amount, plan').eq('status', 'active'),
+    supabase.from('subscriptions').select('amount, plan').eq('status', 'active').lte('created_at', lastMonthEnd),
+    supabase.from('staff').select('*', { count: 'exact', head: true }).eq('is_active', true),
+    supabase.from('staff').select('*', { count: 'exact', head: true }).eq('is_active', true).lte('created_at', lastMonthEnd),
+  ]);
+
+  const mrr = (subscriptions as { amount: number; plan: string }[] | null)?.reduce((sum: number, sub: { amount: number }) => sum + (sub.amount || 0), 0) ?? 0;
+  const mrrLastMonth = (subscriptionsLastMonth as { amount: number; plan: string }[] | null)?.reduce((sum: number, sub: { amount: number }) => sum + (sub.amount || 0), 0) ?? 0;
+
+  function calcGrowth(current: number, previous: number): string {
+    if (previous === 0) return current > 0 ? '신규' : '-';
+    const pct = Math.round(((current - previous) / previous) * 100);
+    if (pct > 0) return `+${pct}% 전월 대비`;
+    if (pct < 0) return `${pct}% 전월 대비`;
+    return '변동 없음';
+  }
+
+  return {
+    totalOrgs: orgCount ?? 0,
+    totalPatients: patientCount ?? 0,
+    mrr,
+    totalStaff: staffCount ?? 0,
+    orgGrowth: calcGrowth(orgCount ?? 0, orgCountLastMonth ?? 0),
+    patientGrowth: calcGrowth(patientCount ?? 0, patientCountLastMonth ?? 0),
+    mrrGrowth: calcGrowth(mrr, mrrLastMonth),
+    staffGrowth: calcGrowth(staffCount ?? 0, staffCountLastMonth ?? 0),
+  };
+}
+
+async function fetchChartData(): Promise<DailyChartData[]> {
+  const supabase = createBrowserSupabaseClient();
+  const { start, end } = getDateRange30Days();
+
+  const [{ data: serviceRequests }, { data: visits }] = await Promise.all([
+    supabase
+      .from('service_requests')
+      .select('created_at')
+      .gte('created_at', start.toISOString())
+      .lte('created_at', end.toISOString()),
+    supabase
+      .from('visits')
+      .select('scheduled_date')
+      .gte('scheduled_date', start.toISOString().split('T')[0])
+      .lte('scheduled_date', end.toISOString().split('T')[0]),
+  ]);
+
+  // Build a map of date -> counts
+  const matchMap = new Map<string, number>();
+  const visitMap = new Map<string, number>();
+
+  ((serviceRequests || []) as { created_at: string }[]).forEach((sr) => {
+    const d = new Date(sr.created_at);
+    const key = d.toISOString().split('T')[0];
+    matchMap.set(key, (matchMap.get(key) || 0) + 1);
   });
-  const [chartData, setChartData] = useState<DailyChartData[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchDashboard() {
-      try {
-        const supabase = createBrowserSupabaseClient();
+  ((visits || []) as { scheduled_date: string }[]).forEach((v) => {
+    const key = v.scheduled_date;
+    visitMap.set(key, (visitMap.get(key) || 0) + 1);
+  });
 
-        const { count: orgCount } = await supabase
-          .from('organizations')
-          .select('*', { count: 'exact', head: true })
-          .eq('verification_status', 'verified');
+  // Generate 30-day array
+  const dailyData: DailyChartData[] = [];
+  const now = new Date();
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    const dateStr = `${d.getMonth() + 1}/${d.getDate()}`;
 
-        const { count: patientCount } = await supabase
-          .from('patients')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'active');
+    dailyData.push({
+      date: dateStr,
+      matchings: matchMap.get(key) || 0,
+      visits: visitMap.get(key) || 0,
+    });
+  }
 
-        const { data: subscriptions } = await supabase
-          .from('subscriptions')
-          .select('amount, plan')
-          .eq('status', 'active');
+  return dailyData;
+}
 
-        const mrr = subscriptions?.reduce((sum, sub) => sum + (sub.amount || 0), 0) ?? 0;
+export default function KPIDashboardPage() {
+  const {
+    data: stats,
+    isLoading: statsLoading,
+    error: statsError,
+  } = useQuery({
+    queryKey: ['admin-dashboard-stats'],
+    queryFn: fetchDashboardStats,
+  });
 
-        const { count: staffCount } = await supabase
-          .from('staff')
-          .select('*', { count: 'exact', head: true })
-          .eq('is_active', true);
+  const {
+    data: chartData,
+    isLoading: chartLoading,
+    error: chartError,
+  } = useQuery({
+    queryKey: ['admin-dashboard-chart'],
+    queryFn: fetchChartData,
+  });
 
-        setStats({
-          totalOrgs: orgCount ?? 0,
-          totalPatients: patientCount ?? 0,
-          mrr,
-          totalStaff: staffCount ?? 0,
-          orgGrowth: '+12% 전월 대비',
-          patientGrowth: '+18% 전월 대비',
-          mrrGrowth: '+23% 전월 대비',
-          staffGrowth: '+8% 전월 대비',
-        });
+  const isLoading = statsLoading || chartLoading;
+  const error = statsError || chartError;
 
-        const now = new Date();
-        const dailyData: DailyChartData[] = [];
-        for (let i = 29; i >= 0; i--) {
-          const d = new Date(now);
-          d.setDate(d.getDate() - i);
-          const dateStr = `${d.getMonth() + 1}/${d.getDate()}`;
+  if (error) {
+    return (
+      <div>
+        <AdminTopBar title="전체 관리자 대시보드" subtitle="플랫폼 전체의 핵심 지표를 한눈에 확인하세요." />
+        <div className="p-8">
+          <Card>
+            <div className="flex flex-col items-center justify-center py-16 text-primary-400">
+              <p className="text-sm font-semibold text-danger-600 mb-2">대시보드 데이터를 불러오지 못했습니다.</p>
+              <p className="text-xs text-primary-300">{(error as Error).message}</p>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
-          const dayStart = new Date(d);
-          dayStart.setHours(0, 0, 0, 0);
-          const dayEnd = new Date(d);
-          dayEnd.setHours(23, 59, 59, 999);
-
-          const { count: matchCount } = await supabase
-            .from('service_requests')
-            .select('*', { count: 'exact', head: true })
-            .gte('created_at', dayStart.toISOString())
-            .lte('created_at', dayEnd.toISOString());
-
-          const { count: visitCount } = await supabase
-            .from('visits')
-            .select('*', { count: 'exact', head: true })
-            .eq('scheduled_date', d.toISOString().split('T')[0]);
-
-          dailyData.push({
-            date: dateStr,
-            matchings: matchCount ?? Math.floor(Math.random() * 20 + 5),
-            visits: visitCount ?? Math.floor(Math.random() * 50 + 10),
-            dau: Math.floor(Math.random() * 200 + 100),
-            mau: Math.floor(Math.random() * 1000 + 500),
-          });
-        }
-
-        setChartData(dailyData);
-      } catch (err) {
-        console.error('대시보드 데이터 로딩 실패:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchDashboard();
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div>
         <AdminTopBar title="전체 관리자 대시보드" subtitle="플랫폼 전체의 핵심 지표를 한눈에 확인하세요." />
@@ -164,6 +200,12 @@ export default function KPIDashboardPage() {
     );
   }
 
+  const safeStats = stats ?? {
+    totalOrgs: 0, totalPatients: 0, mrr: 0, totalStaff: 0,
+    orgGrowth: '-', patientGrowth: '-', mrrGrowth: '-', staffGrowth: '-',
+  };
+  const safeChartData = chartData ?? [];
+
   return (
     <div>
       <AdminTopBar
@@ -175,33 +217,33 @@ export default function KPIDashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard
             title="전체 기관"
-            value={`${stats.totalOrgs.toLocaleString()}개`}
-            change={stats.orgGrowth}
-            changeType="positive"
+            value={`${safeStats.totalOrgs.toLocaleString()}개`}
+            change={safeStats.orgGrowth}
+            changeType={safeStats.orgGrowth.startsWith('+') ? 'positive' : safeStats.orgGrowth.startsWith('-') ? 'negative' : 'neutral'}
             icon={Building2}
             iconColor="bg-secondary-50 text-secondary-700"
           />
           <StatCard
             title="MRR"
-            value={formatCurrency(stats.mrr)}
-            change={stats.mrrGrowth}
-            changeType="positive"
+            value={formatCurrency(safeStats.mrr)}
+            change={safeStats.mrrGrowth}
+            changeType={safeStats.mrrGrowth.startsWith('+') ? 'positive' : safeStats.mrrGrowth.startsWith('-') ? 'negative' : 'neutral'}
             icon={BarChart3}
             iconColor="bg-primary-100 text-primary-800"
           />
           <StatCard
             title="총 환자 수"
-            value={`${stats.totalPatients.toLocaleString()}명`}
-            change={stats.patientGrowth}
-            changeType="positive"
+            value={`${safeStats.totalPatients.toLocaleString()}명`}
+            change={safeStats.patientGrowth}
+            changeType={safeStats.patientGrowth.startsWith('+') ? 'positive' : safeStats.patientGrowth.startsWith('-') ? 'negative' : 'neutral'}
             icon={Heart}
             iconColor="bg-secondary-50 text-secondary-700"
           />
           <StatCard
             title="의료진 수"
-            value={`${stats.totalStaff.toLocaleString()}명`}
-            change={stats.staffGrowth}
-            changeType="positive"
+            value={`${safeStats.totalStaff.toLocaleString()}명`}
+            change={safeStats.staffGrowth}
+            changeType={safeStats.staffGrowth.startsWith('+') ? 'positive' : safeStats.staffGrowth.startsWith('-') ? 'negative' : 'neutral'}
             icon={Stethoscope}
             iconColor="bg-secondary-100 text-secondary-700"
           />
@@ -214,7 +256,7 @@ export default function KPIDashboardPage() {
             <h3 className="text-[15px] font-bold text-primary-900 mb-6">일별 매칭 건수</h3>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
+                <LineChart data={safeChartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e8edf2" vertical={false} />
                   <XAxis
                     dataKey="date"
@@ -247,7 +289,7 @@ export default function KPIDashboardPage() {
             <h3 className="text-[15px] font-bold text-primary-900 mb-6">일별 방문 건수</h3>
             <div className="h-72">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
+                <BarChart data={safeChartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e8edf2" vertical={false} />
                   <XAxis
                     dataKey="date"
@@ -274,49 +316,11 @@ export default function KPIDashboardPage() {
           </Card>
         </div>
 
-        {/* DAU/MAU Trend - Full Width */}
+        {/* Notice about DAU/MAU */}
         <Card>
           <h3 className="text-[15px] font-bold text-primary-900 mb-6">DAU / MAU 추이</h3>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e8edf2" vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 11, fill: '#627d98' }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 11, fill: '#627d98' }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip contentStyle={tooltipStyle} />
-                <Legend
-                  iconType="circle"
-                  wrapperStyle={{ fontSize: '12px', paddingTop: '12px' }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="dau"
-                  name="DAU"
-                  stroke="#002045"
-                  strokeWidth={2.5}
-                  dot={false}
-                  activeDot={{ r: 5, fill: '#002045', strokeWidth: 0 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="mau"
-                  name="MAU"
-                  stroke="#006A63"
-                  strokeWidth={2.5}
-                  dot={false}
-                  activeDot={{ r: 5, fill: '#006A63', strokeWidth: 0 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+          <div className="flex items-center justify-center h-80 text-primary-300">
+            <p className="text-sm">데이터 없음 - 사용자 활동 추적 기능이 활성화되면 표시됩니다.</p>
           </div>
         </Card>
       </div>

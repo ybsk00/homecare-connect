@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
+import { updateVisitStatus, createVisitRecord } from '@homecare/supabase-client';
 import { useAuthStore } from '@/stores/auth-store';
 import { useVisitStore, type VisitFormData } from '@/stores/visit-store';
 import { useOfflineStore } from '@/stores/offline-store';
@@ -37,15 +38,10 @@ export function useVisitFlow(visitId: string) {
 
       if (isOnline) {
         try {
-          await supabase
-            .from('visits')
-            .update({
-              status: 'checked_in',
-              checkin_at: now,
-              checkin_location: locationStr,
-              updated_at: now,
-            })
-            .eq('id', visitId);
+          await updateVisitStatus(supabase, visitId, 'checked_in', {
+            checkin_at: now,
+            checkin_location: locationStr,
+          });
 
           queryClient.invalidateQueries({
             queryKey: ['todayVisits', staffInfo?.id, getToday()],
@@ -93,25 +89,20 @@ export function useVisitFlow(visitId: string) {
       if (isOnline) {
         try {
           // 1. 방문 상태 업데이트
-          await supabase
-            .from('visits')
-            .update({
-              status: 'checked_out',
-              checkout_at: now,
-              checkout_location: locationStr,
-              actual_duration_min: visit?.checkin_at
-                ? Math.round(
-                    (new Date(now).getTime() -
-                      new Date(visit.checkin_at).getTime()) /
-                      60000,
-                  )
-                : null,
-              updated_at: now,
-            })
-            .eq('id', visitId);
+          await updateVisitStatus(supabase, visitId, 'checked_out', {
+            checkout_at: now,
+            checkout_location: locationStr,
+            actual_duration_min: visit?.checkin_at
+              ? Math.round(
+                  (new Date(now).getTime() -
+                    new Date(visit.checkin_at).getTime()) /
+                    60000,
+                )
+              : null,
+          });
 
           // 2. 방문 기록 생성
-          await supabase.from('visit_records').insert({
+          await createVisitRecord(supabase, {
             visit_id: visitId,
             nurse_id: staffInfo?.id ?? '',
             patient_id: visit?.patient_id ?? '',
@@ -130,13 +121,7 @@ export function useVisitFlow(visitId: string) {
           });
 
           // 3. 완료 상태로 변경
-          await supabase
-            .from('visits')
-            .update({
-              status: 'completed',
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', visitId);
+          await updateVisitStatus(supabase, visitId, 'completed');
 
           queryClient.invalidateQueries({
             queryKey: ['todayVisits', staffInfo?.id, getToday()],
@@ -159,15 +144,15 @@ export function useVisitFlow(visitId: string) {
         data: {
           vitals: currentForm.vitals,
           performedItems: currentForm.performedItems,
-          generalCondition: currentForm.generalCondition,
-          consciousness: currentForm.consciousness,
-          skinCondition: currentForm.skinCondition,
-          nutritionIntake: currentForm.nutritionIntake,
-          painScore: currentForm.painScore,
-          nurseNote: currentForm.nurseNote,
-          messageToGuardian: currentForm.messageToGuardian,
+          generalCondition: currentForm.generalCondition ?? null,
+          consciousness: currentForm.consciousness ?? null,
+          skinCondition: currentForm.skinCondition ?? null,
+          nutritionIntake: currentForm.nutritionIntake ?? null,
+          painScore: currentForm.painScore ?? null,
+          nurseNote: currentForm.nurseNote ?? null,
+          messageToGuardian: currentForm.messageToGuardian ?? null,
           photos: currentForm.photos,
-          voiceMemoUri: currentForm.voiceMemoUri,
+          voiceMemoUri: currentForm.voiceMemoUri ?? null,
         },
         checkinAt: visit?.checkin_at ?? null,
         checkinLocation: visit?.checkin_location ?? null,

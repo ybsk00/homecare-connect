@@ -59,8 +59,9 @@ export default function RegisterScreen() {
       Alert.alert('가입 완료', '환영합니다! 로그인되었습니다.', [
         { text: '확인', onPress: () => router.replace('/(tabs)/home') },
       ]);
-    } catch (error: any) {
-      Alert.alert('가입 실패', error?.message ?? '가입 중 오류가 발생했습니다.');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : '가입 중 오류가 발생했습니다.';
+      Alert.alert('가입 실패', message);
     }
   };
 

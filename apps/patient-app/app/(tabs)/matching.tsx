@@ -19,6 +19,12 @@ import { useServiceRequests } from '@/hooks/useMatching';
 import { usePatientStore } from '@/stores/patient-store';
 import { colors, spacing, radius, shadows, typography } from '@/constants/theme';
 import { formatRequestStatus, formatRelativeTime, formatServiceType } from '@homecare/shared-utils';
+import type { Tables } from '@homecare/shared-types';
+
+type ServiceRequestWithRelations = Tables<'service_requests'> & {
+  patient?: { full_name: string } | null;
+  selected_org?: { name: string } | null;
+};
 
 export default function MatchingScreen() {
   const router = useRouter();
@@ -72,7 +78,7 @@ export default function MatchingScreen() {
               description="매칭 요청을 하면 AI가 최적의 기관을 추천합니다"
             />
           ) : (
-            requests.map((req: any) => (
+            (requests as any[]).map((req: ServiceRequestWithRelations) => (
               <TouchableOpacity
                 key={req.id}
                 onPress={() => {

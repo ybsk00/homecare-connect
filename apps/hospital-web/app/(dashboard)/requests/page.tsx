@@ -84,7 +84,7 @@ export default function RequestsPage() {
           status: 'org_accepted',
           assigned_nurse_id: nurseId,
           responded_at: new Date().toISOString(),
-        })
+        } as never)
         .eq('id', requestId);
     },
     onSuccess: () => {
@@ -108,7 +108,7 @@ export default function RequestsPage() {
         .update({
           status: 'org_rejected',
           responded_at: new Date().toISOString(),
-        })
+        } as never)
         .eq('id', requestId);
     },
     onSuccess: () => {

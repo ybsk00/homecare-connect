@@ -1,6 +1,5 @@
 import { clsx } from 'clsx';
-
-type BadgeColor = 'gray' | 'green' | 'yellow' | 'red' | 'blue' | 'navy' | 'teal' | 'brown' | 'purple';
+import type { BadgeColor } from '@homecare/shared-types';
 
 interface BadgeProps {
   children: React.ReactNode;

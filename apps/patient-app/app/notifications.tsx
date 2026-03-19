@@ -19,6 +19,9 @@ import {
 } from '@/hooks/useNotifications';
 import { colors, spacing, radius, typography } from '@/constants/theme';
 import { formatRelativeTime } from '@homecare/shared-utils';
+import type { Tables } from '@homecare/shared-types';
+
+type Notification = Tables<'notifications'>;
 
 function getNotifIcon(type: string): string {
   if (type.includes('visit')) return '📋';
@@ -47,14 +50,14 @@ export default function NotificationsScreen() {
   const markAllRead = useMarkAllAsRead();
 
   const notifications = notifQuery.data?.data ?? [];
-  const hasUnread = notifications.some((n: any) => !n.read);
+  const hasUnread = notifications.some((n: Notification) => !n.read);
 
-  const handlePress = (notif: any) => {
+  const handlePress = (notif: Notification) => {
     if (!notif.read) {
       markRead.mutate(notif.id);
     }
 
-    const data = notif.data ?? {};
+    const data = (notif.data ?? {}) as Record<string, unknown>;
     if (data.visit_id) {
       router.push(`/visit/${data.visit_id}`);
     } else if (data.patient_id) {
@@ -64,7 +67,7 @@ export default function NotificationsScreen() {
     }
   };
 
-  const renderItem = ({ item }: { item: any }) => {
+  const renderItem = ({ item }: { item: Notification }) => {
     const icon = getNotifIcon(item.type);
     const severity = getSeverityColor(item.type);
 
@@ -75,7 +78,7 @@ export default function NotificationsScreen() {
             styles.notifCard,
             !item.read && styles.unread,
             severity && { backgroundColor: severity.bg },
-          ]}
+          ] as any}
         >
           <View style={styles.notifRow}>
             <Text style={styles.icon}>{icon}</Text>
@@ -117,7 +120,7 @@ export default function NotificationsScreen() {
 
       <FlatList
         data={notifications}
-        keyExtractor={(item: any) => item.id}
+        keyExtractor={(item: Notification) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         refreshControl={

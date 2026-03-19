@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import AdminTopBar from '@/components/layout/AdminTopBar';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -9,23 +10,7 @@ import Modal from '@/components/ui/Modal';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { formatDate, formatCurrency } from '@homecare/shared-utils';
 import { AlertTriangle } from 'lucide-react';
-
-type BadgeColor = 'gray' | 'green' | 'yellow' | 'red' | 'blue' | 'navy' | 'teal' | 'brown' | 'purple';
-
-interface Subscription {
-  id: string;
-  org_id: string;
-  plan: string;
-  status: string;
-  amount: number;
-  billing_cycle: string;
-  next_billing_date: string | null;
-  trial_ends_at: string | null;
-  started_at: string;
-  organization?: {
-    name: string;
-  };
-}
+import type { BadgeColor, SubscriptionView as Subscription } from '@homecare/shared-types';
 
 const statusConfig: Record<string, { label: string; color: BadgeColor }> = {
   active: { label: '활성', color: 'green' },
@@ -42,20 +27,15 @@ const planConfig: Record<string, { label: string; color: BadgeColor }> = {
 };
 
 export default function SubscriptionsPage() {
-  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [selectedSub, setSelectedSub] = useState<Subscription | null>(null);
   const [newPlan, setNewPlan] = useState('');
   const [adjustLoading, setAdjustLoading] = useState(false);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    fetchSubscriptions();
-  }, []);
-
-  async function fetchSubscriptions() {
-    setLoading(true);
-    try {
+  const { data: subscriptions = [], isLoading: loading, error } = useQuery({
+    queryKey: ['admin-subscriptions'],
+    queryFn: async () => {
       const supabase = createBrowserSupabaseClient();
       const { data, error } = await supabase
         .from('subscriptions')
@@ -67,13 +47,9 @@ export default function SubscriptionsPage() {
         .order('next_billing_date', { ascending: true });
 
       if (error) throw error;
-      setSubscriptions((data as unknown as Subscription[]) || []);
-    } catch (err) {
-      console.error('구독 목록 조회 실패:', err);
-    } finally {
-      setLoading(false);
-    }
-  }
+      return (data as unknown as Subscription[]) || [];
+    },
+  });
 
   async function handlePlanAdjust() {
     if (!selectedSub || !newPlan) return;
@@ -91,22 +67,22 @@ export default function SubscriptionsPage() {
       const { error } = await supabase
         .from('subscriptions')
         .update({
-          plan: newPlan,
+          plan: newPlan as string,
           amount: planPricing[newPlan] ?? 0,
-        })
+        } as never)
         .eq('id', selectedSub.id);
 
       if (error) throw error;
 
       await supabase
         .from('organizations')
-        .update({ subscription_plan: newPlan })
+        .update({ subscription_plan: newPlan as string } as never)
         .eq('id', selectedSub.org_id);
 
       setShowPlanModal(false);
       setSelectedSub(null);
       setNewPlan('');
-      fetchSubscriptions();
+      queryClient.invalidateQueries({ queryKey: ['admin-subscriptions'] });
     } catch (err) {
       console.error('플랜 변경 실패:', err);
     } finally {
@@ -121,6 +97,16 @@ export default function SubscriptionsPage() {
     <div>
       <AdminTopBar title="구독 관리" subtitle="기관별 구독 현황 및 결제 상태를 관리합니다." />
       <div className="p-8 space-y-8">
+        {/* Error state */}
+        {error && (
+          <Card>
+            <div className="flex flex-col items-center justify-center py-16 text-primary-400">
+              <p className="text-sm font-semibold text-danger-600 mb-2">구독 목록을 불러오지 못했습니다.</p>
+              <p className="text-xs text-primary-300">{(error as Error).message}</p>
+            </div>
+          </Card>
+        )}
+
         {/* Failed Payments Alert */}
         {failedPayments.length > 0 && (
           <div className="p-6 bg-tertiary-50 rounded-2xl">

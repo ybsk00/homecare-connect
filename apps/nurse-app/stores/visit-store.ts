@@ -1,61 +1,7 @@
 import { create } from 'zustand';
+import type { VisitWithPatient, VisitFormData } from '@homecare/shared-types';
 
-export interface VisitWithPatient {
-  id: string;
-  plan_id: string;
-  patient_id: string;
-  org_id: string;
-  nurse_id: string;
-  scheduled_date: string;
-  scheduled_time: string | null;
-  visit_order: number | null;
-  estimated_duration_min: number;
-  status: string;
-  checkin_at: string | null;
-  checkin_location: string | null;
-  checkout_at: string | null;
-  checkout_location: string | null;
-  actual_duration_min: number | null;
-  patient: {
-    id: string;
-    full_name: string;
-    address: string;
-    address_detail: string | null;
-    care_grade: string | null;
-    mobility: string | null;
-    primary_diagnosis: string | null;
-    special_notes: string | null;
-    phone: string | null;
-  } | null;
-  visit_record: {
-    id: string;
-    vitals: Record<string, number | undefined>;
-    performed_items: { item: string; done: boolean; note?: string }[];
-    nurse_note: string | null;
-  }[] | null;
-}
-
-export interface VisitFormData {
-  vitals: {
-    systolic_bp?: number;
-    diastolic_bp?: number;
-    heart_rate?: number;
-    temperature?: number;
-    blood_sugar?: number;
-    spo2?: number;
-    weight?: number;
-  };
-  performedItems: { item: string; done: boolean; note?: string }[];
-  generalCondition: string | null;
-  consciousness: string | null;
-  skinCondition: string | null;
-  nutritionIntake: string | null;
-  painScore: number | null;
-  nurseNote: string;
-  messageToGuardian: string;
-  photos: string[];
-  voiceMemoUri: string | null;
-}
+export type { VisitWithPatient, VisitFormData };
 
 interface VisitState {
   todayVisits: VisitWithPatient[];
@@ -76,15 +22,15 @@ interface VisitState {
 const defaultFormData: VisitFormData = {
   vitals: {},
   performedItems: [],
-  generalCondition: null,
-  consciousness: null,
-  skinCondition: null,
-  nutritionIntake: null,
-  painScore: null,
+  generalCondition: undefined,
+  consciousness: undefined,
+  skinCondition: undefined,
+  nutritionIntake: undefined,
+  painScore: undefined,
   nurseNote: '',
   messageToGuardian: '',
   photos: [],
-  voiceMemoUri: null,
+  voiceMemoUri: undefined,
 };
 
 export const useVisitStore = create<VisitState>((set, get) => ({

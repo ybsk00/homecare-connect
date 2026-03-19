@@ -6,7 +6,7 @@
   "types": "./src/index.ts",
   "scripts": {
     "type-check": "tsc --noEmit",
-    "lint": "echo 'No lint configured'"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.0",

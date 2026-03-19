@@ -1,24 +1,15 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import AdminTopBar from '@/components/layout/AdminTopBar';
 import OrgTable from '@/components/orgs/OrgTable';
 import Card from '@/components/ui/Card';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { clsx } from 'clsx';
+import type { OrganizationView as Organization } from '@homecare/shared-types';
 
 type TabKey = 'pending' | 'verified' | 'rejected' | 'suspended';
-
-interface Organization {
-  id: string;
-  name: string;
-  business_number: string;
-  org_type: string;
-  verification_status: string;
-  subscription_plan: string;
-  active_patient_count: number;
-  created_at: string;
-}
 
 const tabs: { key: TabKey; label: string }[] = [
   { key: 'pending', label: '심사대기' },
@@ -29,20 +20,12 @@ const tabs: { key: TabKey; label: string }[] = [
 
 export default function OrganizationsPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('pending');
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [counts, setCounts] = useState<Record<TabKey, number>>({
-    pending: 0,
-    verified: 0,
-    rejected: 0,
-    suspended: 0,
-  });
+  const queryClient = useQueryClient();
 
-  const fetchOrganizations = useCallback(async () => {
-    setLoading(true);
-    try {
+  const { data: organizations = [], isLoading, error } = useQuery({
+    queryKey: ['admin-organizations', activeTab],
+    queryFn: async () => {
       const supabase = createBrowserSupabaseClient();
-
       const { data, error } = await supabase
         .from('organizations')
         .select('id, name, business_number, org_type, verification_status, subscription_plan, active_patient_count, created_at')
@@ -50,8 +33,14 @@ export default function OrganizationsPage() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setOrganizations((data as Organization[]) || []);
+      return (data as Organization[]) || [];
+    },
+  });
 
+  const { data: counts = { pending: 0, verified: 0, rejected: 0, suspended: 0 } } = useQuery({
+    queryKey: ['admin-organizations-counts'],
+    queryFn: async () => {
+      const supabase = createBrowserSupabaseClient();
       const countPromises = tabs.map(async (tab) => {
         const { count } = await supabase
           .from('organizations')
@@ -65,17 +54,14 @@ export default function OrganizationsPage() {
       countResults.forEach((r) => {
         newCounts[r.key] = r.count;
       });
-      setCounts(newCounts);
-    } catch (err) {
-      console.error('기관 목록 조회 실패:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [activeTab]);
+      return newCounts;
+    },
+  });
 
-  useEffect(() => {
-    fetchOrganizations();
-  }, [fetchOrganizations]);
+  function invalidateOrgs() {
+    queryClient.invalidateQueries({ queryKey: ['admin-organizations'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-organizations-counts'] });
+  }
 
   async function handleApprove(id: string) {
     try {
@@ -85,11 +71,11 @@ export default function OrganizationsPage() {
         .update({
           verification_status: 'verified',
           verified_at: new Date().toISOString(),
-        })
+        } as never)
         .eq('id', id);
 
       if (error) throw error;
-      fetchOrganizations();
+      invalidateOrgs();
     } catch (err) {
       console.error('기관 승인 실패:', err);
     }
@@ -100,11 +86,11 @@ export default function OrganizationsPage() {
       const supabase = createBrowserSupabaseClient();
       const { error } = await supabase
         .from('organizations')
-        .update({ verification_status: 'rejected' })
+        .update({ verification_status: 'rejected' } as never)
         .eq('id', id);
 
       if (error) throw error;
-      fetchOrganizations();
+      invalidateOrgs();
     } catch (err) {
       console.error('기관 거절 실패:', err);
     }
@@ -115,11 +101,11 @@ export default function OrganizationsPage() {
       const supabase = createBrowserSupabaseClient();
       const { error } = await supabase
         .from('organizations')
-        .update({ verification_status: 'suspended' })
+        .update({ verification_status: 'suspended' } as never)
         .eq('id', id);
 
       if (error) throw error;
-      fetchOrganizations();
+      invalidateOrgs();
     } catch (err) {
       console.error('기관 정지 실패:', err);
     }
@@ -157,22 +143,34 @@ export default function OrganizationsPage() {
           ))}
         </div>
 
-        {/* Table */}
-        <Card padding={false}>
-          {loading ? (
-            <div className="flex items-center justify-center py-16">
-              <div className="w-8 h-8 border-[3px] border-primary-100 border-t-secondary-600 rounded-full animate-spin" />
+        {/* Error state */}
+        {error && (
+          <Card>
+            <div className="flex flex-col items-center justify-center py-16 text-primary-400">
+              <p className="text-sm font-semibold text-danger-600 mb-2">기관 목록을 불러오지 못했습니다.</p>
+              <p className="text-xs text-primary-300">{(error as Error).message}</p>
             </div>
-          ) : (
-            <OrgTable
-              organizations={organizations}
-              onApprove={handleApprove}
-              onReject={handleReject}
-              onSuspend={handleSuspend}
-              showActions={activeTab === 'pending' || activeTab === 'verified'}
-            />
-          )}
-        </Card>
+          </Card>
+        )}
+
+        {/* Table */}
+        {!error && (
+          <Card padding={false}>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <div className="w-8 h-8 border-[3px] border-primary-100 border-t-secondary-600 rounded-full animate-spin" />
+              </div>
+            ) : (
+              <OrgTable
+                organizations={organizations}
+                onApprove={handleApprove}
+                onReject={handleReject}
+                onSuspend={handleSuspend}
+                showActions={activeTab === 'pending' || activeTab === 'verified'}
+              />
+            )}
+          </Card>
+        )}
       </div>
     </div>
   );

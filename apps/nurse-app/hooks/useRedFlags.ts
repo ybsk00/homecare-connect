@@ -2,6 +2,11 @@ import { useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
+import {
+  getRedFlagAlerts,
+  acknowledgeRedFlagAlert,
+  resolveRedFlagAlert,
+} from '@homecare/supabase-client';
 import type { Tables } from '@homecare/shared-types';
 
 type RedFlagAlert = Tables<'red_flag_alerts'>;
@@ -15,25 +20,7 @@ export function useRedFlags() {
     queryFn: async () => {
       if (!staffInfo?.orgId) return [];
 
-      const { data, error } = await supabase
-        .from('red_flag_alerts')
-        .select(
-          `
-          *,
-          patient:patients (
-            id,
-            full_name,
-            care_grade
-          )
-        `,
-        )
-        .eq('org_id', staffInfo.orgId)
-        .in('status', ['active', 'acknowledged'])
-        .order('created_at', { ascending: false })
-        .limit(50);
-
-      if (error) throw error;
-      return data ?? [];
+      return await getRedFlagAlerts(supabase, staffInfo.orgId);
     },
     enabled: !!staffInfo?.orgId,
     staleTime: 1000 * 30,
@@ -75,14 +62,7 @@ export function useRedFlags() {
 
   const acknowledgeAlert = async (alertId: string) => {
     const userId = useAuthStore.getState().session?.user?.id;
-    await supabase
-      .from('red_flag_alerts')
-      .update({
-        status: 'acknowledged',
-        acknowledged_by: userId,
-        acknowledged_at: new Date().toISOString(),
-      })
-      .eq('id', alertId);
+    await acknowledgeRedFlagAlert(supabase, alertId, userId!);
 
     queryClient.invalidateQueries({
       queryKey: ['redFlags', staffInfo?.orgId],
@@ -90,14 +70,7 @@ export function useRedFlags() {
   };
 
   const resolveAlert = async (alertId: string, note: string) => {
-    await supabase
-      .from('red_flag_alerts')
-      .update({
-        status: 'resolved',
-        resolution_note: note,
-        resolved_at: new Date().toISOString(),
-      })
-      .eq('id', alertId);
+    await resolveRedFlagAlert(supabase, alertId, note);
 
     queryClient.invalidateQueries({
       queryKey: ['redFlags', staffInfo?.orgId],

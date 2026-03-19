@@ -38,17 +38,18 @@ export default function VisitDetailScreen() {
     );
   }
 
-  const record = Array.isArray(visit.visit_record)
-    ? visit.visit_record[0]
-    : visit.visit_record;
-  const patient = visit.patient;
-  const nurseProfile = visit.nurse?.user;
+  const visitData = visit as any;
+  const record = Array.isArray(visitData.visit_record)
+    ? visitData.visit_record[0]
+    : visitData.visit_record;
+  const patient = visitData.patient;
+  const nurseProfile = visitData.nurse?.user;
   const nurseName = Array.isArray(nurseProfile)
     ? nurseProfile[0]?.full_name
     : nurseProfile?.full_name;
 
-  const statusLabel = formatVisitStatus(visit.status);
-  const statusVariant = getVisitStatusVariant(visit.status);
+  const statusLabel = formatVisitStatus(visitData.status);
+  const statusVariant = getVisitStatusVariant(visitData.status);
 
   return (
     <ScrollView
@@ -68,10 +69,10 @@ export default function VisitDetailScreen() {
         <View style={styles.headerRow}>
           <View>
             <Text style={styles.dateText}>
-              {formatDateWithDay(visit.scheduled_date)}
+              {formatDateWithDay(visitData.scheduled_date)}
             </Text>
-            {visit.scheduled_time && (
-              <Text style={styles.timeText}>{visit.scheduled_time}</Text>
+            {visitData.scheduled_time && (
+              <Text style={styles.timeText}>{visitData.scheduled_time}</Text>
             )}
           </View>
           <Badge text={statusLabel} variant={statusVariant} size="md" />
@@ -88,19 +89,19 @@ export default function VisitDetailScreen() {
           <InfoItem
             label="소요시간"
             value={
-              visit.actual_duration_min
-                ? formatDuration(visit.actual_duration_min)
-                : `예상 ${formatDuration(visit.estimated_duration_min)}`
+              visitData.actual_duration_min
+                ? formatDuration(visitData.actual_duration_min)
+                : `예상 ${formatDuration(visitData.estimated_duration_min)}`
             }
           />
         </View>
 
-        {visit.checkin_at && (
+        {visitData.checkin_at && (
           <View style={styles.checkinInfo}>
-            <Text style={styles.checkinLabel}>체크인: {formatDateTime(visit.checkin_at)}</Text>
-            {visit.checkout_at && (
+            <Text style={styles.checkinLabel}>체크인: {formatDateTime(visitData.checkin_at)}</Text>
+            {visitData.checkout_at && (
               <Text style={styles.checkinLabel}>
-                체크아웃: {formatDateTime(visit.checkout_at)}
+                체크아웃: {formatDateTime(visitData.checkout_at)}
               </Text>
             )}
           </View>
@@ -223,7 +224,7 @@ export default function VisitDetailScreen() {
 
           {/* Guardian message */}
           {record.message_to_guardian && (
-            <Card style={[styles.section, styles.messageBubble]}>
+            <Card style={[styles.section, styles.messageBubble] as any}>
               <Text style={styles.messageLabel}>보호자님께 전달 메시지</Text>
               <Text style={styles.messageText}>{record.message_to_guardian}</Text>
             </Card>
@@ -251,7 +252,7 @@ export default function VisitDetailScreen() {
       ) : (
         <Card style={styles.section}>
           <Text style={styles.emptyText}>
-            {visit.status === 'completed' || visit.status === 'checked_out'
+            {visitData.status === 'completed' || visitData.status === 'checked_out'
               ? '방문 기록이 아직 작성되지 않았습니다'
               : '방문 완료 후 기록이 표시됩니다'}
           </Text>
@@ -259,10 +260,10 @@ export default function VisitDetailScreen() {
       )}
 
       {/* Cancel reason */}
-      {visit.cancel_reason && (
-        <Card style={[styles.section, styles.cancelCard]}>
+      {visitData.cancel_reason && (
+        <Card style={[styles.section, styles.cancelCard] as any}>
           <Text style={styles.cancelLabel}>취소 사유</Text>
-          <Text style={styles.cancelText}>{visit.cancel_reason}</Text>
+          <Text style={styles.cancelText}>{visitData.cancel_reason}</Text>
         </Card>
       )}
     </ScrollView>
