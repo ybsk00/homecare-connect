@@ -1,5 +1,2 @@
 {
-  "buildCommand": "cd apps/admin-web && npx next build",
-  "outputDirectory": "apps/admin-web/.next",
-  "installCommand": "pnpm install --frozen-lockfile"
 }
