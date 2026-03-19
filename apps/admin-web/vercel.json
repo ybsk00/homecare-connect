@@ -1,3 +1,5 @@
 {
+  "buildCommand": "pnpm turbo build --filter=@homecare/admin-web",
+  "outputDirectory": "apps/admin-web/.next",
   "framework": "nextjs"
 }
