@@ -1,5 +1,5 @@
 {
-  "buildCommand": "pnpm turbo build --filter=@homecare/hospital-web",
-  "outputDirectory": "apps/hospital-web/.next",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "buildCommand": "next build"
 }
