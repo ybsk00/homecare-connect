@@ -7,7 +7,9 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "scheme": "homecare-patient",
-    "splash": { "backgroundColor": "#0EA5E9" },
+    "splash": {
+      "backgroundColor": "#0EA5E9"
+    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "kr.homecare-connect.patient",
@@ -16,10 +18,28 @@
       }
     },
     "android": {
-      "adaptiveIcon": { "backgroundColor": "#0EA5E9" },
+      "adaptiveIcon": {
+        "backgroundColor": "#0EA5E9"
+      },
       "package": "kr.homecareconnect.patient",
-      "permissions": ["ACCESS_FINE_LOCATION"]
+      "permissions": [
+        "ACCESS_FINE_LOCATION"
+      ]
     },
-    "plugins": ["expo-router", "expo-secure-store", "expo-location"]
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-location",
+      "expo-asset",
+      "expo-font"
+    ],
+    "install": {
+      "exclude": ["react-native", "react"]
+    },
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "enabled": false
+      }
+    }
   }
 }

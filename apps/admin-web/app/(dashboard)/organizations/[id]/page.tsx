@@ -110,7 +110,7 @@ export default function OrgDetailPage() {
     }
   }
 
-  async function handleReject(id: string, _reason: string) {
+  async function handleReject(id: string, reason: string) {
     setActionLoading(true);
     try {
       const supabase = createBrowserSupabaseClient();
@@ -118,6 +118,19 @@ export default function OrgDetailPage() {
         .from('organizations')
         .update({ verification_status: 'rejected' } as never)
         .eq('id', id);
+
+      // 거절 사유를 감사 로그에 기록
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('audit_logs').insert({
+          user_id: user.id,
+          action: 'org_rejected',
+          resource_type: 'organization',
+          resource_id: id,
+          details: { reason, previous_status: org?.verification_status },
+        } as never);
+      }
+
       setOrg((prev) => prev ? { ...prev, verification_status: 'rejected' } : prev);
     } catch (err) {
       console.error('거절 실패:', err);
@@ -126,7 +139,7 @@ export default function OrgDetailPage() {
     }
   }
 
-  async function handleSuspend(id: string, _reason: string) {
+  async function handleSuspend(id: string, reason: string) {
     setActionLoading(true);
     try {
       const supabase = createBrowserSupabaseClient();
@@ -134,6 +147,19 @@ export default function OrgDetailPage() {
         .from('organizations')
         .update({ verification_status: 'suspended' } as never)
         .eq('id', id);
+
+      // 정지 사유를 감사 로그에 기록
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('audit_logs').insert({
+          user_id: user.id,
+          action: 'org_suspended',
+          resource_type: 'organization',
+          resource_id: id,
+          details: { reason, previous_status: org?.verification_status },
+        } as never);
+      }
+
       setOrg((prev) => prev ? { ...prev, verification_status: 'suspended' } : prev);
     } catch (err) {
       console.error('정지 실패:', err);

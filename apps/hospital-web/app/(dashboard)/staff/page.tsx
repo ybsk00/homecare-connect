@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { useAppStore } from '@/lib/store';
 import { StaffTable, type StaffRow } from '@/components/staff/StaffTable';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
@@ -18,6 +19,9 @@ export default function StaffPage() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteType, setInviteType] = useState('nurse');
   const [inviteLoading, setInviteLoading] = useState(false);
+  const [inviteError, setInviteError] = useState('');
+  const { organization } = useAppStore();
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: ['staff', page],
@@ -66,12 +70,76 @@ export default function StaffPage() {
   });
 
   const handleInvite = async () => {
+    if (!inviteEmail || !organization) return;
     setInviteLoading(true);
-    setTimeout(() => {
-      setInviteLoading(false);
+    setInviteError('');
+    try {
+      const supabase = createBrowserSupabaseClient();
+
+      // 초대할 사용자의 프로필 조회 (이메일 기반 — auth.users에서 조회 불가하므로 notifications로 초대 알림 생성)
+      // 1) 해당 이메일의 사용자가 이미 가입되어 있는지 확인
+      const { data: authUserRaw } = await supabase
+        .from('profiles')
+        .select('id, role')
+        .eq('phone', inviteEmail)
+        .maybeSingle();
+      const authUser = authUserRaw as { id: string; role: string } | null;
+
+      // 2) 이미 소속된 직원인지 확인
+      if (authUser) {
+        const { data: existingStaff } = await supabase
+          .from('staff')
+          .select('id')
+          .eq('user_id', authUser.id)
+          .eq('org_id', organization.id)
+          .maybeSingle();
+
+        if (existingStaff) {
+          setInviteError('이미 소속된 직원입니다.');
+          return;
+        }
+      }
+
+      // 3) 초대 알림 생성 (가입한 사용자에게 알림 발송, 미가입자는 이메일 초대)
+      if (authUser) {
+        // 이미 가입된 사용자 → staff 레코드 생성 + 알림
+        await supabase.from('staff').insert({
+          user_id: authUser.id,
+          org_id: organization.id,
+          staff_type: inviteType as 'nurse' | 'doctor' | 'physio' | 'caregiver',
+          is_active: true,
+        } as never);
+
+        await supabase.from('notifications').insert({
+          user_id: authUser.id,
+          type: 'staff_invite',
+          title: '기관 소속 등록',
+          body: `${organization.name}에 ${inviteType === 'nurse' ? '간호사' : inviteType === 'physio' ? '물리치료사' : '요양보호사'}로 등록되었습니다.`,
+          data: { org_id: organization.id, staff_type: inviteType },
+        } as never);
+      } else {
+        // 미가입 사용자 → 감사 로그에 초대 기록 (추후 가입 시 매칭)
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.from('audit_logs').insert({
+            user_id: user.id,
+            action: 'staff_invite',
+            resource_type: 'organization',
+            resource_id: organization.id,
+            details: { email: inviteEmail, staff_type: inviteType, status: 'pending' },
+          } as never);
+        }
+      }
+
+      await queryClient.invalidateQueries({ queryKey: ['staff'] });
       setInviteOpen(false);
       setInviteEmail('');
-    }, 1000);
+    } catch (err) {
+      console.error('초대 실패:', err);
+      setInviteError('초대 처리 중 오류가 발생했습니다.');
+    } finally {
+      setInviteLoading(false);
+    }
   };
 
   return (
@@ -120,6 +188,9 @@ export default function StaffPage() {
             value={inviteType}
             onChange={(e) => setInviteType(e.target.value)}
           />
+          {inviteError && (
+            <p className="text-sm text-red-600">{inviteError}</p>
+          )}
           <div className="flex justify-end gap-3 pt-2">
             <Button variant="outline" onClick={() => setInviteOpen(false)}>
               취소

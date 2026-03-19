@@ -18,6 +18,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { usePatientsList } from '@/hooks/usePatients';
 import { useTodayVisits, useUpcomingVisits } from '@/hooks/useVisits';
 import { usePatientStore } from '@/stores/patient-store';
+import { useQuery } from '@tanstack/react-query';
+import { getLatestVitalsByPatients } from '@homecare/supabase-client';
+import { supabase } from '@/lib/supabase';
+import { getVitalStatus } from '@homecare/shared-utils';
 import { colors, spacing, radius, shadows, typography } from '@/constants/theme';
 import {
   formatVisitStatus,
@@ -44,6 +48,25 @@ export default function HomeScreen() {
   const upcomingVisits = useUpcomingVisits(selectedPatientId);
 
   const selectedPatient = patients.find((p) => p.id === selectedPatientId);
+
+  // 최근 바이탈 데이터 조회
+  const vitalsQuery = useQuery({
+    queryKey: ['latest-vitals', selectedPatientId],
+    queryFn: async () => {
+      if (!selectedPatientId) return null;
+      const results = await getLatestVitalsByPatients(supabase, [selectedPatientId]);
+      return results[0] ?? null;
+    },
+    enabled: !!selectedPatientId,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const latestVitals = (vitalsQuery.data?.vitals ?? null) as {
+    systolic_bp?: number;
+    diastolic_bp?: number;
+    temperature?: number;
+    heart_rate?: number;
+  } | null;
 
   const isRefreshing =
     patientsQuery.isRefetching || todayVisits.isRefetching || upcomingVisits.isRefetching;
@@ -147,24 +170,40 @@ export default function HomeScreen() {
             {/* 최근 건강 지표 - White cards with vitality chips */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>최근 건강 지표</Text>
-              <View style={styles.healthGrid}>
-                <Card style={styles.healthCard}>
-                  <Text style={styles.healthLabel}>혈압</Text>
-                  <Text style={styles.healthValue}>120/80</Text>
-                  <Text style={styles.healthUnit}>mmHg</Text>
-                  <View style={styles.normalChip}>
-                    <Text style={styles.normalChipText}>정상</Text>
-                  </View>
+              {latestVitals ? (
+                <View style={styles.healthGrid}>
+                  <Card style={styles.healthCard}>
+                    <Text style={styles.healthLabel}>혈압</Text>
+                    <Text style={styles.healthValue}>
+                      {latestVitals.systolic_bp ?? '-'}/{latestVitals.diastolic_bp ?? '-'}
+                    </Text>
+                    <Text style={styles.healthUnit}>mmHg</Text>
+                    {latestVitals.systolic_bp && (
+                      <View style={[styles.normalChip, getVitalStatus('systolic_bp', latestVitals.systolic_bp) !== 'normal' && styles.warningChip]}>
+                        <Text style={[styles.normalChipText, getVitalStatus('systolic_bp', latestVitals.systolic_bp) !== 'normal' && styles.warningChipText]}>
+                          {getVitalStatus('systolic_bp', latestVitals.systolic_bp) === 'normal' ? '정상' : '주의'}
+                        </Text>
+                      </View>
+                    )}
+                  </Card>
+                  <Card style={styles.healthCard}>
+                    <Text style={styles.healthLabel}>체온</Text>
+                    <Text style={styles.healthValue}>{latestVitals.temperature ?? '-'}</Text>
+                    <Text style={styles.healthUnit}>°C</Text>
+                    {latestVitals.temperature && (
+                      <View style={[styles.normalChip, getVitalStatus('temperature', latestVitals.temperature) !== 'normal' && styles.warningChip]}>
+                        <Text style={[styles.normalChipText, getVitalStatus('temperature', latestVitals.temperature) !== 'normal' && styles.warningChipText]}>
+                          {getVitalStatus('temperature', latestVitals.temperature) === 'normal' ? '정상' : '주의'}
+                        </Text>
+                      </View>
+                    )}
+                  </Card>
+                </View>
+              ) : (
+                <Card>
+                  <Text style={styles.noVisit}>아직 기록된 건강 지표가 없습니다</Text>
                 </Card>
-                <Card style={styles.healthCard}>
-                  <Text style={styles.healthLabel}>체온</Text>
-                  <Text style={styles.healthValue}>36.5</Text>
-                  <Text style={styles.healthUnit}>°C</Text>
-                  <View style={styles.normalChip}>
-                    <Text style={styles.normalChipText}>정상</Text>
-                  </View>
-                </Card>
-              </View>
+              )}
             </View>
 
             {/* 다음 정기 검진 */}
@@ -405,6 +444,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: colors.vital.normal.text,
+  },
+  warningChip: {
+    backgroundColor: colors.vital.warning.bg,
+  },
+  warningChipText: {
+    color: colors.vital.warning.text,
   },
 
   // Checkup card

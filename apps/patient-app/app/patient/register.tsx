@@ -8,8 +8,10 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import * as Location from 'expo-location';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { useAuthStore } from '@/stores/auth-store';
@@ -78,7 +80,28 @@ export default function PatientRegisterScreen() {
   const [specialNotes, setSpecialNotes] = useState('');
   const [relationship, setRelationship] = useState('자녀');
 
+  const [locationCoords, setLocationCoords] = useState<{lat: number, lng: number} | null>(null);
+  const [locationLoading, setLocationLoading] = useState(false);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const getGPSLocation = async () => {
+    setLocationLoading(true);
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('권한 필요', '위치 권한을 허용해주세요.');
+        return;
+      }
+      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      setLocationCoords({ lat: loc.coords.latitude, lng: loc.coords.longitude });
+    } catch (err) {
+      console.error('위치 획득 실패:', err);
+      Alert.alert('오류', '위치를 가져올 수 없습니다.');
+    } finally {
+      setLocationLoading(false);
+    }
+  };
 
   const toggleService = (svc: string) => {
     setNeededServices((prev) =>
@@ -114,7 +137,9 @@ export default function PatientRegisterScreen() {
         phone: phone.replace(/-/g, '') || null,
         address: address.trim(),
         address_detail: addressDetail.trim() || null,
-        location: 'POINT(127.0 37.5)',
+        location: locationCoords
+          ? `POINT(${locationCoords.lng} ${locationCoords.lat})`
+          : 'POINT(127.0 37.5)',
         care_grade: (careGrade || null) as CareGrade | null,
         mobility: (mobility || null) as Mobility | null,
         primary_diagnosis: primaryDiagnosis.trim() || null,
@@ -221,6 +246,21 @@ export default function PatientRegisterScreen() {
             value={addressDetail}
             onChangeText={setAddressDetail}
           />
+
+          <TouchableOpacity
+            onPress={getGPSLocation}
+            style={styles.locationButton}
+            disabled={locationLoading}
+          >
+            {locationLoading ? (
+              <ActivityIndicator size="small" color={colors.primary} />
+            ) : (
+              <Text style={styles.locationButtonText}>현재 위치 사용</Text>
+            )}
+            {locationCoords && (
+              <Text style={styles.locationConfirm}>위치 확인됨</Text>
+            )}
+          </TouchableOpacity>
         </View>
 
         {/* Section: Medical info */}
@@ -427,4 +467,25 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   submitSection: { marginTop: spacing.xl },
+
+  locationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceContainerHighest,
+    marginBottom: spacing.md,
+  },
+  locationButtonText: {
+    ...typography.captionMedium,
+    color: colors.primary,
+    fontWeight: '600',
+  },
+  locationConfirm: {
+    ...typography.captionMedium,
+    color: colors.secondary,
+    fontWeight: '600',
+  },
 });

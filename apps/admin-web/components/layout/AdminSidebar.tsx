@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { clsx } from 'clsx';
 import {
   LayoutDashboard,
@@ -14,6 +14,7 @@ import {
   LogOut,
   Shield,
 } from 'lucide-react';
+import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 
 const navigation = [
   { name: '대시보드', href: '/', icon: LayoutDashboard },
@@ -27,6 +28,13 @@ const navigation = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const supabase = createBrowserSupabaseClient();
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
 
   function isActive(href: string) {
     if (href === '/') return pathname === '/';
@@ -89,7 +97,10 @@ export default function AdminSidebar() {
 
       {/* Bottom Section */}
       <div className="px-5 pb-6 space-y-4">
-        <button className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-[13px] font-medium text-white/40 hover:text-white/70 hover:bg-white/[0.04] transition-all duration-200">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-[13px] font-medium text-white/40 hover:text-white/70 hover:bg-white/[0.04] transition-all duration-200"
+        >
           <LogOut className="w-[18px] h-[18px] shrink-0" />
           로그아웃
         </button>

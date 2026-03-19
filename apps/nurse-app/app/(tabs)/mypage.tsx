@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useQuery } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
 import { supabase } from '@/lib/supabase';
@@ -208,6 +209,22 @@ export default function MyPageScreen() {
               />
             </View>
           )}
+        </Card>
+
+        {/* 업무 관리 */}
+        <Text style={styles.sectionTitle}>{'\uC5C5\uBB34 \uAD00\uB9AC'}</Text>
+        <Card noPadding>
+          <MenuItem
+            label={'\uC11C\uBE44\uC2A4 \uACC4\uD68D'}
+            icon={'\uD83D\uDCCB'}
+            onPress={() => router.push('/service-plan')}
+          />
+          <MenuItem
+            label={'AI \uB9AC\uD3EC\uD2B8'}
+            icon={'\uD83E\uDD16'}
+            onPress={() => router.push('/ai-report')}
+            last
+          />
         </Card>
 
         {/* Settings — tonal list */}

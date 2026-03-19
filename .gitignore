@@ -17,6 +17,9 @@ coverage/
 .env.production
 !.env.example
 
+# MCP config (contains access tokens)
+.mcp.json
+
 # Platform builds
 ios/
 android/
@@ -53,3 +56,4 @@ npm-debug.log*
 **/service-account*.json
 *secret*.json
 !package*.json
+.env*.local

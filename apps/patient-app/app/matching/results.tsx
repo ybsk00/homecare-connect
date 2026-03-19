@@ -21,7 +21,6 @@ interface MatchingResultItem {
   service_match_score: number;
   capacity_score: number;
   reputation_score: number;
-  response_score: number;
 }
 
 export default function MatchingResultsScreen() {
@@ -79,7 +78,6 @@ export default function MatchingResultsScreen() {
               serviceMatchScore={result.service_match_score}
               capacityScore={result.capacity_score}
               reputationScore={result.reputation_score}
-              responseScore={result.response_score}
               onPress={(orgId) =>
                 router.push(
                   `/matching/${orgId}?requestId=${requestId ?? ''}`,

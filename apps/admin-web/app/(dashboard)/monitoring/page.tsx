@@ -41,11 +41,18 @@ const tooltipStyle = {
   padding: '12px 16px',
 };
 
+interface SystemHealth {
+  label: string;
+  status: string;
+  color: 'green' | 'yellow' | 'red' | 'gray';
+}
+
 interface MonitoringData {
   redFlagStats: RedFlagStats;
   reportStats: ReportStats;
   chatStats: ChatStats;
   aiCost: AiCostEstimate;
+  systemHealth: SystemHealth[];
 }
 
 export default function MonitoringPage() {
@@ -94,6 +101,46 @@ export default function MonitoringPage() {
       const estimatedCalls = totalRecords * 2 + totalChats + (reports?.length ?? 0);
       const estimatedCost = estimatedCalls * costPerCall;
 
+      // 시스템 헬스체크: 최근 7일 내 데이터 존재 여부로 서비스 상태 판별
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+      const [
+        { count: recentAlerts },
+        { count: recentReports },
+        { count: recentChats },
+        { count: ragDocCount },
+      ] = await Promise.all([
+        supabase.from('red_flag_alerts').select('*', { count: 'exact', head: true }).gte('created_at', sevenDaysAgo),
+        supabase.from('ai_reports').select('*', { count: 'exact', head: true }).gte('created_at', sevenDaysAgo),
+        supabase.from('notifications').select('*', { count: 'exact', head: true }).eq('type', 'chat_message').gte('created_at', sevenDaysAgo),
+        supabase.from('rag_documents').select('*', { count: 'exact', head: true }).eq('is_active', true),
+      ]);
+
+      const reportErrors = statusCounts.error;
+
+      const systemHealth: SystemHealth[] = [
+        {
+          label: 'AI 엔진',
+          status: total > 0 ? (reportErrors > 0 ? '일부 오류' : '정상') : '대기',
+          color: total > 0 ? (reportErrors > 0 ? 'yellow' : 'green') : 'gray',
+        },
+        {
+          label: 'RAG 파이프라인',
+          status: (ragDocCount ?? 0) > 0 ? '정상' : '문서 없음',
+          color: (ragDocCount ?? 0) > 0 ? 'green' : 'yellow',
+        },
+        {
+          label: 'Gemini API',
+          status: estimatedCalls > 0 ? (reportErrors > 0 ? '일부 오류' : '정상') : '대기',
+          color: estimatedCalls > 0 ? (reportErrors > 0 ? 'yellow' : 'green') : 'gray',
+        },
+        {
+          label: '레드플래그 탐지',
+          status: totalRecords > 0 ? '정상' : '대기',
+          color: totalRecords > 0 ? 'green' : 'gray',
+        },
+      ];
+
       return {
         redFlagStats: {
           total,
@@ -118,6 +165,7 @@ export default function MonitoringPage() {
           estimatedCost,
           avgCallsPerDay: Math.round(estimatedCalls / 30),
         },
+        systemHealth,
       };
     },
   });
@@ -285,12 +333,7 @@ export default function MonitoringPage() {
 
         {/* System Health Indicators */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          {[
-            { label: 'AI 엔진', status: '정상', color: 'green' as const },
-            { label: 'RAG 파이프라인', status: '정상', color: 'green' as const },
-            { label: 'Gemini API', status: '정상', color: 'green' as const },
-            { label: '레드플래그 탐지', status: '정상', color: 'green' as const },
-          ].map((item) => (
+          {(data?.systemHealth ?? []).map((item) => (
             <Card key={item.label}>
               <div className="flex items-center justify-between">
                 <span className="text-[13px] font-medium text-primary-600">{item.label}</span>

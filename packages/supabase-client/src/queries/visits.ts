@@ -27,7 +27,8 @@ export async function getVisitsByNurseDate(
         mobility,
         primary_diagnosis,
         special_notes,
-        phone
+        phone,
+        location
       ),
       visit_record:visit_records (
         id,

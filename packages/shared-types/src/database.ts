@@ -1215,11 +1215,9 @@ export interface Database {
           org_id: string;
           org_name: string;
           distance_km: number;
-          travel_minutes: number;
           service_match_score: number;
           capacity_score: number;
           reputation_score: number;
-          response_score: number;
           total_score: number;
         }[];
       };

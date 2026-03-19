@@ -64,3 +64,49 @@ export {
   getNurseMonthlyVisits,
   getPatientsByNurse,
 } from './queries/records';
+
+// Queries - Messages
+export {
+  getMessages,
+  sendMessage,
+  markMessagesAsRead,
+} from './queries/messages';
+
+// Queries - Reviews
+export {
+  getReviewsByOrg,
+  createReview,
+  getReviewsByGuardian,
+} from './queries/reviews';
+
+// Queries - Service Plans
+export {
+  getServicePlan,
+  getServicePlansByPatient,
+  createServicePlan,
+  updateServicePlan,
+  consentServicePlan,
+} from './queries/service-plans';
+
+// Queries - AI Reports
+export {
+  getAIReport,
+  getAIReportsByPatient,
+  getAIReportsByOrg,
+  addDoctorOpinion,
+  sendReportToGuardian,
+} from './queries/ai-reports';
+
+// Queries - Subscriptions & Payments
+export {
+  getSubscription,
+  updateSubscription,
+  getPaymentHistory,
+} from './queries/subscriptions';
+
+// Queries - Push Tokens
+export {
+  upsertPushToken,
+  deactivatePushToken,
+  getActivePushTokens,
+} from './queries/push-tokens';

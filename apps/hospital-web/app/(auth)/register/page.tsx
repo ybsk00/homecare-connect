@@ -46,6 +46,33 @@ export default function RegisterPage() {
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
 
+  // Location
+  const [locationCoords, setLocationCoords] = useState<{lat: number, lng: number} | null>(null);
+  const [locationLoading, setLocationLoading] = useState(false);
+
+  const getLocation = () => {
+    if (!navigator.geolocation) {
+      alert('이 브라우저에서는 위치 기능을 지원하지 않습니다.');
+      return;
+    }
+    setLocationLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocationCoords({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        });
+        setLocationLoading(false);
+      },
+      (error) => {
+        console.error('위치 획득 실패:', error);
+        alert('위치를 가져올 수 없습니다. 브라우저 위치 권한을 확인해주세요.');
+        setLocationLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
+
   // Step 2: Organization
   const [orgName, setOrgName] = useState('');
   const [businessNumber, setBusinessNumber] = useState('');
@@ -118,7 +145,9 @@ export default function RegisterPage() {
         org_type: orgType as 'home_nursing' | 'home_care' | 'rehab_center' | 'clinic' | 'hospital',
         phone: orgPhone,
         address,
-        location: 'POINT(127.0 37.5)',
+        location: locationCoords
+          ? `POINT(${locationCoords.lng} ${locationCoords.lat})`
+          : 'POINT(127.0 37.5)',
         services: selectedServices,
       } as never);
 
@@ -250,6 +279,24 @@ export default function RegisterPage() {
               onChange={(e) => setAddress(e.target.value)}
               required
             />
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={getLocation}
+                disabled={locationLoading}
+                className={clsx(
+                  'rounded-full px-4 py-2 text-xs font-semibold transition-all',
+                  'bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest',
+                  locationLoading && 'opacity-60 cursor-not-allowed'
+                )}
+              >
+                {locationLoading ? '위치 확인 중...' : '현재 위치 사용'}
+              </button>
+              {locationCoords && (
+                <span className="text-xs font-medium text-secondary">위치 확인됨</span>
+              )}
+            </div>
 
             <div>
               <label className="mb-2 block text-sm font-medium text-on-surface">

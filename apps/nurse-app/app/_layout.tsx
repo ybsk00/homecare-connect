@@ -5,6 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/lib/query-client';
 import { useOfflineSync } from '@/hooks/useOfflineSync';
+import { usePushTokenRegistration } from '@/hooks/usePushToken';
 import { Colors, Spacing, FontSize } from '@/constants/theme';
 
 function OfflineBanner() {
@@ -37,6 +38,8 @@ function OfflineBanner() {
 }
 
 function RootLayoutInner() {
+  usePushTokenRegistration();
+
   return (
     <>
       <StatusBar style="dark" />
@@ -80,6 +83,22 @@ function RootLayoutInner() {
         <Stack.Screen
           name="route/index"
           options={{ title: '\uB3D9\uC120 \uCD5C\uC801\uD654' }}
+        />
+        <Stack.Screen
+          name="service-plan/index"
+          options={{ title: '\uC11C\uBE44\uC2A4 \uACC4\uD68D' }}
+        />
+        <Stack.Screen
+          name="service-plan/[planId]"
+          options={{ title: '\uC11C\uBE44\uC2A4 \uACC4\uD68D \uC0C1\uC138' }}
+        />
+        <Stack.Screen
+          name="ai-report/index"
+          options={{ title: 'AI \uB9AC\uD3EC\uD2B8' }}
+        />
+        <Stack.Screen
+          name="ai-report/[reportId]"
+          options={{ title: 'AI \uB9AC\uD3EC\uD2B8 \uC0C1\uC138' }}
         />
       </Stack>
     </>

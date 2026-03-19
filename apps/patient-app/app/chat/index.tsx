@@ -47,7 +47,7 @@ export default function ChatScreen() {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('chat', {
+      const { data, error } = await supabase.functions.invoke('rag-chat', {
         body: {
           message: trimmed,
           conversation_id: conversationId,

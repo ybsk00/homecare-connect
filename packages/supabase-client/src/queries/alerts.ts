@@ -22,7 +22,11 @@ export async function getRedFlagAlerts(
       `
       *,
       patient:patients (id, full_name, care_grade),
-      nurse:profiles!red_flag_alerts_nurse_id_fkey (id, full_name)
+      nurse:staff!red_flag_alerts_nurse_id_fkey (
+        id,
+        staff_type,
+        user:profiles (full_name, avatar_url)
+      )
     `,
     )
     .eq('org_id', orgId)

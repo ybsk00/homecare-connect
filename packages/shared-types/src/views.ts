@@ -82,6 +82,7 @@ export type VisitWithPatient = Tables<'visits'> & {
     allergies?: unknown[];
     special_notes?: string | null;
     phone?: string | null;
+    location?: string | null;
   } | null;
   nurse?: {
     id: string;

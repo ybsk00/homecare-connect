@@ -130,6 +130,18 @@ export default function MyPageScreen() {
               onPress={() => router.push('/notifications')}
             />
             <MenuItem
+              label="서비스 계획"
+              onPress={() => router.push('/service-plan')}
+            />
+            <MenuItem
+              label="AI 건강 리포트"
+              onPress={() => router.push('/ai-report')}
+            />
+            <MenuItem
+              label="리뷰 관리"
+              onPress={() => router.push('/review/write' as any)}
+            />
+            <MenuItem
               label="AI 건강 상담"
               onPress={() => router.push('/chat')}
             />
