@@ -79,7 +79,10 @@ export function TopBar() {
   const handleLogout = async () => {
     const supabase = createBrowserSupabaseClient();
     await supabase.auth.signOut();
-    router.push('/login');
+    useAppStore.getState().setProfile(null);
+    useAppStore.getState().setOrganization(null);
+    useAppStore.getState().setStaffInfo(null);
+    window.location.href = '/login';
   };
 
   const getRoleLabel = () => {
