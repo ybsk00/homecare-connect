@@ -1,7 +1,6 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import AdminTopBar from '@/components/admin/layout/AdminTopBar';
 import Card from '@/components/admin/ui/Card';
 import StatCard from '@/components/admin/ui/StatCard';
 import Badge from '@/components/admin/ui/Badge';
@@ -192,7 +191,6 @@ export default function MonitoringPage() {
   if (error) {
     return (
       <div>
-        <AdminTopBar title="AI 모니터링" subtitle="AI 기능별 성능과 비용을 모니터링합니다." />
         <div className="p-8">
           <Card>
             <div className="flex flex-col items-center justify-center py-16 text-primary-400">
@@ -208,7 +206,6 @@ export default function MonitoringPage() {
   if (loading) {
     return (
       <div>
-        <AdminTopBar title="AI 모니터링" subtitle="AI 기능별 성능과 비용을 모니터링합니다." />
         <div className="p-8 flex items-center justify-center py-24">
           <div className="w-8 h-8 border-[3px] border-primary-100 border-t-secondary-600 rounded-full animate-spin" />
         </div>
@@ -218,7 +215,6 @@ export default function MonitoringPage() {
 
   return (
     <div>
-      <AdminTopBar title="AI 모니터링" subtitle="AI 기능별 성능과 비용을 모니터링합니다." />
       <div className="p-8 space-y-8">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

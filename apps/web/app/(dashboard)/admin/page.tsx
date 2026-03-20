@@ -18,7 +18,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import AdminTopBar from '@/components/admin/layout/AdminTopBar';
 import StatCard from '@/components/admin/ui/StatCard';
 import Card from '@/components/admin/ui/Card';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
@@ -167,7 +166,6 @@ export default function KPIDashboardPage() {
   if (error) {
     return (
       <div>
-        <AdminTopBar title="전체 관리자 대시보드" subtitle="플랫폼 전체의 핵심 지표를 한눈에 확인하세요." />
         <div className="p-8">
           <Card>
             <div className="flex flex-col items-center justify-center py-16 text-primary-400">
@@ -183,7 +181,6 @@ export default function KPIDashboardPage() {
   if (isLoading) {
     return (
       <div>
-        <AdminTopBar title="전체 관리자 대시보드" subtitle="플랫폼 전체의 핵심 지표를 한눈에 확인하세요." />
         <div className="p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => (
@@ -206,10 +203,6 @@ export default function KPIDashboardPage() {
 
   return (
     <div>
-      <AdminTopBar
-        title="전체 관리자 대시보드"
-        subtitle="플랫폼 전체의 핵심 지표를 한눈에 확인하세요."
-      />
       <div className="p-8 space-y-8">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

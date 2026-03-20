@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import AdminTopBar from '@/components/admin/layout/AdminTopBar';
 import Card from '@/components/admin/ui/Card';
 import Badge from '@/components/admin/ui/Badge';
 import Button from '@/components/admin/ui/Button';
@@ -148,7 +147,6 @@ export default function AdsPage() {
 
   return (
     <div>
-      <AdminTopBar title="광고 관리" subtitle="의료광고 심사 및 매출 현황을 관리합니다." />
       <div className="p-8 space-y-8">
         {/* Revenue Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

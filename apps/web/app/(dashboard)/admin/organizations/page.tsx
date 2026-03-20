@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import AdminTopBar from '@/components/admin/layout/AdminTopBar';
 import OrgTable from '@/components/admin/orgs/OrgTable';
 import Card from '@/components/admin/ui/Card';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
@@ -113,7 +112,6 @@ export default function OrganizationsPage() {
 
   return (
     <div>
-      <AdminTopBar title="기관 관리" subtitle="기관 등록 심사 및 현황을 관리합니다." />
       <div className="p-8 space-y-8">
         <div className="flex gap-2">
           {tabs.map((tab) => (

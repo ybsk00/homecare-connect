@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import AdminTopBar from '@/components/admin/layout/AdminTopBar';
 import Card from '@/components/admin/ui/Card';
 import Badge from '@/components/admin/ui/Badge';
 import Button from '@/components/admin/ui/Button';
@@ -95,7 +94,6 @@ export default function SubscriptionsPage() {
 
   return (
     <div>
-      <AdminTopBar title="구독 관리" subtitle="기관별 구독 현황 및 결제 상태를 관리합니다." />
       <div className="p-8 space-y-8">
         {/* Error state */}
         {error && (

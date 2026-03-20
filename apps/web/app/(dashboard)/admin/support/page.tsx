@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import AdminTopBar from '@/components/admin/layout/AdminTopBar';
 import Card from '@/components/admin/ui/Card';
 import Badge from '@/components/admin/ui/Badge';
 import Button from '@/components/admin/ui/Button';
@@ -134,7 +133,6 @@ export default function SupportPage() {
 
   return (
     <div>
-      <AdminTopBar title="민원 처리" subtitle="접수된 민원을 확인하고 답변합니다." />
       <div className="p-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left: Ticket List */}

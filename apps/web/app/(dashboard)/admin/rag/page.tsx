@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import AdminTopBar from '@/components/admin/layout/AdminTopBar';
 import Card from '@/components/admin/ui/Card';
 import Badge from '@/components/admin/ui/Badge';
 import Button from '@/components/admin/ui/Button';
@@ -137,7 +136,6 @@ export default function RagPage() {
 
   return (
     <div>
-      <AdminTopBar title="RAG KB 관리" subtitle="보호자 챗봇에서 활용되는 지식베이스를 관리합니다." />
       <div className="p-8 space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">

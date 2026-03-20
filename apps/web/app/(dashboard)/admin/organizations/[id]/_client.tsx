@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import AdminTopBar from '@/components/admin/layout/AdminTopBar';
 import OrgReviewPanel from '@/components/admin/orgs/OrgReviewPanel';
 import Card from '@/components/admin/ui/Card';
 import Badge from '@/components/admin/ui/Badge';
@@ -169,7 +168,6 @@ export default function OrgDetailClient() {
   if (loading || !org) {
     return (
       <div>
-        <AdminTopBar title="기관 상세" />
         <div className="p-8 flex items-center justify-center py-24">
           <div className="w-8 h-8 border-[3px] border-primary-100 border-t-secondary-600 rounded-full animate-spin" />
         </div>
@@ -186,7 +184,6 @@ export default function OrgDetailClient() {
 
   return (
     <div>
-      <AdminTopBar title="기관 상세" subtitle={org.name} />
       <div className="p-8 space-y-8">
         <Button variant="ghost" size="sm" onClick={() => router.push('/admin/organizations')}>
           <ArrowLeft className="w-4 h-4 mr-1.5" />
