@@ -1,4 +1,8 @@
+'use client';
+
 import { ArrowRight, Heart, Droplets, Thermometer, Activity } from 'lucide-react';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
 function VitalCard({
   icon: Icon,
@@ -32,6 +36,12 @@ function VitalCard({
 }
 
 export function Hero() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <section
       id="hero"
@@ -45,7 +55,11 @@ export function Hero() {
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-6 lg:grid-cols-2 lg:gap-16">
         {/* Left: Text content */}
-        <div className="max-w-xl">
+        <div
+          className={`max-w-xl transition-all duration-1000 ease-out ${
+            mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`}
+        >
           {/* Badge */}
           <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-secondary/10 px-4 py-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-secondary" />
@@ -74,14 +88,14 @@ export function Hero() {
           <div className="mt-8 flex flex-wrap gap-4">
             <a
               href="/login"
-              className="btn-gradient inline-flex items-center gap-2 rounded-2xl px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary/20 transition-opacity hover:opacity-90"
+              className="btn-gradient inline-flex items-center gap-2 rounded-2xl px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary/20 transition-all hover:opacity-90 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
             >
               지금 서비스 신청하기
               <ArrowRight className="h-4 w-4" />
             </a>
             <a
               href="/login"
-              className="inline-flex items-center gap-2 rounded-2xl border border-secondary px-7 py-3.5 text-base font-semibold text-secondary transition-colors hover:bg-secondary/5"
+              className="inline-flex items-center gap-2 rounded-2xl border border-secondary px-7 py-3.5 text-base font-semibold text-secondary transition-all hover:bg-secondary/5 hover:-translate-y-0.5"
             >
               AI 내담 체험하기
             </a>
@@ -89,7 +103,6 @@ export function Hero() {
 
           {/* Social proof */}
           <div className="mt-10 flex items-center gap-3">
-            {/* Avatars placeholder */}
             <div className="flex -space-x-2">
               {[
                 'bg-primary/80',
@@ -112,26 +125,32 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Right: Visual */}
-        <div className="relative flex items-center justify-center lg:justify-end">
-          {/* Main visual card */}
-          <div className="relative h-[420px] w-full max-w-md overflow-hidden rounded-3xl bg-gradient-to-br from-primary/5 to-secondary/10 lg:h-[480px]">
-            {/* Healthcare illustration placeholder */}
-            <div className="flex h-full flex-col items-center justify-center p-8">
-              <div className="flex h-28 w-28 items-center justify-center rounded-full bg-secondary/10">
-                <HeartPulseIcon className="h-16 w-16 text-secondary" />
-              </div>
-              <p className="mt-6 text-center text-lg font-semibold text-primary">
-                전문 방문간호 서비스
-              </p>
-              <p className="mt-2 text-center text-sm text-on-surface-variant">
-                검증된 의료진이 직접 방문합니다
-              </p>
-            </div>
+        {/* Right: Visual with hero image */}
+        <div
+          className={`relative flex items-center justify-center lg:justify-end transition-all duration-1000 delay-300 ease-out ${
+            mounted ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
+          }`}
+        >
+          {/* Main hero image */}
+          <div className="relative h-[420px] w-full max-w-md overflow-hidden rounded-3xl shadow-2xl shadow-primary/10 lg:h-[500px]">
+            <Image
+              src="/images/hero.jpg"
+              alt="방문간호 서비스"
+              fill
+              className="object-cover"
+              priority
+            />
+            {/* Soft gradient overlay at bottom */}
+            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/20 to-transparent" />
           </div>
 
-          {/* Floating glassmorphism vitals card */}
-          <div className="glass absolute -right-2 -bottom-4 w-64 rounded-2xl p-5 shadow-xl lg:right-0 lg:-bottom-6">
+          {/* Floating glassmorphism vitals card - bottom right, not overlapping image too much */}
+          <div
+            className={`glass absolute -right-4 bottom-8 w-64 rounded-2xl p-5 shadow-xl transition-all duration-1000 delay-700 ease-out lg:right-[-2rem] lg:bottom-12 ${
+              mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            }`}
+            style={{ animation: mounted ? 'float 6s ease-in-out infinite' : 'none' }}
+          >
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-sm font-bold text-primary">건강 지표</h3>
               <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-700">
@@ -170,8 +189,13 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Floating notification card */}
-          <div className="glass absolute -left-4 top-8 rounded-2xl p-4 shadow-lg lg:left-0 lg:top-12">
+          {/* Floating notification card - top left, outside image area */}
+          <div
+            className={`glass absolute -left-6 top-4 rounded-2xl p-4 shadow-lg transition-all duration-1000 delay-500 ease-out lg:-left-8 lg:top-8 ${
+              mounted ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0'
+            }`}
+            style={{ animation: mounted ? 'floatReverse 5s ease-in-out infinite' : 'none' }}
+          >
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
                 <Activity className="h-5 w-5 text-secondary" />
@@ -188,24 +212,18 @@ export function Hero() {
           </div>
         </div>
       </div>
-    </section>
-  );
-}
 
-function HeartPulseIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M19.5 12.572l-7.5 7.428l-7.5-7.428A5 5 0 1 1 12 6.006a5 5 0 1 1 7.5 6.572" />
-      <path d="M5 12h2l2 3l4-6l2 3h2" />
-    </svg>
+      {/* CSS Animations */}
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-12px); }
+        }
+        @keyframes floatReverse {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+        }
+      `}</style>
+    </section>
   );
 }

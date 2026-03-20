@@ -1,4 +1,7 @@
+'use client';
+
 import { Brain, Activity, ShieldCheck } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 
 const features = [
   {
@@ -28,11 +31,32 @@ const features = [
 ];
 
 export function FeatureCards() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section id="features" className="bg-surface-container-low py-20 lg:py-28">
+    <section id="features" ref={sectionRef} className="bg-surface-container-low py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-6">
         {/* Section header */}
-        <div className="mx-auto max-w-2xl text-center">
+        <div
+          className={`mx-auto max-w-2xl text-center transition-all duration-800 ease-out ${
+            visible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+          }`}
+        >
           <h2 className="text-3xl font-bold tracking-tight text-primary lg:text-4xl">
             왜 홈케어커넥트인가요?
           </h2>
@@ -43,13 +67,16 @@ export function FeatureCards() {
 
         {/* Cards */}
         <div className="mt-14 grid gap-6 md:grid-cols-3 lg:gap-8">
-          {features.map((feature) => (
+          {features.map((feature, i) => (
             <div
               key={feature.title}
-              className="group rounded-2xl bg-surface-container-lowest p-8 shadow-sm transition-shadow hover:shadow-md"
+              className={`group rounded-2xl bg-surface-container-lowest p-8 shadow-sm transition-all duration-700 ease-out hover:shadow-lg hover:-translate-y-1 ${
+                visible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
+              }`}
+              style={{ transitionDelay: visible ? `${300 + i * 150}ms` : '0ms' }}
             >
               <div
-                className={`inline-flex h-14 w-14 items-center justify-center rounded-2xl ${feature.color}`}
+                className={`inline-flex h-14 w-14 items-center justify-center rounded-2xl ${feature.color} transition-transform duration-300 group-hover:scale-110`}
               >
                 <feature.icon className={`h-7 w-7 ${feature.iconColor}`} />
               </div>
