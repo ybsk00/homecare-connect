@@ -6,7 +6,6 @@ const nextConfig: NextConfig = {
     '@homecare/shared-utils',
     '@homecare/supabase-client',
   ],
-  outputFileTracingRoot: process.env.VERCEL ? '/vercel/path0' : undefined,
 };
 
 export default nextConfig;
