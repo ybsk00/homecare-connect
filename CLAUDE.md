@@ -8,10 +8,9 @@ Turborepo + pnpm 모노레포
 
 ```
 apps/
+  web/             # 통합 웹앱 (Next.js 15, port 3000) - 랜딩+환자+간호사+병원+관리자
   patient-app/     # 환자/보호자 모바일 앱 (React Native + Expo)
   nurse-app/       # 간호사 모바일 앱 (React Native + Expo)
-  hospital-web/    # 병원 관리 콘솔 (Next.js 15, port 3000)
-  admin-web/       # 플랫폼 백오피스 (Next.js 15, port 3001)
 
 packages/
   shared-types/    # TypeScript 타입 (DB 스키마, API, Enum)
@@ -71,13 +70,20 @@ pnpm lint             # ESLint
 ## Firebase App Hosting
 
 - **프로젝트**: homecare-connect-ce904
-- **백엔드**:
-  - hospital-web → https://hospital-web--homecare-connect-ce904.asia-east1.hosted.app
-  - admin-web → https://admin-web--homecare-connect-ce904.asia-east1.hosted.app
+- **백엔드**: hospital-web (통합 웹앱, root: apps/web)
+- **URL**: https://hospital-web--homecare-connect-ce904.asia-east1.hosted.app
 - **리전**: asia-east1 (타이완)
 - **배포**: GitHub main push → 자동 빌드/배포 (Cloud Run)
-- **설정**: 각 앱의 `apphosting.yaml`에 런타임/환경변수 설정
-- **시크릿**: Firebase Secret Manager (NEXT_PUBLIC_SUPABASE_ANON_KEY)
+- **설정**: `apps/web/apphosting.yaml`
+
+## 웹앱 라우팅 (통합)
+
+- `/` — 히어로 랜딩 (비로그인)
+- `/login` — 통합 로그인 → 역할별 자동 분기
+- `/patient/*` — 환자/보호자 대시보드
+- `/nurse/*` — 간호사 대시보드
+- `/hospital/*` — 병원 관리자 대시보드
+- `/admin/*` — 플랫폼 관리자 대시보드
 
 ## GitHub
 
