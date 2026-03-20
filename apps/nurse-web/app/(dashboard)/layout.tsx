@@ -7,15 +7,16 @@ import { Sidebar } from '@/components/layout/Sidebar';
 import { TopBar } from '@/components/layout/TopBar';
 import { useAppStore } from '@/lib/store';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { Loading } from '@/components/ui/Loading';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { sidebarOpen, setProfile, setStaffInfo } = useAppStore();
   const router = useRouter();
-  const { sidebarOpen, setOrganization, setProfile } = useAppStore();
-  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -38,34 +39,35 @@ export default function DashboardLayout({
 
       if (profile) setProfile(profile);
 
-      // Load organization (owner)
-      const { data: org } = await supabase
-        .from('organizations')
-        .select('*')
-        .eq('owner_id', user.id)
+      // Load staff info
+      const { data: staff } = await supabase
+        .from('staff')
+        .select('id, org_id, license_number, staff_type, specialties, is_active')
+        .eq('user_id', user.id)
         .single();
 
-      if (org) setOrganization(org);
+      if (!staff) {
+        router.replace('/verify');
+        return;
+      }
 
-      setIsAuthChecked(true);
+      setStaffInfo({
+        id: staff.id,
+        organization_id: staff.org_id,
+        license_number: staff.license_number ?? '',
+        staff_type: staff.staff_type,
+        specialties: (staff.specialties as string[]) ?? [],
+        is_active: staff.is_active,
+      });
+
+      setReady(true);
     };
 
     loadUserData();
-  }, [router, setOrganization, setProfile]);
+  }, [setProfile, setStaffInfo, router]);
 
-  if (!isAuthChecked) {
-    return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center">
-            <svg className="w-6 h-6 text-white animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </div>
-          <p className="text-on-surface-variant text-sm">로딩 중...</p>
-        </div>
-      </div>
-    );
+  if (!ready) {
+    return <Loading fullPage text="데이터를 불러오는 중..." />;
   }
 
   return (

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { clsx } from 'clsx';
+import { Loader2 } from 'lucide-react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopBar } from '@/components/layout/TopBar';
 import { useAppStore } from '@/lib/store';
@@ -13,9 +14,9 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { sidebarOpen, setProfile } = useAppStore();
   const router = useRouter();
-  const { sidebarOpen, setOrganization, setProfile } = useAppStore();
-  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -38,31 +39,18 @@ export default function DashboardLayout({
 
       if (profile) setProfile(profile);
 
-      // Load organization (owner)
-      const { data: org } = await supabase
-        .from('organizations')
-        .select('*')
-        .eq('owner_id', user.id)
-        .single();
-
-      if (org) setOrganization(org);
-
-      setIsAuthChecked(true);
+      setLoading(false);
     };
 
     loadUserData();
-  }, [router, setOrganization, setProfile]);
+  }, [router, setProfile]);
 
-  if (!isAuthChecked) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center">
-            <svg className="w-6 h-6 text-white animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </div>
-          <p className="text-on-surface-variant text-sm">로딩 중...</p>
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-on-surface-variant">로딩 중...</p>
         </div>
       </div>
     );

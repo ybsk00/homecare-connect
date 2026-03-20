@@ -39,7 +39,15 @@ export interface Database {
           avatar_url?: string | null;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'profiles_id_fkey';
+            columns: ['id'];
+            isOneToOne: true;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -114,7 +122,15 @@ export interface Database {
           status?: 'active' | 'paused' | 'discharged';
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'patients_primary_guardian_id_fkey';
+            columns: ['primary_guardian_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -147,7 +163,22 @@ export interface Database {
           is_primary?: boolean;
           notification_mode?: 'all' | 'summary' | 'alert_only';
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'guardian_patient_links_guardian_id_fkey';
+            columns: ['guardian_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'guardian_patient_links_patient_id_fkey';
+            columns: ['patient_id'];
+            isOneToOne: false;
+            referencedRelation: 'patients';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -243,7 +274,15 @@ export interface Database {
           subscription_plan?: 'free' | 'basic' | 'pro' | 'enterprise';
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'organizations_owner_id_fkey';
+            columns: ['owner_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -285,7 +324,22 @@ export interface Database {
           current_patient_count?: number;
           is_active?: boolean;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'staff_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'staff_org_id_fkey';
+            columns: ['org_id'];
+            isOneToOne: false;
+            referencedRelation: 'organizations';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -378,7 +432,36 @@ export interface Database {
           expires_at?: string | null;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'service_requests_patient_id_fkey';
+            columns: ['patient_id'];
+            isOneToOne: false;
+            referencedRelation: 'patients';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'service_requests_guardian_id_fkey';
+            columns: ['guardian_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'service_requests_selected_org_id_fkey';
+            columns: ['selected_org_id'];
+            isOneToOne: false;
+            referencedRelation: 'organizations';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'service_requests_assigned_nurse_id_fkey';
+            columns: ['assigned_nurse_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -447,7 +530,36 @@ export interface Database {
           end_date?: string | null;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'service_plans_request_id_fkey';
+            columns: ['request_id'];
+            isOneToOne: false;
+            referencedRelation: 'service_requests';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'service_plans_patient_id_fkey';
+            columns: ['patient_id'];
+            isOneToOne: false;
+            referencedRelation: 'patients';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'service_plans_org_id_fkey';
+            columns: ['org_id'];
+            isOneToOne: false;
+            referencedRelation: 'organizations';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'service_plans_nurse_id_fkey';
+            columns: ['nurse_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -540,7 +652,36 @@ export interface Database {
           reschedule_from?: string | null;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'visits_plan_id_fkey';
+            columns: ['plan_id'];
+            isOneToOne: false;
+            referencedRelation: 'service_plans';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'visits_patient_id_fkey';
+            columns: ['patient_id'];
+            isOneToOne: false;
+            referencedRelation: 'patients';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'visits_org_id_fkey';
+            columns: ['org_id'];
+            isOneToOne: false;
+            referencedRelation: 'organizations';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'visits_nurse_id_fkey';
+            columns: ['nurse_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -654,7 +795,29 @@ export interface Database {
           synced_at?: string | null;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'visit_records_visit_id_fkey';
+            columns: ['visit_id'];
+            isOneToOne: true;
+            referencedRelation: 'visits';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'visit_records_nurse_id_fkey';
+            columns: ['nurse_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'visit_records_patient_id_fkey';
+            columns: ['patient_id'];
+            isOneToOne: false;
+            referencedRelation: 'patients';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -720,7 +883,36 @@ export interface Database {
           resolution_note?: string | null;
           resolved_at?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'red_flag_alerts_visit_record_id_fkey';
+            columns: ['visit_record_id'];
+            isOneToOne: false;
+            referencedRelation: 'visit_records';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'red_flag_alerts_patient_id_fkey';
+            columns: ['patient_id'];
+            isOneToOne: false;
+            referencedRelation: 'patients';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'red_flag_alerts_nurse_id_fkey';
+            columns: ['nurse_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'red_flag_alerts_org_id_fkey';
+            columns: ['org_id'];
+            isOneToOne: false;
+            referencedRelation: 'organizations';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -804,7 +996,29 @@ export interface Database {
           doctor_visit_date?: string | null;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'ai_reports_patient_id_fkey';
+            columns: ['patient_id'];
+            isOneToOne: false;
+            referencedRelation: 'patients';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'ai_reports_org_id_fkey';
+            columns: ['org_id'];
+            isOneToOne: false;
+            referencedRelation: 'organizations';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'ai_reports_doctor_id_fkey';
+            columns: ['doctor_id'];
+            isOneToOne: false;
+            referencedRelation: 'staff';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -852,7 +1066,15 @@ export interface Database {
           push_sent?: boolean;
           kakao_sent?: boolean;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'notifications_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -888,7 +1110,15 @@ export interface Database {
           attachments?: string[];
           read_by?: string[];
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'messages_sender_id_fkey';
+            columns: ['sender_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -939,7 +1169,29 @@ export interface Database {
           is_visible?: boolean;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'reviews_org_id_fkey';
+            columns: ['org_id'];
+            isOneToOne: false;
+            referencedRelation: 'organizations';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'reviews_guardian_id_fkey';
+            columns: ['guardian_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'reviews_patient_id_fkey';
+            columns: ['patient_id'];
+            isOneToOne: false;
+            referencedRelation: 'patients';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -992,7 +1244,15 @@ export interface Database {
           cancelled_at?: string | null;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'subscriptions_org_id_fkey';
+            columns: ['org_id'];
+            isOneToOne: false;
+            referencedRelation: 'organizations';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -1034,7 +1294,22 @@ export interface Database {
           paid_at?: string | null;
           receipt_url?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'payment_history_subscription_id_fkey';
+            columns: ['subscription_id'];
+            isOneToOne: false;
+            referencedRelation: 'subscriptions';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'payment_history_org_id_fkey';
+            columns: ['org_id'];
+            isOneToOne: false;
+            referencedRelation: 'organizations';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -1085,7 +1360,15 @@ export interface Database {
           is_active?: boolean;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'advertisements_org_id_fkey';
+            columns: ['org_id'];
+            isOneToOne: false;
+            referencedRelation: 'organizations';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -1160,7 +1443,15 @@ export interface Database {
           is_active?: boolean;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'push_tokens_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
       };
 
       // =====================================================
@@ -1199,7 +1490,15 @@ export interface Database {
           user_agent?: string | null;
           details?: Record<string, unknown>;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'audit_logs_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'profiles';
+            referencedColumns: ['id'];
+          },
+        ];
       };
     };
 

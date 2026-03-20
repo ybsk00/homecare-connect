@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+
+@theme {
+  --color-primary: #002045;
+  --color-primary-container: #1A365D;
+  --color-secondary: #006A63;
+  --color-secondary-container: #79F7EA;
+  --color-tertiary: #321B00;
+  --color-surface: #F7FAFC;
+  --color-surface-container-low: #F1F4F6;
+  --color-surface-container-lowest: #FFFFFF;
+  --color-surface-container-high: #E5E9EB;
+  --color-on-surface: #181C1E;
+  --color-on-surface-variant: #42474E;
+  --color-outline-variant: #C4C6CF;
+  --color-error: #BA1A1A;
+  --font-family-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-family-sans);
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, #002045, #1A365D);
+}
