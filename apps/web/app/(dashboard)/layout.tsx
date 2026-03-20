@@ -6,6 +6,7 @@ import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { useAppStore } from '@/lib/store';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopBar } from '@/components/layout/TopBar';
+import { ContentLayout } from '@/components/layout/ContentLayout';
 
 export default function DashboardLayout({
   children,
@@ -110,6 +111,12 @@ export default function DashboardLayout({
         </div>
       </div>
     );
+  }
+
+  const role = profile?.role as string;
+
+  if (role === 'guardian' || role === 'nurse') {
+    return <ContentLayout>{children}</ContentLayout>;
   }
 
   return (
