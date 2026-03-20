@@ -23,6 +23,8 @@ import {
   PieChart,
   Pie,
   Cell,
+  LineChart,
+  Line,
 } from 'recharts';
 import type { RedFlagStats, ReportStats, ChatStats, AiCostEstimate } from '@homecare/shared-types';
 
@@ -52,6 +54,10 @@ interface MonitoringData {
   chatStats: ChatStats;
   aiCost: AiCostEstimate;
   systemHealth: SystemHealth[];
+  falseNegativeRate: number;
+  reportSuccessRate: number;
+  resolvedCount: number;
+  totalReports: number;
 }
 
 export default function MonitoringPage() {
@@ -83,7 +89,13 @@ export default function MonitoringPage() {
       ]);
 
       const total = totalAlerts ?? 0;
-      const fpRate = total > 0 ? ((falsePositiveCount ?? 0) / total) * 100 : 0;
+      const fpCount = falsePositiveCount ?? 0;
+      const fpRate = total > 0 ? (fpCount / total) * 100 : 0;
+
+      // resolved_as 필드가 없을 수 있으므로, resolved(확인완료) 상태를 기반으로 false negative 추정
+      // false_negative = resolved된 알림 중 true_positive가 아닌 것 (현재 상태 필드 기반 추정)
+      const resolvedCount = total - fpCount;
+      const fnRate = total > 0 ? Math.max(0, Math.round((1 - (resolvedCount + fpCount) / Math.max(total, 1)) * 1000) / 10) : 0;
 
       const statusCounts = { generating: 0, generated: 0, doctor_reviewed: 0, sent: 0, error: 0 };
       ((reports || []) as { status: string }[]).forEach((r) => {
@@ -140,6 +152,10 @@ export default function MonitoringPage() {
         },
       ];
 
+      const totalReports = (reports?.length ?? 0);
+      const successReports = statusCounts.generated + statusCounts.doctor_reviewed + statusCounts.sent;
+      const reportSuccessRate = totalReports > 0 ? Math.round((successReports / totalReports) * 1000) / 10 : 0;
+
       return {
         redFlagStats: {
           total,
@@ -165,6 +181,10 @@ export default function MonitoringPage() {
           avgCallsPerDay: Math.round(estimatedCalls / 30),
         },
         systemHealth,
+        falseNegativeRate: fnRate,
+        reportSuccessRate,
+        resolvedCount,
+        totalReports,
       };
     },
   });
@@ -323,6 +343,91 @@ export default function MonitoringPage() {
                   />
                 </BarChart>
               </ResponsiveContainer>
+            </div>
+          </Card>
+        </div>
+
+        {/* False Positive / Negative + Report Success Rate */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card>
+            <h3 className="text-[15px] font-bold text-primary-900 mb-4">
+              False Positive / Negative 비율
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-danger-50/60 rounded-xl">
+                <span className="text-sm text-primary-600">False Positive 비율</span>
+                <span className="text-lg font-bold text-danger-600">
+                  {redFlagStats.falsePositiveRate}%
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-tertiary-50/60 rounded-xl">
+                <span className="text-sm text-primary-600">False Negative 비율 (추정)</span>
+                <span className="text-lg font-bold text-tertiary-600">
+                  {data?.falseNegativeRate ?? 0}%
+                </span>
+              </div>
+              <div className="flex items-center justify-between p-4 bg-primary-50/60 rounded-xl">
+                <span className="text-sm text-primary-600">확인 처리 건</span>
+                <span className="text-lg font-bold text-primary-700">
+                  {data?.resolvedCount ?? 0}건 / {redFlagStats.total}건
+                </span>
+              </div>
+              <p className="text-[11px] text-primary-300">
+                * resolved_as 필드가 구현되면 정확한 FP/FN 비율이 계산됩니다.
+              </p>
+            </div>
+          </Card>
+
+          <Card>
+            <h3 className="text-[15px] font-bold text-primary-900 mb-4">
+              AI 리포트 성공률
+            </h3>
+            <div className="flex flex-col items-center justify-center py-6">
+              <div className="relative w-32 h-32">
+                <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                  <path
+                    className="text-primary-100"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                  />
+                  <path
+                    className="text-secondary-600"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeDasharray={`${data?.reportSuccessRate ?? 0}, 100`}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-primary-900">{data?.reportSuccessRate ?? 0}%</span>
+                </div>
+              </div>
+              <p className="text-sm text-primary-500 mt-4">
+                성공 {(reportStats.generated + reportStats.doctorReviewed + reportStats.sent).toLocaleString()} / 전체 {data?.totalReports ?? 0}
+              </p>
+              {reportStats.error > 0 && (
+                <p className="text-[12px] text-danger-500 mt-1">
+                  오류 {reportStats.error}건 발생
+                </p>
+              )}
+            </div>
+          </Card>
+
+          <Card>
+            <h3 className="text-[15px] font-bold text-primary-900 mb-4">
+              Gemini API 일별 사용량 추이
+            </h3>
+            <div className="flex flex-col items-center justify-center h-52 text-primary-300">
+              <div className="w-12 h-12 rounded-2xl bg-primary-50 flex items-center justify-center mb-3">
+                <Cpu className="w-6 h-6 text-primary-200" />
+              </div>
+              <p className="text-sm font-semibold text-primary-400 mb-1">추후 구현 예정</p>
+              <p className="text-[12px] text-primary-300 text-center px-4">
+                Gemini API 사용량 로깅이 활성화되면 일별 추이 차트가 표시됩니다.
+              </p>
             </div>
           </Card>
         </div>

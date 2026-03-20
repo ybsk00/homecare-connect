@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge, getStatusBadgeVariant } from '@/components/ui/Badge';
@@ -15,6 +15,9 @@ import {
   User,
   Clock,
   Eye,
+  Sparkles,
+  Send,
+  AlertTriangle,
 } from 'lucide-react';
 import type { Tables } from '@homecare/shared-types';
 
@@ -27,8 +30,12 @@ const reportStatusLabels: Record<string, string> = {
 };
 
 export default function DoctorPage() {
+  const queryClient = useQueryClient();
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Tables<'ai_reports'> | null>(null);
+  const [doctorOpinion, setDoctorOpinion] = useState('');
+  const [doctorOpinionSimple, setDoctorOpinionSimple] = useState('');
+  const [isConverting, setIsConverting] = useState(false);
 
   const { data: reports = [], isLoading } = useQuery({
     queryKey: ['ai-reports'],
@@ -56,8 +63,82 @@ export default function DoctorPage() {
 
   const openReport = (report: Tables<'ai_reports'>) => {
     setSelectedReport(report);
+    setDoctorOpinion(report.doctor_opinion || '');
+    setDoctorOpinionSimple(report.doctor_opinion_simple || '');
     setReportModalOpen(true);
   };
+
+  // 의사 소견 저장
+  const saveOpinionMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedReport) return;
+      const supabase = createBrowserSupabaseClient();
+      const { error } = await supabase
+        .from('ai_reports')
+        .update({
+          doctor_opinion: doctorOpinion,
+          doctor_opinion_simple: doctorOpinionSimple,
+          status: 'doctor_reviewed',
+        } as never)
+        .eq('id', selectedReport.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ai-reports'] });
+      if (selectedReport) {
+        setSelectedReport({
+          ...selectedReport,
+          doctor_opinion: doctorOpinion,
+          doctor_opinion_simple: doctorOpinionSimple,
+          status: 'doctor_reviewed',
+        });
+      }
+    },
+  });
+
+  // AI 쉬운 말 변환
+  const convertToSimple = async () => {
+    if (!doctorOpinion.trim()) return;
+    setIsConverting(true);
+    try {
+      const supabase = createBrowserSupabaseClient();
+      const { data } = await supabase.functions.invoke('ai-report', {
+        body: {
+          action: 'simplify_opinion',
+          doctor_opinion: doctorOpinion,
+          patient_name: (selectedReport as any)?.patients?.full_name || '환자',
+        },
+      });
+      if (data?.simplified) {
+        setDoctorOpinionSimple(data.simplified);
+      } else {
+        // Fallback: 간단한 변환 메시지
+        setDoctorOpinionSimple(`[보호자용] ${doctorOpinion}`);
+      }
+    } catch {
+      setDoctorOpinionSimple(`[보호자용] ${doctorOpinion}`);
+    } finally {
+      setIsConverting(false);
+    }
+  };
+
+  // 보호자 전달
+  const sendToGuardianMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedReport) return;
+      const supabase = createBrowserSupabaseClient();
+      await supabase
+        .from('ai_reports')
+        .update({ status: 'sent' } as never)
+        .eq('id', selectedReport.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ai-reports'] });
+      if (selectedReport) {
+        setSelectedReport({ ...selectedReport, status: 'sent' });
+      }
+    },
+  });
 
   return (
     <div className="space-y-8">
@@ -227,31 +308,93 @@ export default function DoctorPage() {
               </div>
             )}
 
-            {selectedReport.doctor_opinion && (
-              <div className="rounded-xl bg-primary/5 p-5">
-                <h4 className="mb-1.5 text-sm font-semibold text-primary">
-                  의사 소견
-                </h4>
-                <p className="text-sm text-on-surface">
-                  {selectedReport.doctor_opinion}
-                </p>
+            {/* 의사 소견 입력 */}
+            <div className="rounded-xl bg-primary/5 p-5">
+              <h4 className="mb-2 text-sm font-semibold text-primary">
+                <Stethoscope className="mr-1.5 inline h-4 w-4" />
+                의사 소견
+              </h4>
+              <textarea
+                value={doctorOpinion}
+                onChange={(e) => setDoctorOpinion(e.target.value)}
+                placeholder="환자 상태에 대한 의사 소견을 입력하세요..."
+                rows={4}
+                className="block w-full rounded-lg bg-white px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-primary/40"
+              />
+              <div className="mt-3 flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={convertToSimple}
+                  disabled={!doctorOpinion.trim() || isConverting}
+                  loading={isConverting}
+                >
+                  <Sparkles className="h-4 w-4" />
+                  쉬운 말로 변환
+                </Button>
+                <span className="text-[10px] text-on-surface-variant">
+                  AI가 보호자가 이해하기 쉬운 말로 변환합니다
+                </span>
               </div>
-            )}
-
-            {selectedReport.doctor_opinion_simple && (
-              <div className="rounded-xl bg-secondary/5 p-5">
-                <h4 className="mb-1.5 text-sm font-semibold text-secondary">
-                  보호자용 쉬운 설명
-                </h4>
-                <p className="text-sm text-on-surface">
-                  {selectedReport.doctor_opinion_simple}
-                </p>
-              </div>
-            )}
-
-            <div className="flex justify-end pt-2">
-              <Button onClick={() => setReportModalOpen(false)}>닫기</Button>
             </div>
+
+            {/* 보호자용 쉬운 설명 */}
+            <div className="rounded-xl bg-secondary/5 p-5">
+              <h4 className="mb-2 text-sm font-semibold text-secondary">
+                보호자용 쉬운 설명
+              </h4>
+              <textarea
+                value={doctorOpinionSimple}
+                onChange={(e) => setDoctorOpinionSimple(e.target.value)}
+                placeholder="AI 변환 후 여기에 표시됩니다. 직접 수정도 가능합니다."
+                rows={3}
+                className="block w-full rounded-lg bg-white px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-secondary/40"
+              />
+            </div>
+
+            {/* 면책 고지 */}
+            <div className="flex items-start gap-2 rounded-lg bg-tertiary/5 p-3">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-tertiary" />
+              <p className="text-[11px] leading-relaxed text-tertiary/80">
+                이 소견은 참고용이며, 정확한 진단 및 치료를 대체하지 않습니다.
+                보호자에게 전달 시 자동으로 면책 고지가 포함됩니다.
+              </p>
+            </div>
+
+            {/* 액션 버튼 */}
+            <div className="flex items-center justify-between pt-2">
+              <Button variant="ghost" onClick={() => setReportModalOpen(false)}>닫기</Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="secondary"
+                  loading={saveOpinionMutation.isPending}
+                  onClick={() => saveOpinionMutation.mutate()}
+                  disabled={!doctorOpinion.trim()}
+                >
+                  소견 저장
+                </Button>
+                {selectedReport.status === 'doctor_reviewed' && (
+                  <Button
+                    loading={sendToGuardianMutation.isPending}
+                    onClick={() => sendToGuardianMutation.mutate()}
+                  >
+                    <Send className="h-4 w-4" />
+                    보호자 전달
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {saveOpinionMutation.isSuccess && (
+              <p className="rounded-lg bg-secondary/10 p-2 text-center text-xs text-secondary">
+                의사 소견이 저장되었습니다.
+              </p>
+            )}
+            {sendToGuardianMutation.isSuccess && (
+              <p className="rounded-lg bg-secondary/10 p-2 text-center text-xs text-secondary">
+                보호자에게 전달되었습니다.
+              </p>
+            )}
           </div>
         )}
       </Modal>

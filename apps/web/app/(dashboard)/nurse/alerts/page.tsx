@@ -26,28 +26,32 @@ type AlertSeverity = 'red' | 'orange' | 'yellow';
 const severityConfig: Record<AlertSeverity, {
   label: string;
   icon: typeof AlertOctagon;
-  bg: string;
+  iconBg: string;
+  cardBg: string;
   text: string;
   badgeVariant: 'danger' | 'warning' | 'orange';
 }> = {
   red: {
     label: '심각',
     icon: AlertOctagon,
-    bg: 'bg-error/10',
+    iconBg: 'bg-error/10',
+    cardBg: 'bg-error/5',
     text: 'text-error',
     badgeVariant: 'danger',
   },
   orange: {
     label: '주의',
     icon: AlertTriangle,
-    bg: 'bg-tertiary/10',
+    iconBg: 'bg-tertiary/10',
+    cardBg: 'bg-tertiary/5',
     text: 'text-tertiary',
     badgeVariant: 'orange',
   },
   yellow: {
     label: '관찰',
     icon: AlertCircle,
-    bg: 'bg-tertiary-container',
+    iconBg: 'bg-tertiary-container/60',
+    cardBg: 'bg-tertiary/[0.03]',
     text: 'text-tertiary',
     badgeVariant: 'warning',
   },
@@ -152,7 +156,7 @@ export default function AlertsPage() {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-on-surface">레드플래그</h1>
         <p className="mt-1 text-sm text-on-surface-variant">
@@ -161,11 +165,16 @@ export default function AlertsPage() {
       </div>
 
       {sortedAlerts.length === 0 ? (
-        <Card>
+        <Card className="ambient-shadow">
           <div className="py-14 text-center">
-            <CheckCircle2 className="mx-auto h-12 w-12 text-secondary/40" />
-            <p className="mt-4 text-sm text-on-surface-variant">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-secondary/10">
+              <CheckCircle2 className="h-8 w-8 text-secondary/60" />
+            </div>
+            <p className="mt-5 text-sm font-medium text-on-surface-variant">
               현재 활성 레드플래그 알림이 없습니다.
+            </p>
+            <p className="mt-1 text-xs text-on-surface-variant/60">
+              새로운 알림이 발생하면 여기에 표시됩니다.
             </p>
           </div>
         </Card>
@@ -177,10 +186,10 @@ export default function AlertsPage() {
             const timeAgo = getTimeAgo(alert.created_at);
 
             return (
-              <Card key={alert.id} elevated>
+              <Card key={alert.id} elevated className={clsx('rounded-2xl', severity.cardBg)}>
                 <div className="flex items-start gap-4">
                   {/* Severity icon */}
-                  <div className={clsx('flex h-11 w-11 shrink-0 items-center justify-center rounded-full', severity.bg)}>
+                  <div className={clsx('flex h-11 w-11 shrink-0 items-center justify-center rounded-full', severity.iconBg)}>
                     <SeverityIcon className={clsx('h-5 w-5', severity.text)} />
                   </div>
 

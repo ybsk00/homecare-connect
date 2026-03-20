@@ -140,7 +140,7 @@ export default function PatientsPage() {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-on-surface">담당 환자</h1>
         <p className="mt-1 text-sm text-on-surface-variant">
@@ -149,11 +149,16 @@ export default function PatientsPage() {
       </div>
 
       {patients.length === 0 ? (
-        <Card>
+        <Card className="ambient-shadow">
           <div className="py-14 text-center">
-            <Users className="mx-auto h-12 w-12 text-on-surface-variant/30" />
-            <p className="mt-4 text-sm text-on-surface-variant">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-surface-container-high">
+              <Users className="h-8 w-8 text-on-surface-variant/40" />
+            </div>
+            <p className="mt-5 text-sm font-medium text-on-surface-variant">
               담당 환자가 없습니다.
+            </p>
+            <p className="mt-1 text-xs text-on-surface-variant/60">
+              배정된 환자가 있으면 여기에 표시됩니다.
             </p>
           </div>
         </Card>
@@ -168,23 +173,23 @@ export default function PatientsPage() {
                 key={patient.id}
                 elevated
                 className="cursor-pointer transition-all hover:shadow-[0_15px_50px_rgba(24,28,30,0.08)]"
-                onClick={() => router.push(`/dashboard/patients/${patient.id}`)}
+                onClick={() => router.push(`/nurse/patients/${patient.id}`)}
               >
                 {/* Patient header */}
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-container">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-container">
                     <User className="h-6 w-6 text-white" />
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="font-semibold text-on-surface">
+                      <p className="font-semibold text-on-surface truncate">
                         {patient.full_name}
                       </p>
                       {patient.care_grade && (
                         <Badge variant="primary">{patient.care_grade}등급</Badge>
                       )}
                     </div>
-                    <p className="text-xs text-on-surface-variant">
+                    <p className="mt-0.5 text-xs text-on-surface-variant">
                       {age !== null && `${age}세`}
                       {age !== null && patient.gender && ' / '}
                       {genderLabel(patient.gender)}
@@ -194,9 +199,11 @@ export default function PatientsPage() {
 
                 {/* Primary diagnosis */}
                 {patient.primary_diagnosis && (
-                  <p className="mt-3 text-sm text-on-surface-variant">
-                    {patient.primary_diagnosis}
-                  </p>
+                  <div className="mt-4 rounded-xl bg-surface-container-low px-3 py-2">
+                    <p className="text-xs text-on-surface-variant leading-relaxed">
+                      {patient.primary_diagnosis}
+                    </p>
+                  </div>
                 )}
 
                 {/* Vitals */}

@@ -35,6 +35,8 @@ const guardianTabs: TabItem[] = [
   { label: '기록', href: '/patient/records', icon: FileText },
   { label: '환자관리', href: '/patient/patients', icon: Users },
   { label: 'AI 리포트', href: '/patient/ai-report', icon: Sparkles },
+  { label: '알림', href: '/patient/notifications', icon: Bell },
+  { label: 'AI 상담', href: '/patient/chat', icon: Brain },
 ];
 
 const nurseTabs: TabItem[] = [
@@ -42,6 +44,7 @@ const nurseTabs: TabItem[] = [
   { label: '담당 환자', href: '/nurse/patients', icon: Users },
   { label: '레드플래그', href: '/nurse/alerts', icon: AlertTriangle },
   { label: '월간 통계', href: '/nurse/stats', icon: BarChart3 },
+  { label: '알림', href: '/nurse/notifications', icon: Bell },
 ];
 
 function getTabs(role: string): TabItem[] {
@@ -134,7 +137,7 @@ export function ContentNav({ role, profile }: ContentNavProps) {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 h-16 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+    <header className="fixed top-0 left-0 right-0 z-40 h-16 bg-surface/80 backdrop-blur-xl shadow-[0_1px_3px_rgba(24,28,30,0.04)]">
       <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between px-8">
         {/* Left: Logo */}
         <Link

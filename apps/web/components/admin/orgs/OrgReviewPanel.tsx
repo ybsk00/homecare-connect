@@ -13,6 +13,7 @@ interface OrgReviewPanelProps {
   onApprove: (id: string) => void;
   onReject: (id: string, reason: string) => void;
   onSuspend: (id: string, reason: string) => void;
+  onSetPending?: (id: string) => void;
   loading?: boolean;
 }
 
@@ -21,6 +22,7 @@ export default function OrgReviewPanel({
   onApprove,
   onReject,
   onSuspend,
+  onSetPending,
   loading = false,
 }: OrgReviewPanelProps) {
   const [rejectReason, setRejectReason] = useState('');
@@ -30,6 +32,8 @@ export default function OrgReviewPanel({
 
   const isPending = organization.verification_status === 'pending';
   const isVerified = organization.verification_status === 'verified';
+  const isRejected = organization.verification_status === 'rejected';
+  const isSuspended = organization.verification_status === 'suspended';
 
   const checklistItems = [
     '사업자등록증 확인',
@@ -232,6 +236,24 @@ export default function OrgReviewPanel({
           >
             기관 정지
           </Button>
+        )}
+        {(isRejected || isSuspended) && onSetPending && (
+          <>
+            <Button
+              variant="secondary"
+              loading={loading}
+              onClick={() => onSetPending(organization.id)}
+            >
+              보류(재심사)로 변경
+            </Button>
+            <Button
+              variant="primary"
+              loading={loading}
+              onClick={() => onApprove(organization.id)}
+            >
+              승인
+            </Button>
+          </>
         )}
       </div>
     </Card>

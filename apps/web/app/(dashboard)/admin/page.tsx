@@ -6,6 +6,7 @@ import {
   Heart,
   BarChart3,
   Stethoscope,
+  TrendingUp,
 } from 'lucide-react';
 import {
   LineChart,
@@ -72,6 +73,12 @@ async function fetchDashboardStats(): Promise<DashboardStats> {
   const mrr = (subscriptions as { amount: number; plan: string }[] | null)?.reduce((sum: number, sub: { amount: number }) => sum + (sub.amount || 0), 0) ?? 0;
   const mrrLastMonth = (subscriptionsLastMonth as { amount: number; plan: string }[] | null)?.reduce((sum: number, sub: { amount: number }) => sum + (sub.amount || 0), 0) ?? 0;
 
+  // 무료→유료 전환율 계산
+  const allSubs = (subscriptions as { amount: number; plan: string }[] | null) ?? [];
+  const paidOrgCount = allSubs.filter((s) => s.plan !== 'free').length;
+  const totalSubCount = allSubs.length;
+  const paidConversionRate = totalSubCount > 0 ? Math.round((paidOrgCount / totalSubCount) * 1000) / 10 : 0;
+
   function calcGrowth(current: number, previous: number): string {
     if (previous === 0) return current > 0 ? '신규' : '-';
     const pct = Math.round(((current - previous) / previous) * 100);
@@ -89,6 +96,8 @@ async function fetchDashboardStats(): Promise<DashboardStats> {
     patientGrowth: calcGrowth(patientCount ?? 0, patientCountLastMonth ?? 0),
     mrrGrowth: calcGrowth(mrr, mrrLastMonth),
     staffGrowth: calcGrowth(staffCount ?? 0, staffCountLastMonth ?? 0),
+    paidConversionRate,
+    paidOrgCount,
   };
 }
 
@@ -182,8 +191,8 @@ export default function KPIDashboardPage() {
     return (
       <div>
         <div className="p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[...Array(4)].map((_, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            {[...Array(5)].map((_, i) => (
               <div key={i} className="bg-white rounded-2xl shadow-[var(--shadow-card)] p-7 animate-pulse">
                 <div className="h-3 bg-primary-100 rounded-full w-20 mb-4" />
                 <div className="h-8 bg-primary-100 rounded-xl w-32" />
@@ -198,6 +207,7 @@ export default function KPIDashboardPage() {
   const safeStats = stats ?? {
     totalOrgs: 0, totalPatients: 0, mrr: 0, totalStaff: 0,
     orgGrowth: '-', patientGrowth: '-', mrrGrowth: '-', staffGrowth: '-',
+    paidConversionRate: 0, paidOrgCount: 0,
   };
   const safeChartData = chartData ?? [];
 
@@ -205,7 +215,7 @@ export default function KPIDashboardPage() {
     <div>
       <div className="p-8 space-y-8">
         {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
           <StatCard
             title="전체 기관"
             value={`${safeStats.totalOrgs.toLocaleString()}개`}
@@ -213,6 +223,14 @@ export default function KPIDashboardPage() {
             changeType={safeStats.orgGrowth.startsWith('+') ? 'positive' : safeStats.orgGrowth.startsWith('-') ? 'negative' : 'neutral'}
             icon={Building2}
             iconColor="bg-secondary-50 text-secondary-700"
+          />
+          <StatCard
+            title="유료 전환율"
+            value={`${safeStats.paidConversionRate}%`}
+            change={`유료 ${safeStats.paidOrgCount}개 / 전체 ${safeStats.totalOrgs}개`}
+            changeType={safeStats.paidConversionRate > 30 ? 'positive' : 'neutral'}
+            icon={TrendingUp}
+            iconColor="bg-success-50 text-success-600"
           />
           <StatCard
             title="MRR"
@@ -275,8 +293,12 @@ export default function KPIDashboardPage() {
 
         <Card>
           <h3 className="text-[15px] font-bold text-primary-900 mb-6">DAU / MAU 추이</h3>
-          <div className="flex items-center justify-center h-80 text-primary-300">
-            <p className="text-sm">데이터 없음 - 사용자 활동 추적 기능이 활성화되면 표시됩니다.</p>
+          <div className="flex flex-col items-center justify-center h-80 text-primary-300">
+            <div className="w-16 h-16 rounded-2xl bg-primary-50 flex items-center justify-center mb-4">
+              <BarChart3 className="w-8 h-8 text-primary-200" />
+            </div>
+            <p className="text-sm font-semibold text-primary-400 mb-1">추후 구현 예정</p>
+            <p className="text-[12px] text-primary-300">사용자 활동 추적 기능이 활성화되면 DAU/MAU 데이터가 표시됩니다.</p>
           </div>
         </Card>
       </div>

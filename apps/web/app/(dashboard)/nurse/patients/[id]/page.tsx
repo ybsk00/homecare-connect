@@ -166,7 +166,7 @@ export default function PatientDetailPage() {
   const age = calculateAge(patient.birth_date);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* Back button + Header */}
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="sm" onClick={() => router.back()}>
@@ -208,37 +208,41 @@ export default function PatientDetailPage() {
       </Card>
 
       {/* Vital history chart - BP */}
-      <Card>
+      <Card className="bg-surface-container-lowest ambient-shadow">
         <CardHeader>
           <CardTitle>
-            <Heart className="mr-2 inline h-5 w-5 text-on-surface-variant" />
+            <Heart className="mr-2 inline h-5 w-5 text-secondary" />
             혈압 추이
           </CardTitle>
           <span className="text-xs text-on-surface-variant">(mmHg)</span>
         </CardHeader>
         {vitalHistory.length === 0 ? (
-          <p className="py-10 text-center text-sm text-on-surface-variant">
-            바이탈 데이터가 없습니다.
-          </p>
+          <div className="py-12 text-center">
+            <Heart className="mx-auto h-10 w-10 text-on-surface-variant/20" />
+            <p className="mt-3 text-sm text-on-surface-variant">
+              바이탈 데이터가 없습니다.
+            </p>
+          </div>
         ) : (
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={vitalHistory} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E9EB" />
-                <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#42474E' }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#42474E' }} tickLine={false} axisLine={false} />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-outline-variant/30" />
+                <XAxis dataKey="date" tick={{ fontSize: 11 }} className="fill-on-surface-variant" tickLine={false} axisLine={false} />
+                <YAxis tick={{ fontSize: 11 }} className="fill-on-surface-variant" tickLine={false} axisLine={false} />
                 <Tooltip
                   contentStyle={{
-                    borderRadius: 12,
+                    borderRadius: 16,
                     border: 'none',
                     boxShadow: '0 10px 40px rgba(24,28,30,0.1)',
                     fontSize: 12,
                     padding: '12px 16px',
+                    backgroundColor: 'var(--color-surface-container-lowest)',
                   }}
                 />
                 <Legend wrapperStyle={{ fontSize: 12 }} iconType="circle" iconSize={8} />
-                <Line type="monotone" dataKey="systolic_bp" name="수축기" stroke="#006A63" strokeWidth={2.5} dot={{ r: 3, fill: '#006A63', strokeWidth: 0 }} connectNulls />
-                <Line type="monotone" dataKey="diastolic_bp" name="이완기" stroke="#002045" strokeWidth={2.5} dot={{ r: 3, fill: '#002045', strokeWidth: 0 }} connectNulls />
+                <Line type="monotone" dataKey="systolic_bp" name="수축기" stroke="var(--color-secondary)" strokeWidth={2.5} dot={{ r: 3, fill: 'var(--color-secondary)', strokeWidth: 0 }} connectNulls />
+                <Line type="monotone" dataKey="diastolic_bp" name="이완기" stroke="var(--color-primary)" strokeWidth={2.5} dot={{ r: 3, fill: 'var(--color-primary)', strokeWidth: 0 }} connectNulls />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -246,73 +250,82 @@ export default function PatientDetailPage() {
       </Card>
 
       {/* Vital history chart - HR, Temp, SpO2 */}
-      <div className="grid grid-cols-1 gap-8 xl:grid-cols-3">
-        <Card>
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <Card className="bg-surface-container-lowest ambient-shadow">
           <CardHeader>
             <CardTitle>
-              <Activity className="mr-2 inline h-5 w-5 text-on-surface-variant" />
+              <Activity className="mr-2 inline h-5 w-5 text-secondary" />
               심박수
             </CardTitle>
           </CardHeader>
           {vitalHistory.length === 0 ? (
-            <p className="py-8 text-center text-sm text-on-surface-variant">데이터 없음</p>
+            <div className="py-8 text-center">
+              <Activity className="mx-auto h-8 w-8 text-on-surface-variant/20" />
+              <p className="mt-2 text-sm text-on-surface-variant">데이터 없음</p>
+            </div>
           ) : (
             <div className="h-48 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={vitalHistory}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E9EB" />
-                  <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#42474E' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: '#42474E' }} tickLine={false} axisLine={false} />
-                  <Tooltip contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 40px rgba(24,28,30,0.1)', fontSize: 12 }} />
-                  <Line type="monotone" dataKey="heart_rate" name="심박수" stroke="#006A63" strokeWidth={2} dot={{ r: 2, fill: '#006A63', strokeWidth: 0 }} connectNulls />
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-outline-variant/30" />
+                  <XAxis dataKey="date" tick={{ fontSize: 10 }} className="fill-on-surface-variant" tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 10 }} className="fill-on-surface-variant" tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ borderRadius: 16, border: 'none', boxShadow: '0 10px 40px rgba(24,28,30,0.1)', fontSize: 12, backgroundColor: 'var(--color-surface-container-lowest)' }} />
+                  <Line type="monotone" dataKey="heart_rate" name="심박수" stroke="var(--color-secondary)" strokeWidth={2} dot={{ r: 2, fill: 'var(--color-secondary)', strokeWidth: 0 }} connectNulls />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           )}
         </Card>
 
-        <Card>
+        <Card className="bg-surface-container-lowest ambient-shadow">
           <CardHeader>
             <CardTitle>
-              <Thermometer className="mr-2 inline h-5 w-5 text-on-surface-variant" />
+              <Thermometer className="mr-2 inline h-5 w-5 text-tertiary" />
               체온
             </CardTitle>
           </CardHeader>
           {vitalHistory.length === 0 ? (
-            <p className="py-8 text-center text-sm text-on-surface-variant">데이터 없음</p>
+            <div className="py-8 text-center">
+              <Thermometer className="mx-auto h-8 w-8 text-on-surface-variant/20" />
+              <p className="mt-2 text-sm text-on-surface-variant">데이터 없음</p>
+            </div>
           ) : (
             <div className="h-48 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={vitalHistory}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E9EB" />
-                  <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#42474E' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: '#42474E' }} tickLine={false} axisLine={false} domain={[35, 40]} />
-                  <Tooltip contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 40px rgba(24,28,30,0.1)', fontSize: 12 }} />
-                  <Line type="monotone" dataKey="temperature" name="체온" stroke="#321B00" strokeWidth={2} dot={{ r: 2, fill: '#321B00', strokeWidth: 0 }} connectNulls />
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-outline-variant/30" />
+                  <XAxis dataKey="date" tick={{ fontSize: 10 }} className="fill-on-surface-variant" tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 10 }} className="fill-on-surface-variant" tickLine={false} axisLine={false} domain={[35, 40]} />
+                  <Tooltip contentStyle={{ borderRadius: 16, border: 'none', boxShadow: '0 10px 40px rgba(24,28,30,0.1)', fontSize: 12, backgroundColor: 'var(--color-surface-container-lowest)' }} />
+                  <Line type="monotone" dataKey="temperature" name="체온" stroke="var(--color-tertiary)" strokeWidth={2} dot={{ r: 2, fill: 'var(--color-tertiary)', strokeWidth: 0 }} connectNulls />
                 </LineChart>
               </ResponsiveContainer>
             </div>
           )}
         </Card>
 
-        <Card>
+        <Card className="bg-surface-container-lowest ambient-shadow">
           <CardHeader>
             <CardTitle>
-              <Droplets className="mr-2 inline h-5 w-5 text-on-surface-variant" />
+              <Droplets className="mr-2 inline h-5 w-5 text-secondary" />
               산소포화도
             </CardTitle>
           </CardHeader>
           {vitalHistory.length === 0 ? (
-            <p className="py-8 text-center text-sm text-on-surface-variant">데이터 없음</p>
+            <div className="py-8 text-center">
+              <Droplets className="mx-auto h-8 w-8 text-on-surface-variant/20" />
+              <p className="mt-2 text-sm text-on-surface-variant">데이터 없음</p>
+            </div>
           ) : (
             <div className="h-48 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={vitalHistory}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E5E9EB" />
-                  <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#42474E' }} tickLine={false} axisLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: '#42474E' }} tickLine={false} axisLine={false} domain={[85, 100]} />
-                  <Tooltip contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 40px rgba(24,28,30,0.1)', fontSize: 12 }} />
-                  <Line type="monotone" dataKey="spo2" name="SpO2" stroke="#006A63" strokeWidth={2} dot={{ r: 2, fill: '#006A63', strokeWidth: 0 }} connectNulls />
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-outline-variant/30" />
+                  <XAxis dataKey="date" tick={{ fontSize: 10 }} className="fill-on-surface-variant" tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 10 }} className="fill-on-surface-variant" tickLine={false} axisLine={false} domain={[85, 100]} />
+                  <Tooltip contentStyle={{ borderRadius: 16, border: 'none', boxShadow: '0 10px 40px rgba(24,28,30,0.1)', fontSize: 12, backgroundColor: 'var(--color-surface-container-lowest)' }} />
+                  <Line type="monotone" dataKey="spo2" name="SpO2" stroke="var(--color-secondary)" strokeWidth={2} dot={{ r: 2, fill: 'var(--color-secondary)', strokeWidth: 0 }} connectNulls />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -321,22 +334,25 @@ export default function PatientDetailPage() {
       </div>
 
       {/* Visit history timeline */}
-      <Card>
+      <Card className="ambient-shadow">
         <CardHeader>
           <CardTitle>
-            <Calendar className="mr-2 inline h-5 w-5 text-on-surface-variant" />
+            <Calendar className="mr-2 inline h-5 w-5 text-primary" />
             방문 이력
           </CardTitle>
         </CardHeader>
         {visitHistory.length === 0 ? (
-          <p className="py-8 text-center text-sm text-on-surface-variant">방문 이력이 없습니다.</p>
+          <div className="py-10 text-center">
+            <Calendar className="mx-auto h-10 w-10 text-on-surface-variant/20" />
+            <p className="mt-3 text-sm text-on-surface-variant">방문 이력이 없습니다.</p>
+          </div>
         ) : (
           <div className="space-y-3">
             {visitHistory.map((visit) => (
               <div
                 key={visit.id}
                 className="flex items-center gap-4 rounded-xl bg-surface-container-low p-4 transition-colors hover:bg-surface-container-high/50 cursor-pointer"
-                onClick={() => router.push(`/dashboard/visit/${visit.id}`)}
+                onClick={() => router.push(`/nurse/visits/${visit.id}`)}
               >
                 <div className="flex h-10 w-10 flex-col items-center justify-center rounded-xl bg-white text-center">
                   <span className="text-[10px] text-on-surface-variant">
@@ -366,15 +382,18 @@ export default function PatientDetailPage() {
       </Card>
 
       {/* Service plans */}
-      <Card>
+      <Card className="ambient-shadow">
         <CardHeader>
           <CardTitle>
-            <FileText className="mr-2 inline h-5 w-5 text-on-surface-variant" />
+            <FileText className="mr-2 inline h-5 w-5 text-primary" />
             서비스 계획
           </CardTitle>
         </CardHeader>
         {servicePlans.length === 0 ? (
-          <p className="py-8 text-center text-sm text-on-surface-variant">서비스 계획이 없습니다.</p>
+          <div className="py-10 text-center">
+            <FileText className="mx-auto h-10 w-10 text-on-surface-variant/20" />
+            <p className="mt-3 text-sm text-on-surface-variant">서비스 계획이 없습니다.</p>
+          </div>
         ) : (
           <div className="space-y-4">
             {servicePlans.map((plan) => (

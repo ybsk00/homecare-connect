@@ -165,6 +165,34 @@ export default function OrgDetailClient() {
     }
   }
 
+  async function handleSetPending(id: string) {
+    setActionLoading(true);
+    try {
+      const supabase = createBrowserSupabaseClient();
+      await supabase
+        .from('organizations')
+        .update({ verification_status: 'pending' } as never)
+        .eq('id', id);
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('audit_logs').insert({
+          user_id: user.id,
+          action: 'org_set_pending',
+          resource_type: 'organization',
+          resource_id: id,
+          details: { previous_status: org?.verification_status },
+        } as never);
+      }
+
+      setOrg((prev) => prev ? { ...prev, verification_status: 'pending' } : prev);
+    } catch (err) {
+      console.error('보류 변경 실패:', err);
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
   if (loading || !org) {
     return (
       <div>
@@ -197,6 +225,7 @@ export default function OrgDetailClient() {
               onApprove={handleApprove}
               onReject={handleReject}
               onSuspend={handleSuspend}
+              onSetPending={handleSetPending}
               loading={actionLoading}
             />
           </div>

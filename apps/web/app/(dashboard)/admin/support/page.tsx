@@ -8,7 +8,7 @@ import Button from '@/components/admin/ui/Button';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { formatDateTime } from '@homecare/shared-utils';
 import { clsx } from 'clsx';
-import { MessageSquare, Send } from 'lucide-react';
+import { MessageSquare, Send, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import type { BadgeColor, SupportTicket } from '@homecare/shared-types';
 
 type StatusKey = 'unread' | 'in_progress' | 'resolved';
@@ -115,6 +115,51 @@ export default function SupportPage() {
     } catch (err) {
       console.error('상태 변경 실패:', err);
     }
+  }
+
+  function buildTimeline(ticket: SupportTicket) {
+    const entries: { icon: typeof Clock; color: string; label: string; time: string }[] = [];
+
+    // 1. 접수
+    entries.push({
+      icon: AlertCircle,
+      color: 'text-primary-400 bg-primary-100',
+      label: '민원 접수',
+      time: formatDateTime(ticket.created_at),
+    });
+
+    // 2. 처리중으로 전환 (data.status가 in_progress 이상이면)
+    const status = (ticket.data?.status as string) || '';
+    if (status === 'in_progress' || status === 'resolved') {
+      entries.push({
+        icon: Clock,
+        color: 'text-yellow-600 bg-yellow-100',
+        label: '처리중으로 변경',
+        time: '', // 정확한 시간 미기록 시 빈 값
+      });
+    }
+
+    // 3. 답변 등록
+    if (ticket.data?.replied_at) {
+      entries.push({
+        icon: Send,
+        color: 'text-secondary-600 bg-secondary-100',
+        label: '관리자 답변 등록',
+        time: formatDateTime(ticket.data.replied_at as string),
+      });
+    }
+
+    // 4. 완료
+    if (status === 'resolved') {
+      entries.push({
+        icon: CheckCircle2,
+        color: 'text-success-600 bg-success-100',
+        label: '처리 완료',
+        time: ticket.data?.replied_at ? formatDateTime(ticket.data.replied_at as string) : '',
+      });
+    }
+
+    return entries;
   }
 
   const roleLabels: Record<string, string> = {
@@ -235,6 +280,30 @@ export default function SupportPage() {
                     <p className="text-sm text-primary-600 whitespace-pre-wrap leading-relaxed">
                       {selectedTicket.body}
                     </p>
+                  </div>
+
+                  {/* 처리 이력 타임라인 */}
+                  <div className="mb-5">
+                    <h4 className="text-[13px] font-bold text-primary-700 mb-4">처리 이력</h4>
+                    <div className="relative pl-6">
+                      <div className="absolute left-[11px] top-2 bottom-2 w-[2px] bg-primary-100" />
+                      {buildTimeline(selectedTicket).map((entry, idx) => {
+                        const EntryIcon = entry.icon;
+                        return (
+                          <div key={idx} className="relative flex items-start gap-3 mb-4 last:mb-0">
+                            <div className={`absolute -left-6 w-6 h-6 rounded-full flex items-center justify-center ${entry.color}`}>
+                              <EntryIcon className="w-3.5 h-3.5" />
+                            </div>
+                            <div className="ml-3">
+                              <p className="text-[13px] font-semibold text-primary-700">{entry.label}</p>
+                              {entry.time && (
+                                <p className="text-[11px] text-primary-400">{entry.time}</p>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   {/* Existing Reply */}

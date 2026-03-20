@@ -26,6 +26,7 @@ import {
   Stethoscope,
   UserCheck,
   Sparkles,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
 
@@ -63,6 +64,7 @@ const orgAdminNav: NavItem[] = [
   { label: '의사', href: '/hospital/doctor', icon: Stethoscope },
   { label: '통계', href: '/hospital/stats', icon: BarChart3 },
   { label: '수납', href: '/hospital/billing', icon: CreditCard },
+  { label: '청구자료', href: '/hospital/claims', icon: FileSpreadsheet },
   { label: '설정', href: '/hospital/settings', icon: Settings },
 ];
 

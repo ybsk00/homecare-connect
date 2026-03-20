@@ -19,7 +19,6 @@ import {
   LogOut,
   Bell,
 } from 'lucide-react';
-import { clsx } from 'clsx';
 
 const specialtyLabels: Record<string, string> = {
   nursing: '방문간호',
@@ -76,7 +75,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-on-surface">설정</h1>
         <p className="mt-1 text-sm text-on-surface-variant">
@@ -85,10 +84,10 @@ export default function SettingsPage() {
       </div>
 
       {/* Profile info */}
-      <Card elevated>
+      <Card elevated className="ambient-shadow">
         <CardHeader>
           <CardTitle>
-            <User className="mr-2 inline h-5 w-5 text-on-surface-variant" />
+            <User className="mr-2 inline h-5 w-5 text-primary" />
             내 정보
           </CardTitle>
           <Badge variant={staffInfo?.is_active ? 'success' : 'warning'}>
@@ -97,10 +96,10 @@ export default function SettingsPage() {
         </CardHeader>
 
         <div className="flex items-start gap-5">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-container">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-container">
             <User className="h-8 w-8 text-white" />
           </div>
-          <div className="flex-1 space-y-3">
+          <div className="flex-1 space-y-4">
             <div>
               <p className="text-lg font-bold text-on-surface">
                 {profile?.full_name || '이름 없음'}
@@ -112,14 +111,14 @@ export default function SettingsPage() {
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {profile?.phone && (
-                <div className="flex items-center gap-2 text-sm text-on-surface-variant">
-                  <Phone className="h-4 w-4" />
+                <div className="flex items-center gap-2 rounded-xl bg-surface-container-low px-3 py-2.5 text-sm text-on-surface-variant">
+                  <Phone className="h-4 w-4 text-secondary" />
                   {profile.phone}
                 </div>
               )}
-              <div className="flex items-center gap-2 text-sm text-on-surface-variant">
-                <ShieldCheck className="h-4 w-4" />
-                면허번호: {staffInfo?.license_number || '-'}
+              <div className="flex items-center gap-2 rounded-xl bg-surface-container-low px-3 py-2.5 text-sm text-on-surface-variant">
+                <ShieldCheck className="h-4 w-4 text-secondary" />
+                <span>면허번호: <span className="font-semibold text-on-surface">{staffInfo?.license_number || '-'}</span></span>
               </div>
             </div>
 
@@ -127,7 +126,7 @@ export default function SettingsPage() {
             {staffInfo?.specialties && staffInfo.specialties.length > 0 && (
               <div>
                 <p className="mb-2 flex items-center gap-1 text-xs font-medium text-on-surface-variant">
-                  <Award className="h-3.5 w-3.5" />
+                  <Award className="h-3.5 w-3.5 text-secondary" />
                   전문 분야
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -148,38 +147,38 @@ export default function SettingsPage() {
 
       {/* Organization info */}
       {org && (
-        <Card>
+        <Card className="ambient-shadow">
           <CardHeader>
             <CardTitle>
-              <Building2 className="mr-2 inline h-5 w-5 text-on-surface-variant" />
+              <Building2 className="mr-2 inline h-5 w-5 text-primary" />
               소속 기관
             </CardTitle>
           </CardHeader>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
             <div>
               <p className="text-base font-semibold text-on-surface">{org.name}</p>
-              <p className="text-sm text-on-surface-variant">
+              <p className="mt-0.5 text-sm text-on-surface-variant">
                 {orgTypeLabels[org.org_type] || org.org_type}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {org.phone && (
-                <div className="flex items-center gap-2 text-sm text-on-surface-variant">
-                  <Phone className="h-4 w-4" />
+                <div className="flex items-center gap-2 rounded-xl bg-surface-container-low px-3 py-2.5 text-sm text-on-surface-variant">
+                  <Phone className="h-4 w-4 text-secondary" />
                   {org.phone}
                 </div>
               )}
               {org.email && (
-                <div className="flex items-center gap-2 text-sm text-on-surface-variant">
-                  <Mail className="h-4 w-4" />
+                <div className="flex items-center gap-2 rounded-xl bg-surface-container-low px-3 py-2.5 text-sm text-on-surface-variant">
+                  <Mail className="h-4 w-4 text-secondary" />
                   {org.email}
                 </div>
               )}
               {org.address && (
-                <div className="flex items-center gap-2 text-sm text-on-surface-variant sm:col-span-2">
-                  <MapPin className="h-4 w-4 shrink-0" />
+                <div className="flex items-center gap-2 rounded-xl bg-surface-container-low px-3 py-2.5 text-sm text-on-surface-variant sm:col-span-2">
+                  <MapPin className="h-4 w-4 shrink-0 text-secondary" />
                   {org.address}
                 </div>
               )}
@@ -189,10 +188,10 @@ export default function SettingsPage() {
       )}
 
       {/* Notification settings */}
-      <Card>
+      <Card className="ambient-shadow">
         <CardHeader>
           <CardTitle>
-            <Bell className="mr-2 inline h-5 w-5 text-on-surface-variant" />
+            <Bell className="mr-2 inline h-5 w-5 text-primary" />
             알림 설정
           </CardTitle>
         </CardHeader>

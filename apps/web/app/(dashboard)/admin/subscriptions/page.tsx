@@ -29,6 +29,7 @@ export default function SubscriptionsPage() {
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [selectedSub, setSelectedSub] = useState<Subscription | null>(null);
   const [newPlan, setNewPlan] = useState('');
+  const [adjustReason, setAdjustReason] = useState('');
   const [adjustLoading, setAdjustLoading] = useState(false);
   const queryClient = useQueryClient();
 
@@ -78,9 +79,27 @@ export default function SubscriptionsPage() {
         .update({ subscription_plan: newPlan as string } as never)
         .eq('id', selectedSub.org_id);
 
+      // 감사 로그 기록
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('audit_logs').insert({
+          user_id: user.id,
+          action: 'subscription_plan_changed',
+          resource_type: 'subscription',
+          resource_id: selectedSub.id,
+          details: {
+            org_id: selectedSub.org_id,
+            previous_plan: selectedSub.plan,
+            new_plan: newPlan,
+            reason: adjustReason || '관리자 수동 변경',
+          },
+        } as never);
+      }
+
       setShowPlanModal(false);
       setSelectedSub(null);
       setNewPlan('');
+      setAdjustReason('');
       queryClient.invalidateQueries({ queryKey: ['admin-subscriptions'] });
     } catch (err) {
       console.error('플랜 변경 실패:', err);
@@ -90,7 +109,8 @@ export default function SubscriptionsPage() {
   }
 
   const failedPayments = subscriptions.filter((s) => s.status === 'past_due');
-  const normalSubscriptions = subscriptions.filter((s) => s.status !== 'past_due');
+  // 전체 구독을 표시하되, past_due는 테이블에서도 하이라이트
+  const allSubscriptions = subscriptions;
 
   return (
     <div>
@@ -170,21 +190,34 @@ export default function SubscriptionsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {normalSubscriptions.length === 0 ? (
+                  {allSubscriptions.length === 0 ? (
                     <tr>
                       <td colSpan={8} className="px-6 py-16 text-center text-sm text-primary-300">
                         구독 데이터가 없습니다.
                       </td>
                     </tr>
                   ) : (
-                    normalSubscriptions.map((sub, idx) => {
+                    allSubscriptions.map((sub, idx) => {
                       const status = statusConfig[sub.status] || { label: sub.status, color: 'gray' as BadgeColor };
                       const plan = planConfig[sub.plan] || { label: sub.plan, color: 'gray' as BadgeColor };
+                      const isPastDue = sub.status === 'past_due';
 
                       return (
-                        <tr key={sub.id} className={`transition-all duration-150 hover:bg-secondary-50/40 ${idx % 2 === 1 ? 'bg-primary-50/30' : ''}`}>
+                        <tr
+                          key={sub.id}
+                          className={`transition-all duration-150 hover:bg-secondary-50/40 ${
+                            isPastDue
+                              ? 'bg-danger-50/40 hover:bg-danger-50/60'
+                              : idx % 2 === 1
+                                ? 'bg-primary-50/30'
+                                : ''
+                          }`}
+                        >
                           <td className="px-6 py-4 text-sm font-semibold text-primary-800">
-                            {sub.organization?.name || '-'}
+                            <div className="flex items-center gap-2">
+                              {isPastDue && <AlertTriangle className="w-4 h-4 text-danger-500 flex-shrink-0" />}
+                              {sub.organization?.name || '-'}
+                            </div>
                           </td>
                           <td className="px-6 py-4">
                             <Badge color={plan.color}>{plan.label}</Badge>
@@ -233,6 +266,7 @@ export default function SubscriptionsPage() {
           onClose={() => {
             setShowPlanModal(false);
             setSelectedSub(null);
+            setAdjustReason('');
           }}
           title="수동 플랜 조정"
           size="sm"
@@ -266,12 +300,25 @@ export default function SubscriptionsPage() {
                   <option value="enterprise">Enterprise (599,000원/월)</option>
                 </select>
               </div>
+              <div>
+                <label className="block text-[13px] font-semibold text-primary-600 mb-2">
+                  변경 사유 (선택)
+                </label>
+                <textarea
+                  value={adjustReason}
+                  onChange={(e) => setAdjustReason(e.target.value)}
+                  placeholder="플랜 변경 사유를 입력하세요..."
+                  rows={2}
+                  className="w-full rounded-xl bg-primary-50/60 px-4 py-3 text-sm text-primary-800 placeholder-primary-300 focus:outline-none focus:ring-2 focus:ring-secondary-500/30 transition-all"
+                />
+              </div>
               <div className="flex justify-end gap-3 pt-2">
                 <Button
                   variant="ghost"
                   onClick={() => {
                     setShowPlanModal(false);
                     setSelectedSub(null);
+                    setAdjustReason('');
                   }}
                 >
                   취소

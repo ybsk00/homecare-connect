@@ -8,12 +8,51 @@ import Button from '@/components/admin/ui/Button';
 import Input from '@/components/admin/ui/Input';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { formatDate } from '@homecare/shared-utils';
-import { Upload, BookOpen, ToggleLeft, ToggleRight, Trash2 } from 'lucide-react';
-import type { RagDocument, DocumentGroup } from '@homecare/shared-types';
+import { Upload, BookOpen, ToggleLeft, ToggleRight, Trash2, MessageCircle, AlertTriangle } from 'lucide-react';
+import { clsx } from 'clsx';
+type TabKey = 'documents' | 'chat_logs';
+
+interface RagDocument {
+  id: string;
+  title: string;
+  source: string;
+  content: string;
+  chunk_index: number;
+  is_active: boolean;
+  created_at: string;
+  metadata?: Record<string, unknown>;
+}
+
+interface DocumentGroup {
+  title: string;
+  source: string;
+  chunks: RagDocument[];
+  is_active: boolean;
+  created_at: string;
+}
+
+interface ChatLogEntry {
+  id: string;
+  user_id: string;
+  title: string;
+  body: string;
+  created_at: string;
+  type: string;
+  data?: {
+    escalated?: boolean;
+    session_id?: string;
+    message_count?: number;
+  };
+  profile?: {
+    full_name: string;
+    role: string;
+  } | null;
+}
 
 export default function RagPage() {
   const queryClient = useQueryClient();
 
+  const [activeTab, setActiveTab] = useState<TabKey>('documents');
   const [showUploadForm, setShowUploadForm] = useState(false);
   const [uploadTitle, setUploadTitle] = useState('');
   const [uploadSource, setUploadSource] = useState('');
@@ -49,6 +88,25 @@ export default function RagPage() {
 
       return Array.from(groups.values());
     },
+  });
+
+  const { data: chatLogs = [], isLoading: chatLogsLoading } = useQuery({
+    queryKey: ['admin-rag-chat-logs'],
+    queryFn: async () => {
+      const supabase = createBrowserSupabaseClient();
+
+      // rag_conversations 테이블이 있으면 조회, 없으면 notifications의 chat_message 타입을 fallback으로 사용
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*, profile:profiles (full_name, role)')
+        .in('type', ['chat_message', 'chat_escalation'])
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (error) throw error;
+      return (data as unknown as ChatLogEntry[]) || [];
+    },
+    enabled: activeTab === 'chat_logs',
   });
 
   function invalidateDocuments() {
@@ -134,22 +192,53 @@ export default function RagPage() {
     }
   }
 
+  const tabs: { key: TabKey; label: string; icon: typeof BookOpen }[] = [
+    { key: 'documents', label: '문서 관리', icon: BookOpen },
+    { key: 'chat_logs', label: '대화 로그', icon: MessageCircle },
+  ];
+
   return (
     <div>
       <div className="p-8 space-y-8">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <div>
+          <div className="flex items-center gap-4">
             <p className="text-sm text-primary-400">
               RAG (Retrieval-Augmented Generation) 지식베이스를 관리합니다.
             </p>
           </div>
-          <Button onClick={() => setShowUploadForm(!showUploadForm)}>
-            <Upload className="w-4 h-4 mr-1.5" />
-            문서 업로드
-          </Button>
+          {activeTab === 'documents' && (
+            <Button onClick={() => setShowUploadForm(!showUploadForm)}>
+              <Upload className="w-4 h-4 mr-1.5" />
+              문서 업로드
+            </Button>
+          )}
         </div>
 
+        {/* Tabs */}
+        <div className="flex gap-2">
+          {tabs.map((tab) => {
+            const TabIcon = tab.icon;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={clsx(
+                  'flex items-center gap-2 px-5 py-2.5 text-[13px] font-semibold rounded-xl transition-all duration-200',
+                  activeTab === tab.key
+                    ? 'gradient-button text-white shadow-sm'
+                    : 'bg-primary-50/60 text-primary-400 hover:text-primary-600 hover:bg-primary-100/60',
+                )}
+              >
+                <TabIcon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* === 문서 관리 탭 === */}
+        {activeTab === 'documents' && <>
         {/* Upload Form */}
         {showUploadForm && (
           <Card>
@@ -266,6 +355,89 @@ export default function RagPage() {
               </Card>
             ))}
           </div>
+        )}
+        </>}
+
+        {/* === 대화 로그 탭 === */}
+        {activeTab === 'chat_logs' && (
+          <>
+            {chatLogsLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <div className="w-8 h-8 border-[3px] border-primary-100 border-t-secondary-600 rounded-full animate-spin" />
+              </div>
+            ) : chatLogs.length === 0 ? (
+              <Card>
+                <div className="flex flex-col items-center justify-center py-16 text-primary-200">
+                  <MessageCircle className="w-14 h-14 mb-4" />
+                  <p className="text-sm font-semibold text-primary-400 mb-1">대화 로그가 없습니다</p>
+                  <p className="text-[12px] text-primary-300">
+                    RAG 챗봇 대화 기록이 쌓이면 이곳에서 확인할 수 있습니다.
+                  </p>
+                </div>
+              </Card>
+            ) : (
+              <Card padding={false}>
+                <div className="p-7 pb-0">
+                  <h3 className="text-[15px] font-bold text-primary-900 mb-2">대화 로그</h3>
+                  <p className="text-[12px] text-primary-400 mb-6">
+                    최근 100건 | 에스컬레이션 건은 별도 표시됩니다.
+                  </p>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full">
+                    <thead>
+                      <tr className="bg-primary-50/50">
+                        <th className="px-6 py-4 text-left text-[11px] font-semibold text-primary-400 uppercase tracking-wider">사용자</th>
+                        <th className="px-6 py-4 text-left text-[11px] font-semibold text-primary-400 uppercase tracking-wider">유형</th>
+                        <th className="px-6 py-4 text-left text-[11px] font-semibold text-primary-400 uppercase tracking-wider">내용</th>
+                        <th className="px-6 py-4 text-left text-[11px] font-semibold text-primary-400 uppercase tracking-wider">에스컬레이션</th>
+                        <th className="px-6 py-4 text-left text-[11px] font-semibold text-primary-400 uppercase tracking-wider">일시</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {chatLogs.map((log, idx) => {
+                        const isEscalation = log.type === 'chat_escalation' || log.data?.escalated === true;
+                        return (
+                          <tr
+                            key={log.id}
+                            className={clsx(
+                              'transition-all duration-150 hover:bg-secondary-50/40',
+                              isEscalation ? 'bg-danger-50/30' : idx % 2 === 1 ? 'bg-primary-50/30' : '',
+                            )}
+                          >
+                            <td className="px-6 py-4 text-sm font-semibold text-primary-800">
+                              {log.profile?.full_name || '알 수 없음'}
+                            </td>
+                            <td className="px-6 py-4">
+                              <Badge color={log.type === 'chat_escalation' ? 'red' : 'teal'}>
+                                {log.type === 'chat_escalation' ? '에스컬레이션' : '일반 대화'}
+                              </Badge>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-primary-500 max-w-xs truncate">
+                              {log.body}
+                            </td>
+                            <td className="px-6 py-4">
+                              {isEscalation ? (
+                                <div className="flex items-center gap-1.5 text-danger-600">
+                                  <AlertTriangle className="w-4 h-4" />
+                                  <span className="text-[12px] font-semibold">요청됨</span>
+                                </div>
+                              ) : (
+                                <span className="text-[12px] text-primary-300">-</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-[12px] text-primary-400">
+                              {formatDate(log.created_at)}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            )}
+          </>
         )}
       </div>
     </div>

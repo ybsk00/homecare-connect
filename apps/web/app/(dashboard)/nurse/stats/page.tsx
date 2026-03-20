@@ -28,8 +28,6 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import { clsx } from 'clsx';
-
 export default function StatsPage() {
   const { staffInfo } = useAppStore();
   const [selectedMonth, setSelectedMonth] = useState(() => {
@@ -146,7 +144,7 @@ export default function StatsPage() {
   const monthLabel = `${selectedYear}년 ${selectedMonthNum}월`;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-on-surface">월간 통계</h1>
         <p className="mt-1 text-sm text-on-surface-variant">
@@ -200,47 +198,53 @@ export default function StatsPage() {
       </div>
 
       {/* Daily visit count chart */}
-      <Card>
+      <Card className="bg-surface-container-lowest ambient-shadow">
         <CardHeader>
           <CardTitle>
-            <BarChart3 className="mr-2 inline h-5 w-5 text-on-surface-variant" />
+            <BarChart3 className="mr-2 inline h-5 w-5 text-secondary" />
             일별 방문 건수
           </CardTitle>
         </CardHeader>
         {(!monthData || monthData.dailyData.every((d) => d.total === 0)) ? (
-          <p className="py-10 text-center text-sm text-on-surface-variant">
-            해당 월 데이터가 없습니다.
-          </p>
+          <div className="py-12 text-center">
+            <BarChart3 className="mx-auto h-10 w-10 text-on-surface-variant/20" />
+            <p className="mt-3 text-sm text-on-surface-variant">
+              해당 월 데이터가 없습니다.
+            </p>
+          </div>
         ) : (
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthData?.dailyData ?? []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E9EB" />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-outline-variant/30" />
                 <XAxis
                   dataKey="day"
-                  tick={{ fontSize: 10, fill: '#42474E' }}
+                  tick={{ fontSize: 10 }}
+                  className="fill-on-surface-variant"
                   tickLine={false}
                   axisLine={false}
                   interval="preserveStartEnd"
                 />
                 <YAxis
-                  tick={{ fontSize: 11, fill: '#42474E' }}
+                  tick={{ fontSize: 11 }}
+                  className="fill-on-surface-variant"
                   tickLine={false}
                   axisLine={false}
                   allowDecimals={false}
                 />
                 <Tooltip
                   contentStyle={{
-                    borderRadius: 12,
+                    borderRadius: 16,
                     border: 'none',
                     boxShadow: '0 10px 40px rgba(24,28,30,0.1)',
                     fontSize: 12,
                     padding: '12px 16px',
+                    backgroundColor: 'var(--color-surface-container-lowest)',
                   }}
                 />
                 <Legend wrapperStyle={{ fontSize: 12 }} iconType="circle" iconSize={8} />
-                <Bar dataKey="total" name="전체" fill="#E5E9EB" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="completed" name="완료" fill="#006A63" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="total" name="전체" fill="var(--color-surface-container-high)" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="completed" name="완료" fill="var(--color-secondary)" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -248,27 +252,35 @@ export default function StatsPage() {
       </Card>
 
       {/* Completion rate trend */}
-      <Card>
+      <Card className="bg-surface-container-lowest ambient-shadow">
         <CardHeader>
-          <CardTitle>주별 완료율 추이</CardTitle>
+          <CardTitle>
+            <CheckCircle2 className="mr-2 inline h-5 w-5 text-primary" />
+            주별 완료율 추이
+          </CardTitle>
         </CardHeader>
         {(!monthData || monthData.weeklyRate.length === 0) ? (
-          <p className="py-10 text-center text-sm text-on-surface-variant">
-            데이터가 없습니다.
-          </p>
+          <div className="py-12 text-center">
+            <CheckCircle2 className="mx-auto h-10 w-10 text-on-surface-variant/20" />
+            <p className="mt-3 text-sm text-on-surface-variant">
+              데이터가 없습니다.
+            </p>
+          </div>
         ) : (
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={monthData?.weeklyRate ?? []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#E5E9EB" />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-outline-variant/30" />
                 <XAxis
                   dataKey="week"
-                  tick={{ fontSize: 12, fill: '#42474E' }}
+                  tick={{ fontSize: 12 }}
+                  className="fill-on-surface-variant"
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis
-                  tick={{ fontSize: 12, fill: '#42474E' }}
+                  tick={{ fontSize: 12 }}
+                  className="fill-on-surface-variant"
                   tickLine={false}
                   axisLine={false}
                   domain={[0, 100]}
@@ -276,11 +288,12 @@ export default function StatsPage() {
                 />
                 <Tooltip
                   contentStyle={{
-                    borderRadius: 12,
+                    borderRadius: 16,
                     border: 'none',
                     boxShadow: '0 10px 40px rgba(24,28,30,0.1)',
                     fontSize: 12,
                     padding: '12px 16px',
+                    backgroundColor: 'var(--color-surface-container-lowest)',
                   }}
                   formatter={(value: number) => [`${value}%`, '완료율']}
                 />
@@ -288,10 +301,10 @@ export default function StatsPage() {
                   type="monotone"
                   dataKey="rate"
                   name="완료율"
-                  stroke="#002045"
+                  stroke="var(--color-primary)"
                   strokeWidth={2.5}
-                  dot={{ r: 4, fill: '#002045', strokeWidth: 0 }}
-                  activeDot={{ r: 6, fill: '#002045', strokeWidth: 0 }}
+                  dot={{ r: 4, fill: 'var(--color-primary)', strokeWidth: 0 }}
+                  activeDot={{ r: 6, fill: 'var(--color-primary)', strokeWidth: 0 }}
                 />
               </LineChart>
             </ResponsiveContainer>

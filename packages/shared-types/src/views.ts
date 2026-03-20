@@ -35,6 +35,9 @@ export interface DashboardStats {
   patientGrowth: string;
   mrrGrowth: string;
   staffGrowth: string;
+  /** 무료 -> 유료 전환율 (%) */
+  paidConversionRate: number;
+  paidOrgCount: number;
 }
 
 /** 일별 차트 데이터 (매칭/방문 추이) */

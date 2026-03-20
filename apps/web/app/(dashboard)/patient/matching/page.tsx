@@ -32,6 +32,14 @@ const TIME_OPTIONS = [
   { value: 'any', label: '시간 무관' },
 ];
 
+const SEOUL_DISTRICTS = [
+  '강남구', '강동구', '강북구', '강서구', '관악구',
+  '광진구', '구로구', '금천구', '노원구', '도봉구',
+  '동대문구', '동작구', '마포구', '서대문구', '서초구',
+  '성동구', '성북구', '송파구', '양천구', '영등포구',
+  '용산구', '은평구', '종로구', '중구', '중랑구',
+];
+
 export default function MatchingPage() {
   const supabase = useMemo(() => createBrowserSupabaseClient(), []);
   const queryClient = useQueryClient();
@@ -39,6 +47,7 @@ export default function MatchingPage() {
   const [selectedServices, setSelectedServices] = useState<ServiceType[]>([]);
   const [selectedTime, setSelectedTime] = useState<string>('any');
   const [selectedPatient, setSelectedPatient] = useState<string>('');
+  const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [urgency, setUrgency] = useState<'normal' | 'urgent'>('normal');
   const [notes, setNotes] = useState('');
 
@@ -63,7 +72,6 @@ export default function MatchingPage() {
     [patientLinks],
   );
 
-  // 첫 환자 자동 선택
   const effectivePatient = selectedPatient || patients[0]?.id || '';
 
   const { data: requests, isLoading } = useQuery({
@@ -88,6 +96,7 @@ export default function MatchingPage() {
       setShowForm(false);
       setSelectedServices([]);
       setSelectedTime('any');
+      setSelectedRegion('');
       setNotes('');
       setUrgency('normal');
     },
@@ -103,31 +112,31 @@ export default function MatchingPage() {
     switch (status) {
       case 'matching':
       case 'waiting_selection':
-        return 'bg-[#006A63]/10 text-[#006A63]';
+        return 'bg-secondary/10 text-secondary';
       case 'org_accepted':
       case 'service_started':
-        return 'bg-[#22C55E]/10 text-[#22C55E]';
+        return 'bg-secondary-50 text-secondary';
       case 'org_rejected':
       case 'cancelled':
       case 'expired':
-        return 'bg-[#EF4444]/10 text-[#EF4444]';
+        return 'bg-error-container text-error';
       default:
-        return 'bg-[#002045]/10 text-[#002045]';
+        return 'bg-primary/10 text-primary';
     }
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
-        <h1 className="text-2xl font-bold text-[#002045]">매칭</h1>
-        <p className="mt-1 text-[#002045]/60">
+        <h1 className="text-2xl font-bold text-primary">매칭</h1>
+        <p className="mt-1 text-on-surface-variant">
           AI가 최적의 방문간호 기관을 찾아드립니다
         </p>
       </div>
 
       {/* CTA 카드 */}
       {!showForm && (
-        <div className="rounded-2xl bg-gradient-to-br from-[#006A63] to-[#004D47] p-6 text-white">
+        <div className="rounded-2xl bg-gradient-to-br from-secondary to-secondary-900 p-6 text-white shadow-[0_10px_40px_rgba(24,28,30,0.05)]">
           <div className="flex items-start gap-4">
             <div className="rounded-xl bg-white/10 p-3">
               <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -143,7 +152,7 @@ export default function MatchingPage() {
           </div>
           <button
             onClick={() => setShowForm(true)}
-            className="mt-5 w-full rounded-xl bg-white px-6 py-3 text-sm font-semibold text-[#006A63] transition-colors hover:bg-white/90"
+            className="mt-5 w-full rounded-xl bg-white px-6 py-3 text-sm font-semibold text-secondary transition-colors hover:bg-white/90"
           >
             매칭 요청하기
           </button>
@@ -152,17 +161,17 @@ export default function MatchingPage() {
 
       {/* 매칭 요청 폼 */}
       {showForm && (
-        <div className="rounded-2xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-          <h2 className="text-lg font-semibold text-[#002045]">새 매칭 요청</h2>
+        <div className="rounded-2xl bg-surface-container-lowest p-6 shadow-[0_10px_40px_rgba(24,28,30,0.05)]">
+          <h2 className="text-lg font-semibold text-primary">새 매칭 요청</h2>
 
           {/* 환자 선택 */}
           {patients.length > 1 && (
-            <div className="mt-5">
-              <label className="text-sm font-medium text-[#002045]/70">환자 선택</label>
+            <div className="mt-6">
+              <label className="text-sm font-medium text-on-surface-variant">환자 선택</label>
               <select
                 value={effectivePatient}
                 onChange={(e) => setSelectedPatient(e.target.value)}
-                className="mt-1.5 w-full rounded-xl bg-[#F7FAFC] px-4 py-3 text-sm text-[#002045] outline-none focus:ring-2 focus:ring-[#006A63]/30"
+                className="mt-1.5 w-full rounded-xl bg-surface px-4 py-3 text-sm text-primary outline-none focus:ring-2 focus:ring-secondary/30"
               >
                 {patients.map((p) => (
                   <option key={p!.id} value={p!.id}>
@@ -173,9 +182,27 @@ export default function MatchingPage() {
             </div>
           )}
 
+          {/* 지역 선택 */}
+          <div className="mt-6">
+            <label className="text-sm font-medium text-on-surface-variant">지역 선택</label>
+            <p className="mt-0.5 text-xs text-on-surface-variant/60">방문 치료를 받으실 지역을 선택해주세요</p>
+            <select
+              value={selectedRegion}
+              onChange={(e) => setSelectedRegion(e.target.value)}
+              className="mt-1.5 w-full rounded-xl bg-surface px-4 py-3 text-sm text-primary outline-none focus:ring-2 focus:ring-secondary/30"
+            >
+              <option value="">지역을 선택해주세요</option>
+              {SEOUL_DISTRICTS.map((district) => (
+                <option key={district} value={district}>
+                  서울특별시 {district}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* 서비스 유형 */}
-          <div className="mt-5">
-            <label className="text-sm font-medium text-[#002045]/70">필요한 서비스</label>
+          <div className="mt-6">
+            <label className="text-sm font-medium text-on-surface-variant">필요한 서비스</label>
             <div className="mt-2 flex flex-wrap gap-2">
               {SERVICE_OPTIONS.map((opt) => (
                 <button
@@ -183,8 +210,8 @@ export default function MatchingPage() {
                   onClick={() => toggleService(opt.value)}
                   className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                     selectedServices.includes(opt.value)
-                      ? 'bg-[#006A63] text-white'
-                      : 'bg-[#F7FAFC] text-[#002045]/60 hover:bg-[#006A63]/10'
+                      ? 'bg-secondary text-white'
+                      : 'bg-surface text-on-surface-variant hover:bg-secondary/10'
                   }`}
                 >
                   {opt.label}
@@ -194,8 +221,8 @@ export default function MatchingPage() {
           </div>
 
           {/* 선호 시간 */}
-          <div className="mt-5">
-            <label className="text-sm font-medium text-[#002045]/70">선호 시간</label>
+          <div className="mt-6">
+            <label className="text-sm font-medium text-on-surface-variant">선호 시간</label>
             <div className="mt-2 flex gap-2">
               {TIME_OPTIONS.map((opt) => (
                 <button
@@ -203,8 +230,8 @@ export default function MatchingPage() {
                   onClick={() => setSelectedTime(opt.value)}
                   className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                     selectedTime === opt.value
-                      ? 'bg-[#002045] text-white'
-                      : 'bg-[#F7FAFC] text-[#002045]/60 hover:bg-[#002045]/10'
+                      ? 'bg-primary text-white'
+                      : 'bg-surface text-on-surface-variant hover:bg-primary/10'
                   }`}
                 >
                   {opt.label}
@@ -214,15 +241,15 @@ export default function MatchingPage() {
           </div>
 
           {/* 긴급도 */}
-          <div className="mt-5">
-            <label className="text-sm font-medium text-[#002045]/70">긴급도</label>
+          <div className="mt-6">
+            <label className="text-sm font-medium text-on-surface-variant">긴급도</label>
             <div className="mt-2 flex gap-2">
               <button
                 onClick={() => setUrgency('normal')}
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                   urgency === 'normal'
-                    ? 'bg-[#006A63] text-white'
-                    : 'bg-[#F7FAFC] text-[#002045]/60'
+                    ? 'bg-secondary text-white'
+                    : 'bg-surface text-on-surface-variant'
                 }`}
               >
                 일반
@@ -231,8 +258,8 @@ export default function MatchingPage() {
                 onClick={() => setUrgency('urgent')}
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                   urgency === 'urgent'
-                    ? 'bg-[#EF4444] text-white'
-                    : 'bg-[#F7FAFC] text-[#002045]/60'
+                    ? 'bg-error text-on-error'
+                    : 'bg-surface text-on-surface-variant'
                 }`}
               >
                 긴급
@@ -241,36 +268,36 @@ export default function MatchingPage() {
           </div>
 
           {/* 메모 */}
-          <div className="mt-5">
-            <label className="text-sm font-medium text-[#002045]/70">요청 사항</label>
+          <div className="mt-6">
+            <label className="text-sm font-medium text-on-surface-variant">요청 사항</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="특별히 요청하실 사항이 있으면 입력해주세요"
               rows={3}
-              className="mt-1.5 w-full resize-none rounded-xl bg-[#F7FAFC] px-4 py-3 text-sm text-[#002045] outline-none focus:ring-2 focus:ring-[#006A63]/30"
+              className="mt-1.5 w-full resize-none rounded-xl bg-surface px-4 py-3 text-sm text-primary outline-none focus:ring-2 focus:ring-secondary/30"
             />
           </div>
 
           {/* 버튼 */}
-          <div className="mt-6 flex gap-3">
+          <div className="mt-8 flex gap-3">
             <button
               onClick={() => setShowForm(false)}
-              className="flex-1 rounded-xl bg-[#F7FAFC] px-6 py-3 text-sm font-medium text-[#002045]/60 transition-colors hover:bg-[#002045]/10"
+              className="flex-1 rounded-xl bg-surface px-6 py-3 text-sm font-medium text-on-surface-variant transition-colors hover:bg-primary/10"
             >
               취소
             </button>
             <button
               onClick={() => createMutation.mutate()}
               disabled={selectedServices.length === 0 || createMutation.isPending}
-              className="flex-1 rounded-xl bg-gradient-to-r from-[#006A63] to-[#004D47] px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="flex-1 rounded-xl bg-gradient-to-r from-secondary to-secondary-900 px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
             >
               {createMutation.isPending ? '요청 중...' : '매칭 요청'}
             </button>
           </div>
 
           {createMutation.isError && (
-            <p className="mt-3 text-center text-sm text-[#EF4444]">
+            <p className="mt-3 text-center text-sm text-error">
               요청에 실패했습니다. 다시 시도해주세요.
             </p>
           )}
@@ -279,56 +306,103 @@ export default function MatchingPage() {
 
       {/* 요청 이력 */}
       <section>
-        <h2 className="mb-4 text-lg font-semibold text-[#002045]">요청 이력</h2>
+        <h2 className="mb-6 text-lg font-semibold text-primary">요청 이력</h2>
         {isLoading ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 animate-pulse rounded-2xl bg-[#002045]/5" />
+              <div key={i} className="h-24 animate-pulse rounded-2xl bg-primary/5" />
             ))}
           </div>
         ) : !requests || requests.length === 0 ? (
-          <div className="rounded-2xl bg-[#002045]/5 p-8 text-center">
-            <p className="text-[#002045]/40">매칭 요청 이력이 없습니다</p>
+          <div className="rounded-2xl bg-surface-container-lowest p-12 text-center shadow-[0_10px_40px_rgba(24,28,30,0.05)]">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-secondary/10">
+              <svg className="h-8 w-8 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" />
+              </svg>
+            </div>
+            <p className="mt-4 text-sm font-medium text-primary">아직 매칭 요청이 없습니다</p>
+            <p className="mt-1 text-xs text-on-surface-variant">
+              위의 &quot;매칭 요청하기&quot; 버튼을 눌러 첫 매칭을 시작해보세요
+            </p>
+            <button
+              onClick={() => setShowForm(true)}
+              className="mt-4 inline-flex rounded-xl bg-secondary/10 px-4 py-2 text-sm font-medium text-secondary transition-colors hover:bg-secondary/20"
+            >
+              매칭 요청하기
+            </button>
           </div>
         ) : (
-          <div className="space-y-3">
-            {requests.map((req) => (
-              <div
-                key={req.id}
-                className="rounded-2xl bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-[#002045]">
-                      {(req.patient as any)?.full_name ?? '환자'}
-                    </p>
-                    <div className="mt-1.5 flex flex-wrap gap-1.5">
-                      {(req.requested_services as string[])?.map((svc: string) => (
-                        <span
-                          key={svc}
-                          className="rounded-full bg-[#006A63]/10 px-2.5 py-0.5 text-xs text-[#006A63]"
-                        >
-                          {formatServiceType(svc)}
-                        </span>
-                      ))}
+          <div className="space-y-4">
+            {requests.map((req) => {
+              const matchedOrgs = (req as any).matched_organizations as any[] | undefined;
+              return (
+                <div
+                  key={req.id}
+                  className="rounded-2xl bg-surface-container-lowest p-6 shadow-[0_10px_40px_rgba(24,28,30,0.05)]"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-primary">
+                        {(req.patient as any)?.full_name ?? '환자'}
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {(req.requested_services as string[])?.map((svc: string) => (
+                          <span
+                            key={svc}
+                            className="rounded-full bg-secondary/10 px-2.5 py-0.5 text-xs font-medium text-secondary"
+                          >
+                            {formatServiceType(svc)}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-medium ${getStatusBadgeStyle(req.status)}`}
-                  >
-                    {formatRequestStatus(req.status)}
-                  </span>
-                </div>
-                <div className="mt-3 flex items-center justify-between text-xs text-[#002045]/50">
-                  <span>{formatDate(req.created_at)}</span>
-                  {(req.selected_org as any)?.name && (
-                    <span className="font-medium text-[#002045]/70">
-                      {(req.selected_org as any).name}
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${getStatusBadgeStyle(req.status)}`}
+                    >
+                      {formatRequestStatus(req.status)}
                     </span>
+                  </div>
+
+                  {/* 추천 기관 카드 */}
+                  {matchedOrgs && matchedOrgs.length > 0 && (
+                    <div className="mt-4 space-y-2">
+                      <p className="text-xs font-medium text-on-surface-variant">추천 기관</p>
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        {matchedOrgs.map((org: any, idx: number) => (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-3 rounded-xl bg-surface p-3"
+                          >
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary/10 text-sm font-bold text-secondary">
+                              {idx + 1}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="truncate text-sm font-medium text-primary">
+                                {org.name ?? org.org_name ?? '기관'}
+                              </p>
+                              {org.match_score != null && (
+                                <p className="text-xs text-on-surface-variant">
+                                  매칭 점수 {Math.round(org.match_score)}점
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
+
+                  <div className="mt-4 flex items-center justify-between text-xs text-on-surface-variant">
+                    <span>{formatDate(req.created_at)}</span>
+                    {(req.selected_org as any)?.name && (
+                      <span className="font-medium text-primary">
+                        {(req.selected_org as any).name}
+                      </span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
