@@ -20,6 +20,43 @@
   --color-error: #BA1A1A;
   --color-error-container: #FFDAD6;
   --color-on-error: #FFFFFF;
+
+  /* Primary scale (deep navy) */
+  --color-primary-50: #E8EDF4;
+  --color-primary-100: #C5D1E3;
+  --color-primary-200: #9EB3D0;
+  --color-primary-300: #7795BD;
+  --color-primary-400: #5A7EAF;
+  --color-primary-500: #3D67A1;
+  --color-primary-600: #2D5085;
+  --color-primary-700: #1E3A69;
+  --color-primary-800: #0F254D;
+  --color-primary-900: #002045;
+
+  /* Secondary scale (teal) */
+  --color-secondary-50: #E0F5F3;
+  --color-secondary-100: #B3E6E1;
+  --color-secondary-200: #80D6CD;
+  --color-secondary-300: #4DC5B9;
+  --color-secondary-400: #26B8AA;
+  --color-secondary-500: #00AB9B;
+  --color-secondary-600: #009485;
+  --color-secondary-700: #007D6F;
+  --color-secondary-800: #006A63;
+  --color-secondary-900: #004D47;
+
+  /* Tertiary scale (warm brown) */
+  --color-tertiary-50: #FFF3E0;
+  --color-tertiary-100: #FFE0B2;
+  --color-tertiary-200: #FFCC80;
+  --color-tertiary-300: #FFB74D;
+  --color-tertiary-400: #FFA726;
+  --color-tertiary-500: #FF9800;
+  --color-tertiary-600: #8B6914;
+  --color-tertiary-700: #6D4C00;
+  --color-tertiary-800: #4E3600;
+  --color-tertiary-900: #321B00;
+
   --font-family-sans: 'Pretendard Variable', Pretendard, system-ui, sans-serif;
 }
 
@@ -46,6 +83,16 @@ body {
   border-radius: 12px;
 }
 .btn-gradient:hover {
+  background: linear-gradient(135deg, #1A365D, #002045);
+}
+
+/* Admin gradient button (alias) */
+.gradient-button {
+  background: linear-gradient(135deg, #002045, #1A365D);
+  color: white;
+  border-radius: 12px;
+}
+.gradient-button:hover {
   background: linear-gradient(135deg, #1A365D, #002045);
 }
 
