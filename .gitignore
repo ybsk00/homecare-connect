@@ -3,6 +3,7 @@ node_modules/
 
 # Build outputs
 .next/
+out/
 dist/
 .expo/
 *.tsbuildinfo
@@ -32,6 +33,9 @@ android/
 
 # Vercel
 .vercel
+
+# Firebase
+.firebase/
 
 # OS files
 .DS_Store

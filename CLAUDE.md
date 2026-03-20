@@ -31,6 +31,7 @@ supabase/
 - **상태**: Zustand (클라이언트) + TanStack Query v5 (서버)
 - **백엔드/DB**: Supabase (PostgreSQL 17 + PostGIS + pgvector)
 - **AI**: Google Gemini 2.5 Flash
+- **호스팅**: Firebase App Hosting (Next.js SSR)
 - **모노레포**: Turborepo + pnpm
 
 ## Supabase
@@ -66,6 +67,17 @@ pnpm lint             # ESLint
 
 .env 파일은 절대 git에 커밋하지 않는다. .env.example 참고.
 필요한 키: Supabase(anon/service_role), Gemini, Kakao, Toss
+
+## Firebase App Hosting
+
+- **프로젝트**: homecare-connect-ce904
+- **백엔드**:
+  - hospital-web → https://hospital-web--homecare-connect-ce904.asia-east1.hosted.app
+  - admin-web → https://admin-web--homecare-connect-ce904.asia-east1.hosted.app
+- **리전**: asia-east1 (타이완)
+- **배포**: GitHub main push → 자동 빌드/배포 (Cloud Run)
+- **설정**: 각 앱의 `apphosting.yaml`에 런타임/환경변수 설정
+- **시크릿**: Firebase Secret Manager (NEXT_PUBLIC_SUPABASE_ANON_KEY)
 
 ## GitHub
 
