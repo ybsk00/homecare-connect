@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { clsx } from 'clsx';
@@ -20,7 +20,6 @@ import {
   Plus,
   Menu,
   X,
-  MessageSquare,
   LayoutDashboard,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -36,10 +35,10 @@ type TabItem = {
 
 const guardianTabs: TabItem[] = [
   { label: '대시보드', href: '/patient', icon: LayoutDashboard },
-  { label: '매칭', href: '/patient/matching', icon: Brain },
+  { label: '매칭 요청', href: '/patient/matching', icon: Brain },
   { label: '일정', href: '/patient/schedule', icon: Calendar },
-  { label: '기록', href: '/patient/records', icon: FileText },
-  { label: '환자관리', href: '/patient/patients', icon: Users },
+  { label: '방문 기록', href: '/patient/records', icon: FileText },
+  { label: '환자 관리', href: '/patient/patients', icon: Users },
   { label: 'AI 리포트', href: '/patient/ai-report', icon: Sparkles },
   { label: '알림', href: '/patient/notifications', icon: Bell },
   { label: 'AI 상담', href: '/patient/chat', icon: Brain },
@@ -53,21 +52,6 @@ const nurseTabs: TabItem[] = [
   { label: '알림', href: '/nurse/notifications', icon: Bell },
 ];
 
-// 상단 네비바 탭 (간략)
-const guardianTopTabs = [
-  { label: 'Dashboard', href: '/patient' },
-  { label: 'Care Plans', href: '/patient/matching' },
-  { label: 'Messages', href: '/patient/chat' },
-  { label: 'Insights', href: '/patient/ai-report' },
-];
-
-const nurseTopTabs = [
-  { label: 'Dashboard', href: '/nurse' },
-  { label: 'Patients', href: '/nurse/patients' },
-  { label: 'Alerts', href: '/nurse/alerts' },
-  { label: 'Statistics', href: '/nurse/stats' },
-];
-
 function getTabs(role: string): TabItem[] {
   switch (role) {
     case 'nurse':
@@ -75,16 +59,6 @@ function getTabs(role: string): TabItem[] {
     case 'guardian':
     default:
       return guardianTabs;
-  }
-}
-
-function getTopTabs(role: string) {
-  switch (role) {
-    case 'nurse':
-      return nurseTopTabs;
-    case 'guardian':
-    default:
-      return guardianTopTabs;
   }
 }
 
@@ -118,7 +92,6 @@ export function ContentNav({ role, profile }: ContentNavProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const tabs = getTabs(role);
-  const topTabs = getTopTabs(role);
   const roleHome = getRoleHome(role);
 
   // Unread notification count
@@ -147,7 +120,7 @@ export function ContentNav({ role, profile }: ContentNavProps) {
     window.location.href = '/login';
   };
 
-  const isTabActive = (tab: TabItem | { href: string }): boolean => {
+  const isTabActive = (tab: TabItem): boolean => {
     if (tab.href === '/patient' || tab.href === '/nurse') {
       return pathname === tab.href;
     }
@@ -157,17 +130,19 @@ export function ContentNav({ role, profile }: ContentNavProps) {
   return (
     <>
       {/* ── 좌측 사이드바 (lg 이상) ── */}
-      <aside className="hidden lg:flex h-screen w-72 fixed left-0 top-0 z-40 bg-[#FAFBFC] flex-col p-6 space-y-8">
+      <aside className="hidden lg:flex h-screen w-72 fixed left-0 top-0 z-40 bg-[#FAFBFC] flex-col p-6 space-y-6">
         {/* 로고 영역 */}
-        <div className="flex items-center gap-3 mb-2">
+        <Link href={roleHome} className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center">
             <HeartPulse className="h-5 w-5 text-white" />
           </div>
           <div>
-            <p className="text-lg font-bold text-on-surface tracking-tight">Care Management</p>
-            <p className="text-[11px] font-medium text-on-surface-variant">Premium Concierge</p>
+            <p className="text-lg font-bold text-on-surface tracking-tight">홈케어커넥트</p>
+            <p className="text-[11px] font-medium text-on-surface-variant">
+              {profile?.full_name ?? '사용자'} · {getRoleLabel(role)}
+            </p>
           </div>
-        </div>
+        </Link>
 
         {/* 네비게이션 링크 */}
         <nav className="flex-1 flex flex-col gap-1">
@@ -214,69 +189,41 @@ export function ContentNav({ role, profile }: ContentNavProps) {
             className="w-full flex items-center justify-center gap-2 bg-gradient-to-br from-primary to-primary-container text-white py-3.5 px-6 rounded-xl font-bold text-sm shadow-lg shadow-primary/20 active:scale-95 transition-transform"
           >
             <Plus className="h-4 w-4" />
-            {role === 'nurse' ? 'New Visit Record' : 'New Care Request'}
+            {role === 'nurse' ? '새 방문 기록' : '새 케어 요청'}
           </Link>
 
           <div className="flex flex-col gap-0.5">
             <button className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high/50 rounded-xl transition-colors">
               <HelpCircle className="h-4 w-4" />
-              <span>Support</span>
+              <span>고객 지원</span>
             </button>
             <button
               onClick={handleLogout}
               className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-error/5 hover:text-error rounded-xl transition-colors cursor-pointer"
             >
               <LogOut className="h-4 w-4" />
-              <span>Sign Out</span>
+              <span>로그아웃</span>
             </button>
           </div>
         </div>
       </aside>
 
-      {/* ── 상단 네비바 ── */}
-      <nav className="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl shadow-[0_1px_3px_rgba(46,71,110,0.04)]">
-        <div className="flex items-center justify-between px-6 lg:px-8 py-3.5 max-w-[1920px] mx-auto">
-          {/* 좌: 로고 (lg에서 숨김) + 탭 */}
-          <div className="flex items-center gap-8">
-            <Link
-              href={roleHome}
-              className="lg:hidden flex items-center gap-2 shrink-0"
-            >
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-                <HeartPulse className="h-4 w-4 text-white" />
-              </div>
-              <span className="text-[15px] font-extrabold text-on-surface tracking-tighter">
-                HomeCare Connect
-              </span>
-            </Link>
-
-            {/* 상단 탭 (lg 이상) */}
-            <div className="hidden lg:flex items-center gap-1 ml-72">
-              {topTabs.map((tab) => {
-                const active = isTabActive(tab);
-                return (
-                  <Link
-                    key={tab.href}
-                    href={tab.href}
-                    className={clsx(
-                      'px-4 py-1.5 text-sm font-semibold tracking-tight transition-colors duration-300',
-                      active
-                        ? 'text-on-surface border-b-2 border-on-surface'
-                        : 'text-on-surface-variant hover:text-on-surface'
-                    )}
-                  >
-                    {tab.label}
-                  </Link>
-                );
-              })}
+      {/* ── 모바일 상단바 (lg 미만) ── */}
+      <nav className="lg:hidden fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl shadow-[0_1px_3px_rgba(46,71,110,0.04)]">
+        <div className="flex items-center justify-between px-4 py-3">
+          <Link href={roleHome} className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+              <HeartPulse className="h-4 w-4 text-white" />
             </div>
-          </div>
+            <span className="text-[15px] font-extrabold text-on-surface tracking-tighter">
+              홈케어커넥트
+            </span>
+          </Link>
 
-          {/* 우: 알림 + 프로필 */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Link
               href={role === 'nurse' ? '/nurse/notifications' : '/patient/notifications'}
-              className="relative p-2 hover:bg-surface-container-low/50 rounded-xl transition-colors duration-300 active:scale-95"
+              className="relative p-2 rounded-xl"
             >
               <Bell className="h-5 w-5 text-on-surface" />
               {(unreadCount ?? 0) > 0 && (
@@ -285,18 +232,8 @@ export function ContentNav({ role, profile }: ContentNavProps) {
                 </span>
               )}
             </Link>
-            <button className="hidden sm:block p-2 hover:bg-surface-container-low/50 rounded-xl transition-colors duration-300 active:scale-95">
-              <MessageSquare className="h-5 w-5 text-on-surface" />
-            </button>
-            <div className="h-10 w-10 rounded-full bg-surface-container-high overflow-hidden flex items-center justify-center">
-              <span className="text-sm font-bold text-primary">
-                {profile?.full_name?.charAt(0) ?? 'U'}
-              </span>
-            </div>
-
-            {/* 모바일 메뉴 토글 */}
             <button
-              className="lg:hidden p-2 hover:bg-surface-container-low/50 rounded-xl transition-colors"
+              className="p-2 rounded-xl"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

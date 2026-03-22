@@ -225,7 +225,7 @@ export default function PatientsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-secondary">Patient Management</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-secondary">환자 관리</p>
           <h1 className="mt-1 text-4xl font-extrabold tracking-tight text-primary">환자 관리</h1>
           <p className="mt-2 text-on-surface-variant">등록된 환자를 관리하세요</p>
         </div>

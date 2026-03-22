@@ -150,7 +150,7 @@ export default function MatchingPage() {
               </svg>
             </div>
             <div className="flex-1">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-white/60">AI Matching</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-white/60">AI 매칭</p>
               <h2 className="mt-1 text-xl font-bold leading-snug">AI 매칭으로 최적의 간호사를 찾아보세요</h2>
               <p className="mt-2 text-sm leading-relaxed text-white/70">
                 환자 정보와 위치를 기반으로 가장 적합한 기관을 추천해드립니다
@@ -169,7 +169,7 @@ export default function MatchingPage() {
       {/* Matching Request Form */}
       {showForm && (
         <div className="rounded-3xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-secondary">New Request</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-secondary">새 요청</p>
           <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-primary">새 매칭 요청</h2>
 
           {/* Patient Selection */}
@@ -315,7 +315,7 @@ export default function MatchingPage() {
       {/* Request History */}
       <section>
         <div className="mb-8">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-secondary">History</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-secondary">이력</p>
           <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-primary">요청 이력</h2>
         </div>
 

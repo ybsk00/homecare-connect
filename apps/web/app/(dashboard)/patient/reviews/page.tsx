@@ -167,7 +167,7 @@ export default function ReviewsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-secondary">Reviews</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-secondary">리뷰</p>
           <h1 className="mt-1 text-4xl font-extrabold tracking-tight text-primary">리뷰</h1>
           <p className="mt-2 text-on-surface-variant">서비스 이용 후기를 남겨주세요</p>
         </div>

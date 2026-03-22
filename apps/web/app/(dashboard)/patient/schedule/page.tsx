@@ -150,7 +150,7 @@ export default function SchedulePage() {
       <div className="flex items-end justify-between">
         <div>
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-secondary">
-            SCHEDULE
+            일정
           </p>
           <h1 className="text-4xl font-extrabold tracking-tight text-primary">일정</h1>
           <p className="mt-2 text-base text-on-surface-variant">방문 일정을 확인하세요</p>

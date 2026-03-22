@@ -10,7 +10,7 @@ export function ContentLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-surface">
       <ContentNav role={role} profile={profile} />
-      <main className="lg:ml-72 pt-20 pb-12 px-6 md:px-12 bg-surface min-h-screen">
+      <main className="lg:ml-72 pt-4 lg:pt-8 pb-20 lg:pb-12 px-4 sm:px-6 md:px-12 bg-surface min-h-screen">
         <div className="max-w-7xl mx-auto">
           {children}
         </div>

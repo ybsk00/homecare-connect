@@ -248,7 +248,7 @@ export default function PatientDashboardPage() {
             <>
               <div>
                 <span className="inline-block bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-6">
-                  Next Visit
+                  다음 방문
                 </span>
                 <h2 className="text-2xl font-bold text-primary mb-2">방문 예정 안내</h2>
                 <p className="text-on-surface-variant text-sm mb-6">
@@ -293,13 +293,13 @@ export default function PatientDashboardPage() {
         <div className="bento-card col-span-1 md:col-span-2 lg:col-span-2 flex flex-col justify-between overflow-hidden relative">
           <div className="flex justify-between items-start z-10">
             <div>
-              <h2 className="text-2xl font-bold text-primary mb-1">AI Vitality Chart</h2>
+              <h2 className="text-2xl font-bold text-primary mb-1">AI 건강 차트</h2>
               <p className="text-on-surface-variant text-sm">실시간 건강 상태 요약</p>
             </div>
             {healthScore !== null && (
               <div className="text-right">
                 <p className="text-4xl font-black text-secondary">{healthScore}</p>
-                <p className="text-[10px] font-bold text-secondary uppercase tracking-widest">Health Score</p>
+                <p className="text-[10px] font-bold text-secondary uppercase tracking-widest">건강 점수</p>
               </div>
             )}
           </div>
@@ -357,7 +357,7 @@ export default function PatientDashboardPage() {
 
         {/* ▸ Care Timeline (row-span-2) */}
         <div className="bento-card lg:row-span-2">
-          <h2 className="text-xl font-bold text-primary mb-8">Care Timeline</h2>
+          <h2 className="text-xl font-bold text-primary mb-8">케어 타임라인</h2>
 
           {recentRecords.length === 0 ? (
             <div className="py-12 text-center">
@@ -407,7 +407,7 @@ export default function PatientDashboardPage() {
         {/* ▸ Matching Status */}
         <div className="bento-card flex flex-col justify-between">
           <div>
-            <h2 className="text-xl font-bold text-primary mb-2">Matching Status</h2>
+            <h2 className="text-xl font-bold text-primary mb-2">매칭 현황</h2>
             <p className="text-on-surface-variant text-sm mb-8">매칭 프로세스 진행 상황</p>
           </div>
 

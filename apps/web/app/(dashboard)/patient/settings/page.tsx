@@ -92,7 +92,7 @@ export default function SettingsPage() {
     <div className="space-y-12">
       {/* Header */}
       <div>
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-secondary">Settings</p>
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-secondary">설정</p>
         <h1 className="mt-1 text-4xl font-extrabold tracking-tight text-primary">설정</h1>
         <p className="mt-2 text-on-surface-variant">계정 및 서비스 설정을 관리하세요</p>
       </div>
@@ -107,7 +107,7 @@ export default function SettingsPage() {
               </svg>
             </div>
             <div>
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/60">Profile</p>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/60">프로필</p>
               <h2 className="text-xl font-bold text-primary">프로필</h2>
             </div>
           </div>
@@ -201,7 +201,7 @@ export default function SettingsPage() {
             </svg>
           </div>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/60">Notifications</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/60">알림</p>
             <h2 className="text-xl font-bold text-primary">알림 설정</h2>
           </div>
         </div>
@@ -236,7 +236,7 @@ export default function SettingsPage() {
             </svg>
           </div>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/60">Service Plan</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/60">서비스 플랜</p>
             <h2 className="text-xl font-bold text-primary">서비스 정보</h2>
           </div>
         </div>
@@ -297,7 +297,7 @@ export default function SettingsPage() {
             </svg>
           </div>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/60">Communication</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/60">소통</p>
             <h2 className="text-xl font-bold text-primary">기관 소통</h2>
           </div>
         </div>
@@ -357,7 +357,7 @@ export default function SettingsPage() {
             </svg>
           </div>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/60">Account</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/60">계정</p>
             <h2 className="text-xl font-bold text-primary">계정 관리</h2>
           </div>
         </div>

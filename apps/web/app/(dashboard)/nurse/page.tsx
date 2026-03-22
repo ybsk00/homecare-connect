@@ -212,12 +212,12 @@ export default function NurseDashboardPage() {
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
                   <div className="px-3 py-1 bg-secondary rounded-full text-[10px] font-bold tracking-widest uppercase">
-                    {liveVisit ? 'Visit in Progress' : 'Next Visit'}
+                    {liveVisit ? '방문 진행 중' : '다음 방문'}
                   </div>
                   {liveVisit && (
                     <div className="flex items-center gap-1.5 text-secondary-container">
                       <span className="w-2 h-2 bg-secondary rounded-full animate-pulse" />
-                      <span className="text-xs font-bold">LIVE</span>
+                      <span className="text-xs font-bold">실시간</span>
                     </div>
                   )}
                 </div>
@@ -358,7 +358,7 @@ export default function NurseDashboardPage() {
                         {alert.severity}
                       </span>
                       <span className="text-[10px] font-bold bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded uppercase">
-                        AI matched
+                        AI 매칭
                       </span>
                     </div>
                   </div>
@@ -411,7 +411,7 @@ export default function NurseDashboardPage() {
                           {visit.scheduled_time?.slice(0, 5) ?? '--:--'}
                         </div>
                         <div className="text-[10px] text-on-surface-variant font-bold uppercase tracking-tighter">
-                          {visit.estimated_duration_min ?? '--'} min
+                          {visit.estimated_duration_min ?? '--'}분
                         </div>
                       </div>
                       <div className={clsx(
@@ -424,7 +424,7 @@ export default function NurseDashboardPage() {
                           {(isLive || isNext) && (
                             <span className="flex items-center gap-1 rounded-full bg-secondary/10 px-2 py-0.5 text-[10px] font-bold text-secondary">
                               {isLive && <span className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />}
-                              {isLive ? 'LIVE' : 'NEXT'}
+                              {isLive ? '실시간' : '다음'}
                             </span>
                           )}
                         </div>

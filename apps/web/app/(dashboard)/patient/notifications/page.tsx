@@ -109,7 +109,7 @@ export default function PatientNotificationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-secondary">Notifications</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-secondary">알림</p>
           <h1 className="mt-1 text-4xl font-extrabold tracking-tight text-primary">알림</h1>
           <p className="mt-2 text-on-surface-variant">
             {unreadCount > 0 ? `읽지 않은 알림 ${unreadCount}건` : '모든 알림을 확인했습니다'}
