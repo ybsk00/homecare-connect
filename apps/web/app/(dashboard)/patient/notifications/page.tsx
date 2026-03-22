@@ -105,12 +105,13 @@ export default function PatientNotificationsPage() {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-primary">알림</h1>
-          <p className="mt-1 text-on-surface-variant">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-secondary">Notifications</p>
+          <h1 className="mt-1 text-4xl font-extrabold tracking-tight text-primary">알림</h1>
+          <p className="mt-2 text-on-surface-variant">
             {unreadCount > 0 ? `읽지 않은 알림 ${unreadCount}건` : '모든 알림을 확인했습니다'}
           </p>
         </div>
@@ -118,7 +119,7 @@ export default function PatientNotificationsPage() {
           <button
             onClick={() => markAllMutation.mutate()}
             disabled={markAllMutation.isPending}
-            className="flex items-center gap-1.5 rounded-xl bg-secondary/10 px-4 py-2.5 text-sm font-medium text-secondary transition-colors hover:bg-secondary/20 disabled:opacity-50"
+            className="flex items-center gap-2 rounded-2xl bg-secondary/10 px-5 py-3 text-sm font-semibold text-secondary transition-all hover:bg-secondary/15 active:scale-95 disabled:opacity-50"
           >
             <CheckCheck className="h-4 w-4" />
             모두 읽음
@@ -126,17 +127,32 @@ export default function PatientNotificationsPage() {
         )}
       </div>
 
+      {/* Unread Counter Badge */}
+      {unreadCount > 0 && (
+        <div className="rounded-2xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+          <div className="flex items-center gap-6">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-secondary/10">
+              <Bell className="h-7 w-7 text-secondary" />
+            </div>
+            <div>
+              <p className="text-4xl font-extrabold tracking-tight text-primary">{unreadCount}</p>
+              <p className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/60">읽지 않은 알림</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Filter Tabs */}
-      <div className="flex gap-2">
+      <div className="flex gap-2.5 overflow-x-auto pb-1">
         {filterTabs.map((tab) => (
           <button
             key={tab.label}
             onClick={() => setActiveFilter(tab.label)}
             className={clsx(
-              'rounded-xl px-4 py-2 text-sm font-medium transition-colors',
+              'shrink-0 rounded-full px-5 py-2.5 text-sm font-medium transition-all',
               activeFilter === tab.label
-                ? 'bg-primary text-white'
-                : 'bg-primary/5 text-on-surface-variant hover:bg-primary/10 hover:text-primary'
+                ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                : 'bg-surface-container-low text-on-surface-variant hover:bg-primary/5 hover:text-primary'
             )}
           >
             {tab.label}
@@ -146,18 +162,18 @@ export default function PatientNotificationsPage() {
 
       {/* Notification List */}
       {isLoading ? (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-20 animate-pulse rounded-2xl bg-primary/5" />
+            <div key={i} className="h-24 animate-pulse rounded-2xl bg-primary/5" />
           ))}
         </div>
       ) : filteredNotifications.length === 0 ? (
-        <div className="rounded-2xl bg-primary/5 p-10 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-            <Bell className="h-8 w-8 text-primary/30" />
+        <div className="rounded-2xl bg-surface-container-lowest p-16 text-center shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/8">
+            <Bell className="h-10 w-10 text-primary/25" />
           </div>
-          <p className="mt-4 text-sm font-medium text-on-surface-variant">알림이 없습니다</p>
-          <p className="mt-1 text-xs text-on-surface-variant/60">새로운 알림이 도착하면 여기에 표시됩니다</p>
+          <p className="mt-6 text-base font-semibold text-primary">알림이 없습니다</p>
+          <p className="mt-2 text-sm text-on-surface-variant/60">새로운 알림이 도착하면 여기에 표시됩니다</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -174,16 +190,16 @@ export default function PatientNotificationsPage() {
                   }
                 }}
                 className={clsx(
-                  'flex w-full items-start gap-4 rounded-2xl p-4 text-left transition-colors',
+                  'group flex w-full items-start gap-4 rounded-2xl p-5 text-left transition-all duration-300 hover:-translate-y-0.5',
                   notification.read
-                    ? 'bg-surface-container-lowest shadow-[0_10px_40px_rgba(24,28,30,0.05)]'
-                    : 'bg-secondary/5 shadow-[0_10px_40px_rgba(24,28,30,0.05)]'
+                    ? 'bg-surface-container-lowest shadow-[0_10px_40px_rgba(46,71,110,0.06)] hover:shadow-[0_20px_60px_rgba(46,71,110,0.1)]'
+                    : 'bg-secondary/5 shadow-[0_10px_40px_rgba(46,71,110,0.06)] hover:shadow-[0_20px_60px_rgba(46,71,110,0.1)]'
                 )}
               >
                 {/* Icon - 원형 배경 */}
                 <div
                   className={clsx(
-                    'flex h-11 w-11 shrink-0 items-center justify-center rounded-full',
+                    'flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-transform group-hover:scale-105',
                     iconColor
                   )}
                 >
@@ -192,29 +208,29 @@ export default function PatientNotificationsPage() {
 
                 {/* Content */}
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start justify-between gap-3">
                     <p
                       className={clsx(
-                        'text-sm',
+                        'text-sm leading-snug',
                         notification.read
                           ? 'font-medium text-on-surface-variant'
-                          : 'font-semibold text-primary'
+                          : 'font-bold text-primary'
                       )}
                     >
                       {notification.title}
                     </p>
-                    <span className="shrink-0 text-xs text-on-surface-variant/50">
+                    <span className="shrink-0 text-[10px] font-medium uppercase tracking-widest text-on-surface-variant/40">
                       {relativeTime(notification.created_at)}
                     </span>
                   </div>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-on-surface-variant/60">
+                  <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-on-surface-variant/60">
                     {notification.body}
                   </p>
                 </div>
 
                 {/* Unread indicator */}
                 {!notification.read && (
-                  <div className="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-secondary" />
+                  <div className="mt-2 h-3 w-3 shrink-0 rounded-full bg-secondary shadow-md shadow-secondary/30" />
                 )}
               </button>
             );

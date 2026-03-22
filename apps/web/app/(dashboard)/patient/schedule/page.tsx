@@ -145,20 +145,24 @@ export default function SchedulePage() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
+      {/* Page Header */}
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-primary">일정</h1>
-          <p className="mt-1 text-on-surface-variant">방문 일정을 확인하세요</p>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-secondary">
+            SCHEDULE
+          </p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-primary">일정</h1>
+          <p className="mt-2 text-base text-on-surface-variant">방문 일정을 확인하세요</p>
         </div>
 
-        {/* 주간/월간 토글 */}
-        <div className="flex rounded-xl bg-surface-container-low p-1">
+        {/* 주간/월간 토글 - pill switcher */}
+        <div className="flex rounded-2xl bg-surface-container-low p-1.5">
           <button
             onClick={() => setViewMode('week')}
-            className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
+            className={`rounded-xl px-5 py-2 text-sm font-semibold transition-all duration-200 ${
               viewMode === 'week'
-                ? 'bg-surface-container-lowest text-primary shadow-[0_10px_40px_rgba(24,28,30,0.05)]'
+                ? 'bg-surface-container-lowest text-primary shadow-[0_10px_40px_rgba(46,71,110,0.06)]'
                 : 'text-on-surface-variant hover:text-primary'
             }`}
           >
@@ -166,9 +170,9 @@ export default function SchedulePage() {
           </button>
           <button
             onClick={() => setViewMode('month')}
-            className={`rounded-lg px-4 py-1.5 text-sm font-medium transition-colors ${
+            className={`rounded-xl px-5 py-2 text-sm font-semibold transition-all duration-200 ${
               viewMode === 'month'
-                ? 'bg-surface-container-lowest text-primary shadow-[0_10px_40px_rgba(24,28,30,0.05)]'
+                ? 'bg-surface-container-lowest text-primary shadow-[0_10px_40px_rgba(46,71,110,0.06)]'
                 : 'text-on-surface-variant hover:text-primary'
             }`}
           >
@@ -179,23 +183,23 @@ export default function SchedulePage() {
 
       {/* 주간 캘린더 */}
       {viewMode === 'week' && (
-        <div className="rounded-2xl bg-surface-container-lowest p-5 shadow-[0_10px_40px_rgba(24,28,30,0.05)]">
+        <div className="rounded-2xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
           {/* 주간 네비게이션 */}
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-6 flex items-center justify-between">
             <button
               onClick={() => setWeekOffset((prev) => prev - 1)}
-              className="rounded-xl bg-surface p-2 text-on-surface-variant transition-colors hover:bg-primary/10"
+              className="rounded-2xl bg-surface-container-low p-2.5 text-on-surface-variant transition-colors hover:bg-surface-container-high"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
               </svg>
             </button>
-            <p className="text-sm font-medium text-primary">
+            <p className="text-sm font-bold tracking-wide text-primary">
               {weekRange.start.replace(/-/g, '.')} ~ {weekRange.end.replace(/-/g, '.')}
             </p>
             <button
               onClick={() => setWeekOffset((prev) => prev + 1)}
-              className="rounded-xl bg-surface p-2 text-on-surface-variant transition-colors hover:bg-primary/10"
+              className="rounded-2xl bg-surface-container-low p-2.5 text-on-surface-variant transition-colors hover:bg-surface-container-high"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
@@ -204,7 +208,7 @@ export default function SchedulePage() {
           </div>
 
           {/* 요일 그리드 */}
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-2">
             {weekDates.map((date) => {
               const dateStr = toDateString(date);
               const isSelected = dateStr === selectedDate;
@@ -215,22 +219,26 @@ export default function SchedulePage() {
                 <button
                   key={dateStr}
                   onClick={() => setSelectedDate(dateStr)}
-                  className={`flex flex-col items-center gap-1 rounded-xl py-3 transition-colors ${
+                  className={`group flex flex-col items-center gap-1.5 rounded-2xl py-4 transition-all duration-200 ${
                     isSelected
-                      ? 'bg-primary text-white'
+                      ? 'bg-gradient-to-b from-primary to-primary/90 text-white shadow-[0_8px_24px_rgba(0,32,69,0.25)]'
                       : today
-                        ? 'bg-secondary/10 text-secondary'
-                        : 'text-on-surface-variant hover:bg-surface'
+                        ? 'bg-secondary/8 text-secondary hover:bg-secondary/15'
+                        : 'text-on-surface-variant hover:bg-surface-container-high'
                   }`}
                 >
-                  <span className="text-xs">{getVisitDayLabel(date.getDay())}</span>
-                  <span className="text-lg font-semibold">{date.getDate()}</span>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider opacity-70">
+                    {getVisitDayLabel(date.getDay())}
+                  </span>
+                  <span className="text-2xl font-bold tracking-tight">{date.getDate()}</span>
                   {hasVisits && (
-                    <div
-                      className={`h-1.5 w-1.5 rounded-full ${
-                        isSelected ? 'bg-white' : 'bg-secondary'
-                      }`}
-                    />
+                    <div className="flex items-center justify-center">
+                      <div
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          isSelected ? 'bg-white shadow-[0_0_6px_rgba(255,255,255,0.5)]' : 'bg-secondary shadow-[0_0_6px_rgba(0,106,99,0.3)]'
+                        }`}
+                      />
+                    </div>
                   )}
                 </button>
               );
@@ -241,21 +249,21 @@ export default function SchedulePage() {
 
       {/* 월간 캘린더 */}
       {viewMode === 'month' && (
-        <div className="rounded-2xl bg-surface-container-lowest p-5 shadow-[0_10px_40px_rgba(24,28,30,0.05)]">
+        <div className="rounded-2xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
           {/* 월간 네비게이션 */}
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-6 flex items-center justify-between">
             <button
               onClick={() => setMonthOffset((prev) => prev - 1)}
-              className="rounded-xl bg-surface p-2 text-on-surface-variant transition-colors hover:bg-primary/10"
+              className="rounded-2xl bg-surface-container-low p-2.5 text-on-surface-variant transition-colors hover:bg-surface-container-high"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
               </svg>
             </button>
-            <p className="text-sm font-semibold text-primary">{monthYear}</p>
+            <p className="text-base font-bold tracking-wide text-primary">{monthYear}</p>
             <button
               onClick={() => setMonthOffset((prev) => prev + 1)}
-              className="rounded-xl bg-surface p-2 text-on-surface-variant transition-colors hover:bg-primary/10"
+              className="rounded-2xl bg-surface-container-low p-2.5 text-on-surface-variant transition-colors hover:bg-surface-container-high"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
@@ -264,9 +272,9 @@ export default function SchedulePage() {
           </div>
 
           {/* 요일 헤더 */}
-          <div className="mb-1 grid grid-cols-7 gap-1">
+          <div className="mb-2 grid grid-cols-7 gap-1">
             {['일', '월', '화', '수', '목', '금', '토'].map((d) => (
-              <div key={d} className="py-1 text-center text-xs font-medium text-on-surface-variant">
+              <div key={d} className="py-2 text-center text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60">
                 {d}
               </div>
             ))}
@@ -287,19 +295,19 @@ export default function SchedulePage() {
                 <button
                   key={dateStr}
                   onClick={() => setSelectedDate(dateStr)}
-                  className={`relative flex flex-col items-center gap-0.5 rounded-xl py-2.5 transition-colors ${
+                  className={`group relative flex flex-col items-center gap-1 rounded-2xl py-3 transition-all duration-200 ${
                     isSelected
-                      ? 'bg-primary text-white'
+                      ? 'bg-gradient-to-b from-primary to-primary/90 text-white shadow-[0_6px_20px_rgba(0,32,69,0.2)]'
                       : today
-                        ? 'bg-secondary/10 text-secondary'
-                        : 'text-on-surface-variant hover:bg-surface'
+                        ? 'bg-secondary/8 text-secondary hover:bg-secondary/15'
+                        : 'text-on-surface-variant hover:bg-surface-container-high'
                   }`}
                 >
-                  <span className="text-sm font-medium">{date.getDate()}</span>
+                  <span className="text-sm font-bold">{date.getDate()}</span>
                   {hasVisits && (
                     <div
-                      className={`h-1 w-1 rounded-full ${
-                        isSelected ? 'bg-white' : 'bg-secondary'
+                      className={`h-1.5 w-1.5 rounded-full ${
+                        isSelected ? 'bg-white shadow-[0_0_6px_rgba(255,255,255,0.5)]' : 'bg-secondary shadow-[0_0_6px_rgba(0,106,99,0.3)]'
                       }`}
                     />
                   )}
@@ -311,22 +319,27 @@ export default function SchedulePage() {
       )}
 
       {/* 선택된 날짜 방문 목록 */}
-      <section>
-        <h2 className="mb-6 text-sm font-medium text-on-surface-variant">
-          {formatDateWithDay(selectedDate)}
-        </h2>
+      <section className="space-y-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary/10">
+            <div className="h-2.5 w-2.5 rounded-full bg-secondary" />
+          </div>
+          <h2 className="text-lg font-bold tracking-tight text-primary">
+            {formatDateWithDay(selectedDate)}
+          </h2>
+        </div>
 
         {isLoading ? (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {[1, 2].map((i) => (
-              <div key={i} className="h-20 animate-pulse rounded-2xl bg-primary/5" />
+              <div key={i} className="h-24 animate-pulse rounded-2xl bg-primary/5" />
             ))}
           </div>
         ) : selectedVisits.length === 0 ? (
-          <div className="rounded-2xl bg-surface-container-lowest p-12 text-center shadow-[0_10px_40px_rgba(24,28,30,0.05)]">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/5">
+          <div className="rounded-2xl bg-surface-container-lowest p-16 text-center shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/5">
               <svg
-                className="h-8 w-8 text-primary/30"
+                className="h-10 w-10 text-primary/20"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -339,15 +352,15 @@ export default function SchedulePage() {
                 />
               </svg>
             </div>
-            <p className="mt-4 text-sm font-medium text-primary">
+            <p className="mt-6 text-base font-bold text-primary">
               예정된 방문이 없습니다
             </p>
-            <p className="mt-1 text-xs text-on-surface-variant">
+            <p className="mt-2 text-sm text-on-surface-variant">
               이 날짜에는 아직 방문 일정이 잡혀있지 않습니다
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {selectedVisits.map((visit) => {
               const stepIdx = getStepIndex(visit.status);
               const isCancelled = visit.status === 'cancelled' || visit.status === 'no_show';
@@ -355,42 +368,46 @@ export default function SchedulePage() {
               return (
                 <div
                   key={visit.id}
-                  className="overflow-hidden rounded-2xl bg-surface-container-lowest shadow-[0_10px_40px_rgba(24,28,30,0.05)]"
+                  className="group overflow-hidden rounded-2xl bg-surface-container-lowest shadow-[0_10px_40px_rgba(46,71,110,0.06)] transition-shadow duration-300 hover:shadow-[0_16px_56px_rgba(46,71,110,0.1)]"
                 >
-                  {/* 히어로 헤더 */}
-                  <div className="bg-gradient-to-br from-primary to-primary-container p-5 text-white">
-                    <div className="flex items-start justify-between">
+                  {/* 히어로 헤더 - glassmorphism hero card */}
+                  <div className="relative overflow-hidden bg-gradient-to-br from-primary via-primary/95 to-secondary/80 p-8 text-white">
+                    {/* Blur orb decorations */}
+                    <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-white/5 blur-3xl" />
+                    <div className="pointer-events-none absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-secondary/20 blur-2xl" />
+
+                    <div className="relative flex items-start justify-between">
                       <div>
-                        <p className="text-2xl font-bold tracking-tight">
+                        <p className="text-4xl font-extrabold tracking-tight">
                           {visit.scheduled_time ?? '시간 미정'}
                         </p>
-                        <div className="mt-1.5 flex items-center gap-2">
+                        <div className="mt-3 flex items-center gap-3">
                           {(visit as any).service_type && (
-                            <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-medium">
+                            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold backdrop-blur-sm">
                               {formatServiceType((visit as any).service_type)}
                             </span>
                           )}
-                          <span className="text-sm text-white/70">
+                          <span className="text-sm font-medium text-white/60">
                             담당: {(visit.nurse as any)?.user?.full_name ?? '배정 대기'}
                           </span>
                         </div>
                       </div>
                       <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${getStatusColor(visit.status)}`}
+                        className={`rounded-full px-3.5 py-1.5 text-xs font-bold ${getStatusColor(visit.status)}`}
                       >
                         {formatVisitStatus(visit.status)}
                       </span>
                     </div>
                     {visit.estimated_duration_min && (
-                      <p className="mt-2 text-xs text-white/50">
+                      <p className="relative mt-4 text-xs font-medium text-white/40">
                         예상 소요: {visit.estimated_duration_min}분
                       </p>
                     )}
                   </div>
 
-                  {/* 스텝 인디케이터 */}
+                  {/* 스텝 인디케이터 - upgraded sizing and glow */}
                   {!isCancelled && (
-                    <div className="px-5 py-4">
+                    <div className="px-8 py-6">
                       <div className="flex items-center justify-between">
                         {VISIT_STEPS.map((step, idx) => {
                           const isActive = idx <= stepIdx;
@@ -400,22 +417,22 @@ export default function SchedulePage() {
                               <div className="relative flex w-full items-center justify-center">
                                 {idx > 0 && (
                                   <div
-                                    className={`absolute right-1/2 h-0.5 w-full ${
-                                      idx <= stepIdx ? 'bg-secondary' : 'bg-surface-container-high'
+                                    className={`absolute right-1/2 h-0.5 w-full transition-colors duration-300 ${
+                                      idx <= stepIdx ? 'bg-gradient-to-r from-secondary to-secondary/70' : 'bg-surface-container-high'
                                     }`}
                                   />
                                 )}
                                 <div
-                                  className={`relative z-10 flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                                  className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 ${
                                     isCurrent
-                                      ? 'bg-secondary text-white ring-4 ring-secondary/20'
+                                      ? 'bg-gradient-to-br from-secondary to-secondary/80 text-white shadow-[0_0_16px_rgba(0,106,99,0.35)] ring-4 ring-secondary/15'
                                       : isActive
                                         ? 'bg-secondary text-white'
                                         : 'bg-surface-container-high text-on-surface-variant'
                                   }`}
                                 >
                                   {isActive && idx < stepIdx ? (
-                                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                                       <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                                     </svg>
                                   ) : (
@@ -424,8 +441,8 @@ export default function SchedulePage() {
                                 </div>
                               </div>
                               <span
-                                className={`mt-1.5 text-[10px] font-medium ${
-                                  isCurrent ? 'text-secondary' : isActive ? 'text-primary' : 'text-on-surface-variant'
+                                className={`mt-2.5 text-[11px] font-bold ${
+                                  isCurrent ? 'text-secondary' : isActive ? 'text-primary' : 'text-on-surface-variant/60'
                                 }`}
                               >
                                 {step.label}

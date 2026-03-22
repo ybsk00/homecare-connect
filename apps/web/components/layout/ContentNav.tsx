@@ -16,6 +16,12 @@ import {
   Sparkles,
   AlertTriangle,
   BarChart3,
+  HelpCircle,
+  Plus,
+  Menu,
+  X,
+  MessageSquare,
+  LayoutDashboard,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAppStore } from '@/lib/store';
@@ -29,7 +35,7 @@ type TabItem = {
 };
 
 const guardianTabs: TabItem[] = [
-  { label: '대시보드', href: '/patient', icon: Home },
+  { label: '대시보드', href: '/patient', icon: LayoutDashboard },
   { label: '매칭', href: '/patient/matching', icon: Brain },
   { label: '일정', href: '/patient/schedule', icon: Calendar },
   { label: '기록', href: '/patient/records', icon: FileText },
@@ -47,6 +53,21 @@ const nurseTabs: TabItem[] = [
   { label: '알림', href: '/nurse/notifications', icon: Bell },
 ];
 
+// 상단 네비바 탭 (간략)
+const guardianTopTabs = [
+  { label: 'Dashboard', href: '/patient' },
+  { label: 'Care Plans', href: '/patient/matching' },
+  { label: 'Messages', href: '/patient/chat' },
+  { label: 'Insights', href: '/patient/ai-report' },
+];
+
+const nurseTopTabs = [
+  { label: 'Dashboard', href: '/nurse' },
+  { label: 'Patients', href: '/nurse/patients' },
+  { label: 'Alerts', href: '/nurse/alerts' },
+  { label: 'Statistics', href: '/nurse/stats' },
+];
+
 function getTabs(role: string): TabItem[] {
   switch (role) {
     case 'nurse':
@@ -54,6 +75,16 @@ function getTabs(role: string): TabItem[] {
     case 'guardian':
     default:
       return guardianTabs;
+  }
+}
+
+function getTopTabs(role: string) {
+  switch (role) {
+    case 'nurse':
+      return nurseTopTabs;
+    case 'guardian':
+    default:
+      return guardianTopTabs;
   }
 }
 
@@ -85,9 +116,9 @@ interface ContentNavProps {
 
 export function ContentNav({ role, profile }: ContentNavProps) {
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const tabs = getTabs(role);
+  const topTabs = getTopTabs(role);
   const roleHome = getRoleHome(role);
 
   // Unread notification count
@@ -107,17 +138,6 @@ export function ContentNav({ role, profile }: ContentNavProps) {
     refetchInterval: 30000,
   });
 
-  // Close menu on outside click
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   const handleLogout = async () => {
     const supabase = createBrowserSupabaseClient();
     await supabase.auth.signOut();
@@ -127,33 +147,30 @@ export function ContentNav({ role, profile }: ContentNavProps) {
     window.location.href = '/login';
   };
 
-  const isTabActive = (tab: TabItem): boolean => {
-    // Exact match for root pages (dashboard / 오늘 일정)
+  const isTabActive = (tab: TabItem | { href: string }): boolean => {
     if (tab.href === '/patient' || tab.href === '/nurse') {
       return pathname === tab.href;
     }
-    // Prefix match for sub-pages
     return pathname === tab.href || pathname.startsWith(tab.href + '/');
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 h-16 bg-surface/80 backdrop-blur-xl shadow-[0_1px_3px_rgba(24,28,30,0.04)]">
-      <div className="mx-auto flex h-full max-w-[1400px] items-center justify-between px-8">
-        {/* Left: Logo */}
-        <Link
-          href={roleHome}
-          className="flex shrink-0 items-center gap-2.5 transition-opacity hover:opacity-80"
-        >
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary">
-            <HeartPulse className="h-[18px] w-[18px] text-white" />
+    <>
+      {/* ── 좌측 사이드바 (lg 이상) ── */}
+      <aside className="hidden lg:flex h-screen w-72 fixed left-0 top-0 z-40 bg-[#FAFBFC] flex-col p-6 space-y-8">
+        {/* 로고 영역 */}
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center">
+            <HeartPulse className="h-5 w-5 text-white" />
           </div>
-          <span className="text-[15px] font-bold tracking-tight text-primary">
-            HomeCare Connect
-          </span>
-        </Link>
+          <div>
+            <p className="text-lg font-bold text-on-surface tracking-tight">Care Management</p>
+            <p className="text-[11px] font-medium text-on-surface-variant">Premium Concierge</p>
+          </div>
+        </div>
 
-        {/* Center: Tab navigation */}
-        <nav className="flex items-center gap-1">
+        {/* 네비게이션 링크 */}
+        <nav className="flex-1 flex flex-col gap-1">
           {tabs.map((tab) => {
             const active = isTabActive(tab);
             return (
@@ -161,59 +178,193 @@ export function ContentNav({ role, profile }: ContentNavProps) {
                 key={tab.href}
                 href={tab.href}
                 className={clsx(
-                  'relative flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium transition-colors',
+                  'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 group',
                   active
-                    ? 'text-primary font-semibold'
-                    : 'text-on-surface-variant hover:text-primary'
+                    ? 'bg-white text-on-surface font-bold shadow-[0_2px_8px_rgba(46,71,110,0.08)]'
+                    : 'text-on-surface-variant hover:bg-surface-container-high/50'
                 )}
               >
-                <tab.icon className="h-4 w-4" />
-                <span>{tab.label}</span>
-                {/* Active indicator */}
-                {active && (
-                  <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-secondary" />
+                <tab.icon
+                  className={clsx(
+                    'h-[18px] w-[18px] transition-transform duration-200',
+                    active ? 'text-secondary' : 'group-hover:translate-x-0.5'
+                  )}
+                />
+                <span className={clsx(
+                  'transition-transform duration-200',
+                  !active && 'group-hover:translate-x-0.5'
+                )}>
+                  {tab.label}
+                </span>
+                {/* 알림 뱃지 */}
+                {tab.href.includes('notification') && (unreadCount ?? 0) > 0 && (
+                  <span className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-error text-[10px] font-bold text-white">
+                    {(unreadCount ?? 0) > 9 ? '9+' : unreadCount}
+                  </span>
                 )}
               </Link>
             );
           })}
         </nav>
 
-        {/* Right: Notification + User + Logout */}
-        <div className="flex shrink-0 items-center gap-3">
-          {/* Notification bell */}
-          <button className="relative rounded-xl p-2 text-on-surface-variant transition-colors hover:bg-surface-container-high/50">
-            <Bell className="h-5 w-5" />
-            {(unreadCount ?? 0) > 0 && (
-              <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-error text-[10px] font-bold text-white">
-                {(unreadCount ?? 0) > 9 ? '9+' : unreadCount}
-              </span>
-            )}
-          </button>
+        {/* 하단: CTA + 지원/로그아웃 */}
+        <div className="space-y-3 pt-4 border-t border-surface-container-high/30">
+          <Link
+            href={role === 'nurse' ? '/nurse' : '/patient/matching'}
+            className="w-full flex items-center justify-center gap-2 bg-gradient-to-br from-primary to-primary-container text-white py-3.5 px-6 rounded-xl font-bold text-sm shadow-lg shadow-primary/20 active:scale-95 transition-transform"
+          >
+            <Plus className="h-4 w-4" />
+            {role === 'nurse' ? 'New Visit Record' : 'New Care Request'}
+          </Link>
 
-          {/* User info */}
-          <div className="flex items-center gap-2 pl-1">
-            <div className="text-right">
-              <p className="text-sm font-medium leading-tight text-on-surface">
-                {profile?.full_name || '사용자'}
-              </p>
-              <p className="text-[11px] leading-tight text-on-surface-variant">
-                {getRoleLabel(role)}
-              </p>
-            </div>
-          </div>
-
-          {/* Logout */}
-          <div className="relative" ref={menuRef}>
+          <div className="flex flex-col gap-0.5">
+            <button className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high/50 rounded-xl transition-colors">
+              <HelpCircle className="h-4 w-4" />
+              <span>Support</span>
+            </button>
             <button
-              onMouseDown={handleLogout}
-              className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-error transition-colors hover:bg-error/5 cursor-pointer"
+              onClick={handleLogout}
+              className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-error/5 hover:text-error rounded-xl transition-colors cursor-pointer"
             >
               <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">로그아웃</span>
+              <span>Sign Out</span>
             </button>
           </div>
         </div>
-      </div>
-    </header>
+      </aside>
+
+      {/* ── 상단 네비바 ── */}
+      <nav className="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl shadow-[0_1px_3px_rgba(46,71,110,0.04)]">
+        <div className="flex items-center justify-between px-6 lg:px-8 py-3.5 max-w-[1920px] mx-auto">
+          {/* 좌: 로고 (lg에서 숨김) + 탭 */}
+          <div className="flex items-center gap-8">
+            <Link
+              href={roleHome}
+              className="lg:hidden flex items-center gap-2 shrink-0"
+            >
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
+                <HeartPulse className="h-4 w-4 text-white" />
+              </div>
+              <span className="text-[15px] font-extrabold text-on-surface tracking-tighter">
+                HomeCare Connect
+              </span>
+            </Link>
+
+            {/* 상단 탭 (lg 이상) */}
+            <div className="hidden lg:flex items-center gap-1 ml-72">
+              {topTabs.map((tab) => {
+                const active = isTabActive(tab);
+                return (
+                  <Link
+                    key={tab.href}
+                    href={tab.href}
+                    className={clsx(
+                      'px-4 py-1.5 text-sm font-semibold tracking-tight transition-colors duration-300',
+                      active
+                        ? 'text-on-surface border-b-2 border-on-surface'
+                        : 'text-on-surface-variant hover:text-on-surface'
+                    )}
+                  >
+                    {tab.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 우: 알림 + 프로필 */}
+          <div className="flex items-center gap-3">
+            <Link
+              href={role === 'nurse' ? '/nurse/notifications' : '/patient/notifications'}
+              className="relative p-2 hover:bg-surface-container-low/50 rounded-xl transition-colors duration-300 active:scale-95"
+            >
+              <Bell className="h-5 w-5 text-on-surface" />
+              {(unreadCount ?? 0) > 0 && (
+                <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-error text-[10px] font-bold text-white">
+                  {(unreadCount ?? 0) > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </Link>
+            <button className="hidden sm:block p-2 hover:bg-surface-container-low/50 rounded-xl transition-colors duration-300 active:scale-95">
+              <MessageSquare className="h-5 w-5 text-on-surface" />
+            </button>
+            <div className="h-10 w-10 rounded-full bg-surface-container-high overflow-hidden flex items-center justify-center">
+              <span className="text-sm font-bold text-primary">
+                {profile?.full_name?.charAt(0) ?? 'U'}
+              </span>
+            </div>
+
+            {/* 모바일 메뉴 토글 */}
+            <button
+              className="lg:hidden p-2 hover:bg-surface-container-low/50 rounded-xl transition-colors"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* ── 모바일 메뉴 오버레이 ── */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-40 bg-black/20 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}>
+          <div
+            className="absolute right-0 top-0 h-full w-72 bg-white shadow-2xl p-6 pt-20 space-y-2 overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {tabs.map((tab) => {
+              const active = isTabActive(tab);
+              return (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={clsx(
+                    'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all',
+                    active
+                      ? 'bg-surface-container-low text-on-surface font-bold'
+                      : 'text-on-surface-variant hover:bg-surface-container-low/50'
+                  )}
+                >
+                  <tab.icon className="h-[18px] w-[18px]" />
+                  <span>{tab.label}</span>
+                </Link>
+              );
+            })}
+            <div className="pt-4 mt-4 border-t border-surface-container-high/30">
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-error hover:bg-error/5 rounded-xl transition-colors w-full cursor-pointer"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>로그아웃</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 모바일 하단 네비바 ── */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl flex justify-around items-center py-3 px-4 z-50 shadow-[0_-1px_3px_rgba(46,71,110,0.04)]">
+        {tabs.slice(0, 4).map((tab) => {
+          const active = isTabActive(tab);
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              className={clsx(
+                'flex flex-col items-center gap-1 transition-colors',
+                active ? 'text-on-surface' : 'text-on-surface-variant/50'
+              )}
+            >
+              <tab.icon className={clsx('h-5 w-5', active && 'text-secondary')} />
+              <span className={clsx('text-[10px]', active ? 'font-bold' : 'font-medium')}>
+                {tab.label}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+    </>
   );
 }

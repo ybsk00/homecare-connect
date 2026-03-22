@@ -18,6 +18,7 @@ import {
   MessageSquare,
   User,
   Clock,
+  Sparkles,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -28,6 +29,7 @@ const severityConfig: Record<AlertSeverity, {
   icon: typeof AlertOctagon;
   iconBg: string;
   cardBg: string;
+  borderColor: string;
   text: string;
   badgeVariant: 'danger' | 'warning' | 'orange';
 }> = {
@@ -35,7 +37,8 @@ const severityConfig: Record<AlertSeverity, {
     label: '심각',
     icon: AlertOctagon,
     iconBg: 'bg-error/10',
-    cardBg: 'bg-error/5',
+    cardBg: 'bg-error/[0.03]',
+    borderColor: 'border-l-8 border-error/60',
     text: 'text-error',
     badgeVariant: 'danger',
   },
@@ -43,15 +46,17 @@ const severityConfig: Record<AlertSeverity, {
     label: '주의',
     icon: AlertTriangle,
     iconBg: 'bg-tertiary/10',
-    cardBg: 'bg-tertiary/5',
+    cardBg: 'bg-tertiary/[0.03]',
+    borderColor: 'border-l-8 border-tertiary-container',
     text: 'text-tertiary',
     badgeVariant: 'orange',
   },
   yellow: {
     label: '관찰',
     icon: AlertCircle,
-    iconBg: 'bg-tertiary-container/60',
-    cardBg: 'bg-tertiary/[0.03]',
+    iconBg: 'bg-tertiary-container/40',
+    cardBg: 'bg-tertiary/[0.02]',
+    borderColor: 'border-l-8 border-tertiary-container/60',
     text: 'text-tertiary',
     badgeVariant: 'warning',
   },
@@ -156,86 +161,98 @@ export default function AlertsPage() {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
+      {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-on-surface">레드플래그</h1>
-        <p className="mt-1 text-sm text-on-surface-variant">
-          주의가 필요한 환자 알림 {alerts.length}건
+        <h1 className="text-4xl font-extrabold tracking-tight text-primary">레드플래그</h1>
+        <p className="mt-2 text-base leading-relaxed text-on-surface-variant">
+          주의가 필요한 환자 알림 <span className="font-bold text-error">{alerts.length}</span>건
         </p>
       </div>
 
       {sortedAlerts.length === 0 ? (
-        <Card className="ambient-shadow">
+        <div className="rounded-3xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
           <div className="py-14 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-secondary/10">
-              <CheckCircle2 className="h-8 w-8 text-secondary/60" />
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-secondary/10">
+              <CheckCircle2 className="h-10 w-10 text-secondary/50" />
             </div>
-            <p className="mt-5 text-sm font-medium text-on-surface-variant">
+            <p className="mt-6 text-base font-semibold text-on-surface-variant">
               현재 활성 레드플래그 알림이 없습니다.
             </p>
-            <p className="mt-1 text-xs text-on-surface-variant/60">
+            <p className="mt-2 text-sm leading-relaxed text-on-surface-variant/60">
               새로운 알림이 발생하면 여기에 표시됩니다.
             </p>
           </div>
-        </Card>
+        </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {sortedAlerts.map((alert) => {
             const severity = severityConfig[alert.severity as AlertSeverity] ?? severityConfig.yellow;
             const SeverityIcon = severity.icon;
             const timeAgo = getTimeAgo(alert.created_at);
 
             return (
-              <Card key={alert.id} elevated className={clsx('rounded-2xl', severity.cardBg)}>
-                <div className="flex items-start gap-4">
+              <div
+                key={alert.id}
+                className={clsx(
+                  'rounded-2xl p-6 shadow-[0_10px_40px_rgba(46,71,110,0.06)] transition-all duration-300 hover:shadow-[0_15px_50px_rgba(46,71,110,0.1)]',
+                  severity.cardBg,
+                  severity.borderColor
+                )}
+              >
+                <div className="flex items-start gap-5">
                   {/* Severity icon */}
-                  <div className={clsx('flex h-11 w-11 shrink-0 items-center justify-center rounded-full', severity.iconBg)}>
-                    <SeverityIcon className={clsx('h-5 w-5', severity.text)} />
+                  <div className={clsx('flex h-12 w-12 shrink-0 items-center justify-center rounded-full', severity.iconBg)}>
+                    <SeverityIcon className={clsx('h-6 w-6', severity.text)} />
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2.5 flex-wrap">
                       <Badge variant={severity.badgeVariant}>{severity.label}</Badge>
-                      <h3 className="font-semibold text-on-surface">{alert.title}</h3>
+                      <h3 className="text-base font-extrabold tracking-tight text-on-surface">{alert.title}</h3>
                       {alert.status === 'acknowledged' && (
                         <Badge variant="primary">확인됨</Badge>
                       )}
                     </div>
 
                     {alert.description && (
-                      <p className="mt-2 text-sm text-on-surface-variant">{alert.description}</p>
+                      <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">{alert.description}</p>
                     )}
 
-                    <div className="mt-2 flex items-center gap-3 text-xs text-on-surface-variant/70">
-                      <span className="flex items-center gap-1">
-                        <User className="h-3 w-3" />
+                    <div className="mt-3 flex items-center gap-4 text-xs text-on-surface-variant/60">
+                      <span className="flex items-center gap-1.5">
+                        <User className="h-3.5 w-3.5" />
                         {alert.patient.full_name}
                       </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
+                      <span className="flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5" />
                         {timeAgo}
                       </span>
                     </div>
 
                     {/* AI Analysis */}
                     {alert.ai_analysis && (
-                      <div className="mt-3 rounded-xl bg-surface-container-low p-3">
-                        <p className="text-xs font-semibold text-on-surface-variant">AI 분석</p>
-                        <p className="mt-1 text-xs text-on-surface-variant leading-relaxed">
+                      <div className="mt-4 rounded-2xl bg-secondary/[0.06] p-4">
+                        <p className="flex items-center gap-1.5 text-xs font-bold text-secondary">
+                          <Sparkles className="h-3.5 w-3.5" />
+                          AI 분석
+                        </p>
+                        <p className="mt-2 text-xs leading-relaxed text-on-surface-variant">
                           {alert.ai_analysis}
                         </p>
                       </div>
                     )}
 
                     {/* Actions */}
-                    <div className="mt-4 flex items-center gap-2">
+                    <div className="mt-5 flex items-center gap-3">
                       {alert.status === 'active' && (
                         <Button
                           size="sm"
                           variant="secondary"
                           loading={acknowledgeMutation.isPending}
                           onClick={() => acknowledgeMutation.mutate(alert.id)}
+                          className="active:scale-95 transition-transform"
                         >
                           <Eye className="h-3.5 w-3.5" />
                           확인
@@ -248,6 +265,7 @@ export default function AlertsPage() {
                           setResolveModal(alert.id);
                           setResolveNotes('');
                         }}
+                        className="active:scale-95 transition-transform"
                       >
                         <MessageSquare className="h-3.5 w-3.5" />
                         해결
@@ -255,7 +273,7 @@ export default function AlertsPage() {
                     </div>
                   </div>
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>
@@ -268,9 +286,9 @@ export default function AlertsPage() {
         title="알림 해결"
         size="md"
       >
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div>
-            <label className="mb-2 block text-sm font-medium text-on-surface">
+            <label className="mb-2.5 block text-sm font-bold text-on-surface">
               해결 메모
             </label>
             <textarea
@@ -278,11 +296,11 @@ export default function AlertsPage() {
               onChange={(e) => setResolveNotes(e.target.value)}
               placeholder="조치 내용을 입력하세요..."
               rows={4}
-              className="block w-full rounded-xl bg-surface-container-highest px-4 py-2.5 text-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-primary/40"
+              className="block w-full rounded-xl bg-surface-container-low px-4 py-3 text-sm leading-relaxed text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-shadow"
             />
           </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="ghost" onClick={() => setResolveModal(null)}>
+          <div className="flex justify-end gap-3">
+            <Button variant="ghost" onClick={() => setResolveModal(null)} className="active:scale-95 transition-transform">
               취소
             </Button>
             <Button
@@ -295,6 +313,7 @@ export default function AlertsPage() {
                   });
                 }
               }}
+              className="bg-gradient-to-r from-primary to-primary-container active:scale-95 transition-transform"
             >
               해결 완료
             </Button>

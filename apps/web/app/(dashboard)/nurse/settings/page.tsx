@@ -75,57 +75,58 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
+      {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-on-surface">설정</h1>
-        <p className="mt-1 text-sm text-on-surface-variant">
+        <h1 className="text-4xl font-extrabold tracking-tight text-primary">설정</h1>
+        <p className="mt-2 text-base leading-relaxed text-on-surface-variant">
           내 정보 및 알림 설정을 관리합니다.
         </p>
       </div>
 
       {/* Profile info */}
-      <Card elevated className="ambient-shadow">
-        <CardHeader>
-          <CardTitle>
-            <User className="mr-2 inline h-5 w-5 text-primary" />
-            내 정보
-          </CardTitle>
+      <div className="rounded-3xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <User className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-extrabold tracking-tight text-on-surface">내 정보</h2>
+          </div>
           <Badge variant={staffInfo?.is_active ? 'success' : 'warning'}>
             {staffInfo?.is_active ? '활성' : '비활성'}
           </Badge>
-        </CardHeader>
+        </div>
 
-        <div className="flex items-start gap-5">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-container">
-            <User className="h-8 w-8 text-white" />
+        <div className="flex items-start gap-6">
+          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-primary-container shadow-[0_8px_24px_rgba(0,32,69,0.15)]">
+            <User className="h-10 w-10 text-white" />
           </div>
-          <div className="flex-1 space-y-4">
+          <div className="flex-1 space-y-5">
             <div>
-              <p className="text-lg font-bold text-on-surface">
+              <p className="text-xl font-extrabold tracking-tight text-on-surface">
                 {profile?.full_name || '이름 없음'}
               </p>
-              <p className="text-sm text-on-surface-variant">
+              <p className="mt-1 text-sm text-on-surface-variant">
                 {staffInfo?.staff_type === 'nurse' ? '간호사' : staffInfo?.staff_type || '직원'}
               </p>
             </div>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {profile?.phone && (
-                <div className="flex items-center gap-2 rounded-xl bg-surface-container-low px-3 py-2.5 text-sm text-on-surface-variant">
+                <div className="flex items-center gap-3 rounded-xl bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                   <Phone className="h-4 w-4 text-secondary" />
                   {profile.phone}
                 </div>
               )}
-              <div className="flex items-center gap-2 rounded-xl bg-surface-container-low px-3 py-2.5 text-sm text-on-surface-variant">
+              <div className="flex items-center gap-3 rounded-xl bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                 <ShieldCheck className="h-4 w-4 text-secondary" />
-                <span>면허번호: <span className="font-semibold text-on-surface">{staffInfo?.license_number || '-'}</span></span>
+                <span>면허번호: <span className="font-bold text-on-surface">{staffInfo?.license_number || '-'}</span></span>
               </div>
             </div>
 
             {/* Specialties */}
             {staffInfo?.specialties && staffInfo.specialties.length > 0 && (
               <div>
-                <p className="mb-2 flex items-center gap-1 text-xs font-medium text-on-surface-variant">
+                <p className="mb-3 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
                   <Award className="h-3.5 w-3.5 text-secondary" />
                   전문 분야
                 </p>
@@ -133,7 +134,7 @@ export default function SettingsPage() {
                   {staffInfo.specialties.map((spec) => (
                     <span
                       key={spec}
-                      className="rounded-full bg-secondary/10 px-3 py-1 text-xs font-semibold text-on-secondary-container"
+                      className="rounded-full bg-secondary/10 px-4 py-1.5 text-xs font-bold text-on-secondary-container"
                     >
                       {specialtyLabels[spec] || spec}
                     </span>
@@ -143,60 +144,56 @@ export default function SettingsPage() {
             )}
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* Organization info */}
       {org && (
-        <Card className="ambient-shadow">
-          <CardHeader>
-            <CardTitle>
-              <Building2 className="mr-2 inline h-5 w-5 text-primary" />
-              소속 기관
-            </CardTitle>
-          </CardHeader>
+        <div className="rounded-3xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+          <div className="mb-6 flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-extrabold tracking-tight text-on-surface">소속 기관</h2>
+          </div>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
-              <p className="text-base font-semibold text-on-surface">{org.name}</p>
-              <p className="mt-0.5 text-sm text-on-surface-variant">
+              <p className="text-lg font-extrabold tracking-tight text-on-surface">{org.name}</p>
+              <p className="mt-1 text-sm text-on-surface-variant">
                 {orgTypeLabels[org.org_type] || org.org_type}
               </p>
             </div>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {org.phone && (
-                <div className="flex items-center gap-2 rounded-xl bg-surface-container-low px-3 py-2.5 text-sm text-on-surface-variant">
+                <div className="flex items-center gap-3 rounded-xl bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                   <Phone className="h-4 w-4 text-secondary" />
                   {org.phone}
                 </div>
               )}
               {org.email && (
-                <div className="flex items-center gap-2 rounded-xl bg-surface-container-low px-3 py-2.5 text-sm text-on-surface-variant">
+                <div className="flex items-center gap-3 rounded-xl bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant">
                   <Mail className="h-4 w-4 text-secondary" />
                   {org.email}
                 </div>
               )}
               {org.address && (
-                <div className="flex items-center gap-2 rounded-xl bg-surface-container-low px-3 py-2.5 text-sm text-on-surface-variant sm:col-span-2">
+                <div className="flex items-center gap-3 rounded-xl bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant sm:col-span-2">
                   <MapPin className="h-4 w-4 shrink-0 text-secondary" />
                   {org.address}
                 </div>
               )}
             </div>
           </div>
-        </Card>
+        </div>
       )}
 
       {/* Notification settings */}
-      <Card className="ambient-shadow">
-        <CardHeader>
-          <CardTitle>
-            <Bell className="mr-2 inline h-5 w-5 text-primary" />
-            알림 설정
-          </CardTitle>
-        </CardHeader>
+      <div className="rounded-3xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+        <div className="mb-6 flex items-center gap-2">
+          <Bell className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-extrabold tracking-tight text-on-surface">알림 설정</h2>
+        </div>
 
-        <div className="space-y-4">
+        <div className="space-y-3">
           {[
             { label: '새로운 방문 배정 알림', key: 'visit_assigned', defaultOn: true },
             { label: '레드플래그 알림', key: 'red_flag', defaultOn: true },
@@ -205,22 +202,26 @@ export default function SettingsPage() {
           ].map((item) => (
             <label
               key={item.key}
-              className="flex cursor-pointer items-center justify-between rounded-xl bg-surface-container-low p-4 transition-colors hover:bg-surface-container-high/50"
+              className="flex cursor-pointer items-center justify-between rounded-2xl bg-surface-container-low p-5 transition-all duration-200 hover:bg-surface-container-high/40"
             >
-              <span className="text-sm font-medium text-on-surface">{item.label}</span>
-              <input
-                type="checkbox"
-                defaultChecked={item.defaultOn}
-                className="h-4 w-4 rounded accent-secondary"
-              />
+              <span className="text-sm font-semibold text-on-surface">{item.label}</span>
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  defaultChecked={item.defaultOn}
+                  className="peer sr-only"
+                />
+                <div className="h-6 w-11 rounded-full bg-surface-container-high transition-colors peer-checked:bg-secondary" />
+                <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5" />
+              </div>
             </label>
           ))}
         </div>
-      </Card>
+      </div>
 
       {/* Logout */}
-      <div className="flex justify-center pb-8">
-        <Button variant="danger" onClick={handleLogout}>
+      <div className="flex justify-center pb-10">
+        <Button variant="danger" onClick={handleLogout} className="rounded-2xl px-8 py-3 active:scale-95 transition-transform">
           <LogOut className="h-4 w-4" />
           로그아웃
         </Button>

@@ -103,17 +103,17 @@ export default function ReviewsPage() {
     onHover?: (v: number) => void,
     size = 'h-7 w-7',
   ) => (
-    <div className="flex gap-1">
+    <div className="flex gap-1.5">
       {[1, 2, 3, 4, 5].map((star) => (
         <button
           key={star}
           onClick={() => onChange(star)}
           onMouseEnter={() => onHover?.(star)}
           onMouseLeave={() => onHover?.(0)}
-          className="transition-transform hover:scale-110"
+          className="transition-all hover:scale-125 active:scale-95"
         >
           <svg
-            className={`${size} ${
+            className={`${size} transition-colors ${
               star <= (hover || value) ? 'text-tertiary-400' : 'text-primary/10'
             }`}
             fill="currentColor"
@@ -144,59 +144,87 @@ export default function ReviewsPage() {
   /* 세부 평점 바 렌더링 */
   const renderRatingBar = (label: string, value: number) => (
     <div className="flex items-center gap-3">
-      <span className="w-14 shrink-0 text-xs text-on-surface-variant">{label}</span>
+      <span className="w-14 shrink-0 text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant">{label}</span>
       <div className="h-2 flex-1 rounded-full bg-primary/5">
         <div
           className="h-2 rounded-full bg-gradient-to-r from-secondary to-secondary-400 transition-all"
           style={{ width: `${(value / 5) * 100}%` }}
         />
       </div>
-      <span className="w-8 text-right text-xs font-semibold text-primary">{value}/5</span>
+      <span className="w-8 text-right text-sm font-bold text-primary">{value}/5</span>
     </div>
   );
 
+  /* 평균 점수 계산 */
+  const avgRating = useMemo(() => {
+    if (!reviews || reviews.length === 0) return 0;
+    const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+    return (sum / reviews.length).toFixed(1);
+  }, [reviews]);
+
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-primary">리뷰</h1>
-          <p className="mt-1 text-on-surface-variant">서비스 이용 후기를 남겨주세요</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-secondary">Reviews</p>
+          <h1 className="mt-1 text-4xl font-extrabold tracking-tight text-primary">리뷰</h1>
+          <p className="mt-2 text-on-surface-variant">서비스 이용 후기를 남겨주세요</p>
         </div>
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
-            className="rounded-xl bg-gradient-to-r from-secondary to-secondary-900 px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="rounded-2xl bg-gradient-to-r from-secondary to-secondary-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-secondary/20 transition-all hover:shadow-xl hover:shadow-secondary/30 active:scale-95"
           >
             리뷰 작성
           </button>
         )}
       </div>
 
+      {/* 통계 요약 카드 */}
+      {reviews && reviews.length > 0 && !showForm && (
+        <div className="rounded-2xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+          <div className="flex items-center gap-8">
+            <div className="text-center">
+              <p className="text-5xl font-extrabold tracking-tight text-primary">{avgRating}</p>
+              <div className="mt-2">{readOnlyStars(Math.round(Number(avgRating)))}</div>
+              <p className="mt-2 text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/60">평균 평점</p>
+            </div>
+            <div className="h-16 w-px bg-primary/8" />
+            <div className="text-center">
+              <p className="text-5xl font-extrabold tracking-tight text-secondary">{reviews.length}</p>
+              <p className="mt-2 text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/60">총 리뷰</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 리뷰 작성 폼 */}
       {showForm && (
-        <div className="rounded-2xl bg-surface-container-lowest p-6 shadow-[0_10px_40px_rgba(24,28,30,0.05)]">
-          <h2 className="text-lg font-bold text-primary">리뷰 작성</h2>
+        <div className="rounded-2xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+          <h2 className="text-xl font-bold text-primary">리뷰 작성</h2>
+          <p className="mt-1 text-sm text-on-surface-variant/60">서비스에 대한 솔직한 평가를 남겨주세요</p>
 
           {/* 기관 선택 */}
-          <div className="mt-5">
-            <label className="text-sm font-medium text-on-surface-variant">기관 ID</label>
+          <div className="mt-8">
+            <label className="text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/70">기관 ID</label>
             <input
               type="text"
               value={selectedOrgId}
               onChange={(e) => setSelectedOrgId(e.target.value)}
               placeholder="리뷰를 남길 기관 ID를 입력해주세요"
-              className="mt-1.5 w-full rounded-xl bg-surface px-4 py-3 text-sm text-primary outline-none focus:ring-2 focus:ring-secondary/30"
+              className="mt-2 w-full rounded-xl bg-surface-container-low px-4 py-3.5 text-sm text-primary outline-none transition-shadow focus:ring-2 focus:ring-secondary/30 focus:shadow-lg focus:shadow-secondary/5"
             />
             {knownOrgs.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-2">
+              <div className="mt-3 flex flex-wrap gap-2.5">
                 {knownOrgs.map((org) => (
                   <button
                     key={org.id}
                     onClick={() => setSelectedOrgId(org.id)}
-                    className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                    className={`rounded-full px-4 py-2 text-xs font-medium transition-all ${
                       selectedOrgId === org.id
-                        ? 'bg-secondary text-white'
-                        : 'bg-surface text-on-surface-variant hover:bg-secondary/10'
+                        ? 'bg-secondary text-white shadow-md shadow-secondary/20'
+                        : 'bg-surface-container-low text-on-surface-variant hover:bg-secondary/10'
                     }`}
                   >
                     {org.name}
@@ -207,58 +235,50 @@ export default function ReviewsPage() {
           </div>
 
           {/* 총점 */}
-          <div className="mt-5">
-            <label className="text-sm font-medium text-on-surface-variant">총점</label>
-            <div className="mt-2">
+          <div className="mt-8">
+            <label className="text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/70">총점</label>
+            <div className="mt-3">
               {renderStars(rating, setRating, hoverRating, setHoverRating, 'h-10 w-10')}
             </div>
+            {rating > 0 && (
+              <p className="mt-2 text-2xl font-extrabold text-primary">{rating}.0</p>
+            )}
           </div>
 
           {/* 세부 평점 */}
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="text-xs font-medium text-on-surface-variant">서비스 품질</label>
-              <div className="mt-1">
-                {renderStars(ratingQuality, setRatingQuality)}
+          <div className="mt-8 grid gap-6 sm:grid-cols-2">
+            {[
+              { label: '서비스 품질', value: ratingQuality, setter: setRatingQuality },
+              { label: '정시성', value: ratingPunctuality, setter: setRatingPunctuality },
+              { label: '의사소통', value: ratingCommunication, setter: setRatingCommunication },
+              { label: '친절도', value: ratingKindness, setter: setRatingKindness },
+            ].map((item) => (
+              <div key={item.label} className="rounded-xl bg-surface-container-low p-4">
+                <label className="text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/70">{item.label}</label>
+                <div className="mt-2">
+                  {renderStars(item.value, item.setter)}
+                </div>
               </div>
-            </div>
-            <div>
-              <label className="text-xs font-medium text-on-surface-variant">정시성</label>
-              <div className="mt-1">
-                {renderStars(ratingPunctuality, setRatingPunctuality)}
-              </div>
-            </div>
-            <div>
-              <label className="text-xs font-medium text-on-surface-variant">의사소통</label>
-              <div className="mt-1">
-                {renderStars(ratingCommunication, setRatingCommunication)}
-              </div>
-            </div>
-            <div>
-              <label className="text-xs font-medium text-on-surface-variant">친절도</label>
-              <div className="mt-1">
-                {renderStars(ratingKindness, setRatingKindness)}
-              </div>
-            </div>
+            ))}
           </div>
 
           {/* 리뷰 내용 */}
-          <div className="mt-5">
-            <label className="text-sm font-medium text-on-surface-variant">리뷰 내용</label>
+          <div className="mt-8">
+            <label className="text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/70">리뷰 내용</label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="서비스에 대한 소감을 자유롭게 작성해주세요"
               rows={4}
-              className="mt-1.5 w-full resize-none rounded-xl bg-surface px-4 py-3 text-sm text-primary outline-none focus:ring-2 focus:ring-secondary/30"
+              className="mt-2 w-full resize-none rounded-xl bg-surface-container-low px-4 py-3.5 text-sm leading-relaxed text-primary outline-none transition-shadow focus:ring-2 focus:ring-secondary/30 focus:shadow-lg focus:shadow-secondary/5"
             />
           </div>
 
           {/* 버튼 */}
-          <div className="mt-6 flex gap-3">
+          <div className="mt-8 flex gap-3">
             <button
               onClick={resetForm}
-              className="flex-1 rounded-xl bg-surface px-6 py-3 text-sm font-medium text-on-surface-variant transition-colors hover:bg-primary/10"
+              className="flex-1 rounded-2xl bg-surface-container-low px-6 py-3.5 text-sm font-medium text-on-surface-variant transition-colors hover:bg-primary/5"
             >
               취소
             </button>
@@ -267,14 +287,14 @@ export default function ReviewsPage() {
               disabled={
                 rating === 0 || !selectedOrgId || createMutation.isPending
               }
-              className="flex-1 rounded-xl bg-gradient-to-r from-secondary to-secondary-900 px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="flex-1 rounded-2xl bg-gradient-to-r from-secondary to-secondary-900 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-secondary/20 transition-all hover:shadow-xl hover:shadow-secondary/30 active:scale-95 disabled:opacity-50 disabled:shadow-none"
             >
               {createMutation.isPending ? '등록 중...' : '리뷰 등록'}
             </button>
           </div>
 
           {createMutation.isError && (
-            <p className="mt-3 text-center text-sm text-error">
+            <p className="mt-4 text-center text-sm text-error">
               등록에 실패했습니다. 다시 시도해주세요.
             </p>
           )}
@@ -283,55 +303,66 @@ export default function ReviewsPage() {
 
       {/* 리뷰 목록 */}
       {isLoading ? (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-28 animate-pulse rounded-2xl bg-primary/5" />
+            <div key={i} className="h-36 animate-pulse rounded-2xl bg-primary/5" />
           ))}
         </div>
       ) : !reviews || reviews.length === 0 ? (
-        <div className="rounded-2xl bg-primary/5 p-10 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-tertiary-100">
+        <div className="rounded-2xl bg-surface-container-lowest p-16 text-center shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-tertiary-50">
             <svg
-              className="h-8 w-8 text-tertiary-400"
+              className="h-10 w-10 text-tertiary-300"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
           </div>
-          <p className="mt-4 text-sm font-medium text-on-surface-variant">작성한 리뷰가 없습니다</p>
-          <p className="mt-1 text-xs text-on-surface-variant/60">서비스를 이용한 후 리뷰를 남겨보세요</p>
+          <p className="mt-6 text-base font-semibold text-primary">작성한 리뷰가 없습니다</p>
+          <p className="mt-2 text-sm text-on-surface-variant/60">서비스를 이용한 후 리뷰를 남겨보세요</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {reviews.map((review) => {
             const org = review.organization as any;
             return (
               <div
                 key={review.id}
-                className="rounded-2xl bg-surface-container-lowest p-5 shadow-[0_10px_40px_rgba(24,28,30,0.05)]"
+                className="group rounded-2xl bg-surface-container-lowest p-6 shadow-[0_10px_40px_rgba(46,71,110,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(46,71,110,0.1)]"
               >
                 <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-primary">
-                      {org?.name ?? '기관'}
-                    </p>
-                    {org?.org_type && (
-                      <span className="text-xs text-on-surface-variant">
-                        {formatOrgType(org.org_type)}
-                      </span>
-                    )}
+                  <div className="flex items-center gap-4">
+                    {/* 기관 아이콘 */}
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary/8">
+                      <svg className="h-5 w-5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-base font-bold text-primary">
+                        {org?.name ?? '기관'}
+                      </p>
+                      {org?.org_type && (
+                        <span className="rounded-full bg-primary/5 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-on-surface-variant">
+                          {formatOrgType(org.org_type)}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  {readOnlyStars(review.rating)}
+                  <div className="text-right">
+                    {readOnlyStars(review.rating)}
+                    <p className="mt-1 text-lg font-extrabold text-primary">{review.rating}.0</p>
+                  </div>
                 </div>
 
                 {review.content && (
-                  <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">{review.content}</p>
+                  <p className="mt-5 text-sm leading-relaxed text-on-surface-variant">{review.content}</p>
                 )}
 
                 {/* 세부 평점 바 */}
                 {(review.rating_quality || review.rating_punctuality || review.rating_communication || review.rating_kindness) && (
-                  <div className="mt-4 space-y-2 rounded-xl bg-surface p-4">
+                  <div className="mt-5 space-y-3 rounded-xl bg-surface-container-low p-5">
                     {review.rating_quality ? renderRatingBar('품질', review.rating_quality) : null}
                     {review.rating_punctuality ? renderRatingBar('정시성', review.rating_punctuality) : null}
                     {review.rating_communication ? renderRatingBar('소통', review.rating_communication) : null}
@@ -339,9 +370,11 @@ export default function ReviewsPage() {
                   </div>
                 )}
 
-                <p className="mt-3 text-xs text-on-surface-variant/50">
-                  {formatRelativeTime(review.created_at)}
-                </p>
+                <div className="mt-5 border-t border-primary/5 pt-4">
+                  <p className="text-[10px] font-medium uppercase tracking-widest text-on-surface-variant/40">
+                    {formatRelativeTime(review.created_at)}
+                  </p>
+                </div>
               </div>
             );
           })}

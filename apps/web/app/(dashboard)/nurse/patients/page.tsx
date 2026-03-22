@@ -7,7 +7,7 @@ import { useAppStore } from '@/lib/store';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Loading } from '@/components/ui/Loading';
-import { Users, User, Activity, Heart, Thermometer, Droplets } from 'lucide-react';
+import { Users, User, Activity, Heart, Thermometer, Droplets, ChevronRight } from 'lucide-react';
 import { clsx } from 'clsx';
 
 function getVitalStatus(type: string, value: number): 'normal' | 'warning' | 'critical' {
@@ -34,9 +34,9 @@ function getVitalStatus(type: string, value: number): 'normal' | 'warning' | 'cr
 }
 
 const vitalStatusColors = {
-  normal: 'vitality-chip',
-  warning: 'vitality-chip vitality-chip-warning',
-  critical: 'vitality-chip vitality-chip-critical',
+  normal: 'inline-flex items-center rounded-full bg-secondary-container/60 px-2.5 py-1 text-[11px] font-semibold text-on-secondary-container',
+  warning: 'inline-flex items-center rounded-full bg-tertiary-fixed/40 px-2.5 py-1 text-[11px] font-semibold text-tertiary',
+  critical: 'inline-flex items-center rounded-full bg-error-container px-2.5 py-1 text-[11px] font-semibold text-error',
 };
 
 export default function PatientsPage() {
@@ -140,28 +140,29 @@ export default function PatientsPage() {
   if (isLoading) return <Loading />;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
+      {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-on-surface">담당 환자</h1>
-        <p className="mt-1 text-sm text-on-surface-variant">
-          현재 담당하고 있는 환자 {patients.length}명
+        <h1 className="text-4xl font-extrabold tracking-tight text-primary">담당 환자</h1>
+        <p className="mt-2 text-base leading-relaxed text-on-surface-variant">
+          현재 담당하고 있는 환자 <span className="font-bold text-secondary">{patients.length}</span>명
         </p>
       </div>
 
       {patients.length === 0 ? (
-        <Card className="ambient-shadow">
+        <div className="rounded-3xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
           <div className="py-14 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-surface-container-high">
-              <Users className="h-8 w-8 text-on-surface-variant/40" />
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-surface-container-high">
+              <Users className="h-10 w-10 text-on-surface-variant/30" />
             </div>
-            <p className="mt-5 text-sm font-medium text-on-surface-variant">
+            <p className="mt-6 text-base font-semibold text-on-surface-variant">
               담당 환자가 없습니다.
             </p>
-            <p className="mt-1 text-xs text-on-surface-variant/60">
+            <p className="mt-2 text-sm leading-relaxed text-on-surface-variant/60">
               배정된 환자가 있으면 여기에 표시됩니다.
             </p>
           </div>
-        </Card>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
           {patients.map((patient) => {
@@ -169,38 +170,38 @@ export default function PatientsPage() {
             const age = calculateAge(patient.birth_date);
 
             return (
-              <Card
+              <div
                 key={patient.id}
-                elevated
-                className="cursor-pointer transition-all hover:shadow-[0_15px_50px_rgba(24,28,30,0.08)]"
+                className="group cursor-pointer rounded-3xl bg-surface-container-lowest p-6 shadow-[0_10px_40px_rgba(46,71,110,0.06)] transition-all duration-300 hover:shadow-[0_20px_60px_rgba(46,71,110,0.12)] hover:-translate-y-0.5"
                 onClick={() => router.push(`/nurse/patients/${patient.id}`)}
               >
                 {/* Patient header */}
                 <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-container">
-                    <User className="h-6 w-6 text-white" />
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-container ring-2 ring-white shadow-sm">
+                    <User className="h-7 w-7 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="font-semibold text-on-surface truncate">
+                      <p className="text-lg font-extrabold tracking-tight text-on-surface truncate">
                         {patient.full_name}
                       </p>
                       {patient.care_grade && (
                         <Badge variant="primary">{patient.care_grade}등급</Badge>
                       )}
                     </div>
-                    <p className="mt-0.5 text-xs text-on-surface-variant">
+                    <p className="mt-0.5 text-sm text-on-surface-variant">
                       {age !== null && `${age}세`}
                       {age !== null && patient.gender && ' / '}
                       {genderLabel(patient.gender)}
                     </p>
                   </div>
+                  <ChevronRight className="h-5 w-5 shrink-0 text-on-surface-variant/30 transition-all duration-300 group-hover:translate-x-1 group-hover:text-primary" />
                 </div>
 
                 {/* Primary diagnosis */}
                 {patient.primary_diagnosis && (
-                  <div className="mt-4 rounded-xl bg-surface-container-low px-3 py-2">
-                    <p className="text-xs text-on-surface-variant leading-relaxed">
+                  <div className="mt-5 rounded-2xl bg-surface-container-low px-4 py-3">
+                    <p className="text-xs leading-relaxed text-on-surface-variant">
                       {patient.primary_diagnosis}
                     </p>
                   </div>
@@ -208,27 +209,27 @@ export default function PatientsPage() {
 
                 {/* Vitals */}
                 {vitals && (
-                  <div className="mt-4 flex flex-wrap gap-2">
+                  <div className="mt-5 flex flex-wrap gap-2">
                     {vitals.systolic_bp !== null && vitals.diastolic_bp !== null && (
-                      <span className={clsx(vitalStatusColors[getVitalStatus('systolic_bp', vitals.systolic_bp)])}>
+                      <span className={vitalStatusColors[getVitalStatus('systolic_bp', vitals.systolic_bp)]}>
                         <Heart className="mr-1 inline h-3 w-3" />
                         {vitals.systolic_bp}/{vitals.diastolic_bp}
                       </span>
                     )}
                     {vitals.heart_rate !== null && (
-                      <span className={clsx(vitalStatusColors[getVitalStatus('heart_rate', vitals.heart_rate)])}>
+                      <span className={vitalStatusColors[getVitalStatus('heart_rate', vitals.heart_rate)]}>
                         <Activity className="mr-1 inline h-3 w-3" />
                         {vitals.heart_rate}bpm
                       </span>
                     )}
                     {vitals.temperature !== null && (
-                      <span className={clsx(vitalStatusColors[getVitalStatus('temperature', vitals.temperature)])}>
+                      <span className={vitalStatusColors[getVitalStatus('temperature', vitals.temperature)]}>
                         <Thermometer className="mr-1 inline h-3 w-3" />
                         {vitals.temperature}°C
                       </span>
                     )}
                     {vitals.spo2 !== null && (
-                      <span className={clsx(vitalStatusColors[getVitalStatus('spo2', vitals.spo2)])}>
+                      <span className={vitalStatusColors[getVitalStatus('spo2', vitals.spo2)]}>
                         <Droplets className="mr-1 inline h-3 w-3" />
                         {vitals.spo2}%
                       </span>
@@ -237,11 +238,11 @@ export default function PatientsPage() {
                 )}
 
                 {!vitals && (
-                  <p className="mt-4 text-xs text-on-surface-variant/50">
+                  <p className="mt-5 text-xs text-on-surface-variant/40 italic">
                     바이탈 데이터 없음
                   </p>
                 )}
-              </Card>
+              </div>
             );
           })}
         </div>

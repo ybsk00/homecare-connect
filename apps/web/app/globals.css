@@ -20,6 +20,16 @@
   --color-error: #BA1A1A;
   --color-error-container: #FFDAD6;
   --color-on-error: #FFFFFF;
+  --color-on-primary: #FFFFFF;
+  --color-on-primary-container: #7089B3;
+  --color-primary-fixed-variant: #2E476E;
+  --color-secondary-fixed-dim: #84D5CC;
+  --color-tertiary-fixed: #FFDDBB;
+  --color-on-tertiary-fixed-variant: #5E411F;
+  --color-on-error-container: #93000A;
+  --color-surface-container: #EBEEF0;
+  --color-surface-tint: #465F87;
+  --color-inverse-surface: #2D3133;
 
   /* Primary scale (deep navy) */
   --color-primary-50: #E8EDF4;
@@ -124,9 +134,112 @@ body {
   box-shadow: 0 10px 40px rgba(24, 28, 30, 0.05);
 }
 
-/* Ambient floating shadow */
+/* Ambient floating shadow (tinted, not pure black) */
 .ambient-shadow {
-  box-shadow: 0 10px 40px rgba(24, 28, 30, 0.05);
+  box-shadow: 0 10px 40px rgba(46, 71, 110, 0.06);
+}
+
+/* Premium tinted shadow for elevated cards */
+.shadow-tinted {
+  box-shadow: 0 16px 48px rgba(46, 71, 110, 0.06);
+}
+.shadow-tinted-lg {
+  box-shadow: 0 20px 60px rgba(46, 71, 110, 0.08);
+}
+
+/* Hero gradient backgrounds */
+.hero-gradient {
+  background: linear-gradient(135deg, #00091b, #002045);
+}
+.hero-gradient-secondary {
+  background: linear-gradient(135deg, #002045, #006A63);
+}
+
+/* Blur orb decorative elements */
+.blur-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(100px);
+  pointer-events: none;
+}
+.blur-orb-sm {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+/* Label caps (uppercase tracking) */
+.label-caps {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Ghost border (subtle container edge) */
+.ghost-border {
+  box-shadow: inset 0 0 0 1px rgba(196, 198, 207, 0.15);
+}
+
+/* Glassmorphism overlay card (for dark backgrounds) */
+.glass-card-dark {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Bento grid card base */
+.bento-card {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(46, 71, 110, 0.06);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.bento-card:hover {
+  box-shadow: 0 20px 60px rgba(46, 71, 110, 0.08);
+}
+
+/* Timeline vertical line */
+.timeline-line {
+  position: relative;
+}
+.timeline-line::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--color-surface-container);
+}
+
+/* Timeline marker */
+.timeline-marker {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(46, 71, 110, 0.08);
+}
+.timeline-marker-dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 9999px;
+}
+
+/* Smooth card transitions */
+.card-interactive {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 60px rgba(46, 71, 110, 0.08);
 }
 
 /* Custom scrollbar */

@@ -73,10 +73,13 @@ export default function AIReportPage() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
+      {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-primary">AI 리포트</h1>
-        <p className="mt-1 text-on-surface-variant">
+        <h1 className="text-4xl font-extrabold tracking-tight text-primary">
+          AI 리포트
+        </h1>
+        <p className="mt-3 text-base text-on-surface-variant">
           AI가 분석한 건강 경과 리포트를 확인하세요
         </p>
       </div>
@@ -89,7 +92,7 @@ export default function AIReportPage() {
             setSelectedPatient(e.target.value);
             setExpandedReport(null);
           }}
-          className="w-full rounded-xl bg-surface-container-lowest px-4 py-3 text-sm text-primary shadow-[0_10px_40px_rgba(24,28,30,0.05)] outline-none focus:ring-2 focus:ring-secondary/30"
+          className="w-full rounded-2xl bg-surface-container-lowest px-5 py-4 text-sm font-medium text-primary shadow-[0_10px_40px_rgba(46,71,110,0.06)] outline-none transition-shadow hover:shadow-[0_20px_60px_rgba(46,71,110,0.08)] focus:ring-2 focus:ring-secondary/30"
         >
           {patients.map((p) => (
             <option key={p!.id} value={p!.id}>
@@ -99,17 +102,17 @@ export default function AIReportPage() {
         </select>
       )}
 
-      {/* 리포트 안내 */}
-      <div className="rounded-2xl bg-gradient-to-br from-primary/10 to-secondary/10 p-5">
-        <div className="flex items-start gap-3">
-          <div className="rounded-xl bg-primary/10 p-2.5">
-            <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      {/* 리포트 안내 Hero */}
+      <div className="rounded-2xl bg-gradient-to-br from-primary/8 via-secondary/6 to-primary/4 p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+        <div className="flex items-start gap-4">
+          <div className="rounded-2xl bg-secondary/10 p-3.5">
+            <svg className="h-7 w-7 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
             </svg>
           </div>
-          <div>
-            <h3 className="text-sm font-semibold text-primary">AI 건강 경과 분석</h3>
-            <p className="mt-1 text-xs text-on-surface-variant">
+          <div className="flex-1">
+            <h3 className="text-base font-bold text-primary">AI 건강 경과 분석</h3>
+            <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">
               방문 기록과 바이탈 데이터를 바탕으로 AI가 환자의 건강 변화를 분석합니다.
               의사 소견이 추가된 리포트는 더욱 신뢰할 수 있습니다.
             </p>
@@ -119,68 +122,70 @@ export default function AIReportPage() {
 
       {/* 리포트 목록 */}
       {isLoading ? (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 animate-pulse rounded-2xl bg-primary/5" />
+            <div key={i} className="h-28 animate-pulse rounded-2xl bg-primary/5" />
           ))}
         </div>
       ) : !reports || reports.length === 0 ? (
-        <div className="rounded-2xl bg-primary/5 p-10 text-center">
-          <svg
-            className="mx-auto h-12 w-12 text-primary/20"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={1}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-            />
-          </svg>
-          <p className="mt-3 text-sm text-on-surface-variant">
+        <div className="rounded-2xl bg-surface-container-lowest p-16 text-center shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/5">
+            <svg
+              className="h-10 w-10 text-primary/20"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
+              />
+            </svg>
+          </div>
+          <p className="mt-5 text-base font-semibold text-on-surface-variant">
             아직 생성된 AI 리포트가 없습니다
           </p>
-          <p className="mt-1 text-xs text-on-surface-variant/60">
+          <p className="mt-2 text-sm text-on-surface-variant/60">
             방문 기록이 쌓이면 AI가 자동으로 건강 리포트를 생성합니다
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {reports.map((report) => {
             const badge = getStatusBadge(report.status);
             const isExpanded = expandedReport === report.id;
 
             return (
-              <div key={report.id}>
+              <div key={report.id} className="group">
                 <button
                   onClick={() =>
                     setExpandedReport(isExpanded ? null : report.id)
                   }
-                  className="w-full rounded-2xl bg-surface-container-lowest p-5 text-left shadow-[0_10px_40px_rgba(24,28,30,0.05)] transition-shadow hover:shadow-[0_10px_40px_rgba(24,28,30,0.1)]"
+                  className="w-full rounded-2xl bg-surface-container-lowest p-8 text-left shadow-[0_10px_40px_rgba(46,71,110,0.06)] transition-all duration-300 hover:shadow-[0_20px_60px_rgba(46,71,110,0.08)] active:scale-[0.99]"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-primary">
+                      <div className="flex items-center gap-3">
+                        <p className="text-base font-bold text-primary">
                           {formatDate(report.period_start)} ~ {formatDate(report.period_end)}
                         </p>
                         <span
-                          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.style}`}
+                          className={`rounded-full px-3 py-1 text-xs font-semibold ${badge.style}`}
                         >
                           {badge.label}
                         </span>
                       </div>
                       {report.ai_summary && (
-                        <p className="mt-2 line-clamp-2 text-sm text-on-surface-variant">
+                        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-on-surface-variant">
                           {report.ai_summary}
                         </p>
                       )}
-                      <div className="mt-2 flex items-center gap-3 text-xs text-on-surface-variant/60">
-                        <span>{formatRelativeTime(report.created_at)}</span>
+                      <div className="mt-4 flex items-center gap-4 text-xs text-on-surface-variant/60">
+                        <span className="uppercase tracking-wide">{formatRelativeTime(report.created_at)}</span>
                         {report.doctor_confirmed && (
-                          <span className="flex items-center gap-1 text-secondary">
+                          <span className="flex items-center gap-1.5 rounded-full bg-secondary/8 px-2.5 py-0.5 font-semibold text-secondary">
                             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                               <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                             </svg>
@@ -189,25 +194,34 @@ export default function AIReportPage() {
                         )}
                       </div>
                     </div>
-                    <svg
-                      className={`h-5 w-5 text-on-surface-variant/40 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                    </svg>
+                    <div className="ml-4 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/5 transition-colors group-hover:bg-primary/10">
+                      <svg
+                        className={`h-5 w-5 text-primary/40 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                      </svg>
+                    </div>
                   </div>
                 </button>
 
                 {/* 확장된 상세 */}
                 {isExpanded && reportDetail && (
-                  <div className="mt-2 space-y-6 rounded-2xl bg-surface-container-lowest p-6 shadow-[0_10px_40px_rgba(24,28,30,0.05)]">
+                  <div className="mt-3 space-y-8 rounded-2xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
                     {/* AI 분석 */}
                     <div>
-                      <h3 className="text-lg font-bold text-primary">AI 분석 요약</h3>
-                      <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-on-surface-variant">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-secondary/10">
+                          <svg className="h-4.5 w-4.5 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+                          </svg>
+                        </div>
+                        <h3 className="text-lg font-extrabold tracking-tight text-primary">AI 분석 요약</h3>
+                      </div>
+                      <p className="mt-4 whitespace-pre-wrap text-sm leading-7 text-on-surface-variant">
                         {reportDetail.ai_summary ?? '분석 내용이 아직 생성되지 않았습니다.'}
                       </p>
                     </div>
@@ -215,9 +229,9 @@ export default function AIReportPage() {
                     {/* 바이탈 트렌드 */}
                     {reportDetail.vitals_chart_data != null && (
                       <div>
-                        <h3 className="text-lg font-bold text-primary">바이탈 변화 추이</h3>
-                        <div className="mt-3 rounded-xl bg-surface p-4">
-                          <pre className="whitespace-pre-wrap text-xs text-on-surface-variant">
+                        <h3 className="text-lg font-extrabold tracking-tight text-primary">바이탈 변화 추이</h3>
+                        <div className="mt-4 rounded-2xl bg-surface p-6">
+                          <pre className="whitespace-pre-wrap text-xs leading-relaxed text-on-surface-variant">
                             {typeof reportDetail.vitals_chart_data === 'string'
                               ? reportDetail.vitals_chart_data
                               : JSON.stringify(reportDetail.vitals_chart_data as Record<string, unknown>, null, 2)}
@@ -229,13 +243,13 @@ export default function AIReportPage() {
                     {/* 의사 소견 */}
                     {reportDetail.doctor_confirmed && (
                       <div>
-                        <h3 className="text-lg font-bold text-primary">의사 소견</h3>
-                        <div className="mt-3 rounded-xl bg-secondary/5 p-4">
-                          <p className="text-sm text-on-surface-variant">
+                        <h3 className="text-lg font-extrabold tracking-tight text-primary">의사 소견</h3>
+                        <div className="mt-4 rounded-2xl bg-secondary/5 p-6">
+                          <p className="text-sm leading-7 text-on-surface-variant">
                             {reportDetail.doctor_opinion_simple ?? reportDetail.doctor_opinion ?? '소견 없음'}
                           </p>
                           {reportDetail.doctor_confirmed_at && (
-                            <p className="mt-2 text-xs text-on-surface-variant/60">
+                            <p className="mt-4 text-xs uppercase tracking-wide text-on-surface-variant/60">
                               검토일: {formatDate(reportDetail.doctor_confirmed_at)}
                               {' · '}
                               {(reportDetail.doctor as any)?.user?.full_name ?? '담당 의사'}
@@ -247,19 +261,19 @@ export default function AIReportPage() {
 
                     {/* 의사 소견 요청 버튼 */}
                     {!reportDetail.doctor_confirmed && reportDetail.status === 'generated' && (
-                      <div className="text-center">
-                        <p className="text-xs text-on-surface-variant/60">
+                      <div className="py-4 text-center">
+                        <p className="text-sm text-on-surface-variant/60">
                           아직 의사 소견이 추가되지 않았습니다
                         </p>
-                        <button className="mt-2 rounded-xl bg-gradient-to-r from-primary to-primary-container px-5 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90">
+                        <button className="mt-4 rounded-2xl bg-gradient-to-r from-primary to-secondary px-8 py-3.5 text-sm font-bold text-white shadow-[0_10px_40px_rgba(46,71,110,0.15)] transition-all duration-200 hover:shadow-[0_20px_60px_rgba(46,71,110,0.2)] active:scale-95">
                           의사 소견 요청
                         </button>
                       </div>
                     )}
 
                     {/* 면책 고지 */}
-                    <div className="rounded-xl bg-tertiary-50 p-4">
-                      <div className="flex items-start gap-2">
+                    <div className="rounded-2xl bg-tertiary-50 p-5">
+                      <div className="flex items-start gap-3">
                         <svg className="mt-0.5 h-4 w-4 shrink-0 text-tertiary-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
                         </svg>

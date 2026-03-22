@@ -27,6 +27,7 @@ import {
   Timer,
   ChevronLeft,
   ChevronRight,
+  TrendingUp,
 } from 'lucide-react';
 export default function StatsPage() {
   const { staffInfo } = useAppStore();
@@ -144,79 +145,100 @@ export default function StatsPage() {
   const monthLabel = `${selectedYear}년 ${selectedMonthNum}월`;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
+      {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-on-surface">월간 통계</h1>
-        <p className="mt-1 text-sm text-on-surface-variant">
+        <h1 className="text-4xl font-extrabold tracking-tight text-primary">월간 통계</h1>
+        <p className="mt-2 text-base leading-relaxed text-on-surface-variant">
           방문 실적 및 활동 통계를 확인합니다.
         </p>
       </div>
 
       {/* Month selector */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-5">
         <button
           onClick={() => navigateMonth('prev')}
-          className="rounded-xl p-2 text-on-surface-variant transition-colors hover:bg-surface-container-high"
+          className="rounded-2xl p-3 text-on-surface-variant transition-all duration-200 hover:bg-surface-container-high active:scale-95"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <span className="text-lg font-semibold text-on-surface">{monthLabel}</span>
+        <span className="text-xl font-extrabold tracking-tight text-on-surface">{monthLabel}</span>
         <button
           onClick={() => navigateMonth('next')}
-          className="rounded-xl p-2 text-on-surface-variant transition-colors hover:bg-surface-container-high"
+          className="rounded-2xl p-3 text-on-surface-variant transition-all duration-200 hover:bg-surface-container-high active:scale-95"
         >
           <ChevronRight className="h-5 w-5" />
         </button>
       </div>
 
-      {/* Stats cards */}
+      {/* Stats cards - large display numbers */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          icon={<Calendar className="h-5 w-5" />}
-          label="총 방문"
-          value={monthData?.totalVisits ?? 0}
-          iconBg="bg-primary/10 text-primary"
-        />
-        <StatCard
-          icon={<CheckCircle2 className="h-5 w-5" />}
-          label="완료"
-          value={monthData?.completedVisits ?? 0}
-          iconBg="bg-secondary/10 text-secondary"
-        />
-        <StatCard
-          icon={<Clock className="h-5 w-5" />}
-          label="총 시간"
-          value={`${monthData?.totalHours ?? 0}시간`}
-          iconBg="bg-tertiary/10 text-tertiary"
-        />
-        <StatCard
-          icon={<Timer className="h-5 w-5" />}
-          label="평균 소요시간"
-          value={`${monthData?.avgDuration ?? 0}분`}
-          iconBg="bg-primary/10 text-primary"
-        />
+        <div className="rounded-3xl bg-surface-container-lowest p-7 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
+            <Calendar className="h-5 w-5 text-primary" />
+          </div>
+          <p className="mt-5 text-3xl font-black tracking-tight text-on-surface">{monthData?.totalVisits ?? 0}</p>
+          <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">총 방문</p>
+          {monthData && monthData.totalVisits > 0 && (
+            <div className="mt-4">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
+                <div className="h-full rounded-full bg-primary" style={{ width: '100%' }} />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-3xl bg-surface-container-lowest p-7 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10">
+            <CheckCircle2 className="h-5 w-5 text-secondary" />
+          </div>
+          <p className="mt-5 text-3xl font-black tracking-tight text-on-surface">{monthData?.completedVisits ?? 0}</p>
+          <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">완료</p>
+          {monthData && monthData.totalVisits > 0 && (
+            <div className="mt-4">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
+                <div className="h-full rounded-full bg-secondary transition-all duration-500" style={{ width: `${monthData.completionRate}%` }} />
+              </div>
+              <p className="mt-1.5 text-[10px] font-bold text-secondary">{monthData.completionRate}%</p>
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-3xl bg-surface-container-lowest p-7 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-tertiary/10">
+            <Clock className="h-5 w-5 text-tertiary" />
+          </div>
+          <p className="mt-5 text-3xl font-black tracking-tight text-on-surface">{monthData?.totalHours ?? 0}<span className="ml-1 text-lg font-bold text-on-surface-variant">시간</span></p>
+          <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">총 시간</p>
+        </div>
+
+        <div className="rounded-3xl bg-surface-container-lowest p-7 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10">
+            <Timer className="h-5 w-5 text-primary" />
+          </div>
+          <p className="mt-5 text-3xl font-black tracking-tight text-on-surface">{monthData?.avgDuration ?? 0}<span className="ml-1 text-lg font-bold text-on-surface-variant">분</span></p>
+          <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">평균 소요시간</p>
+        </div>
       </div>
 
       {/* Daily visit count chart */}
-      <Card className="bg-surface-container-lowest ambient-shadow">
-        <CardHeader>
-          <CardTitle>
-            <BarChart3 className="mr-2 inline h-5 w-5 text-secondary" />
-            일별 방문 건수
-          </CardTitle>
-        </CardHeader>
+      <div className="rounded-3xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+        <div className="mb-6 flex items-center gap-2">
+          <BarChart3 className="h-5 w-5 text-secondary" />
+          <h2 className="text-lg font-extrabold tracking-tight text-on-surface">일별 방문 건수</h2>
+        </div>
         {(!monthData || monthData.dailyData.every((d) => d.total === 0)) ? (
-          <div className="py-12 text-center">
-            <BarChart3 className="mx-auto h-10 w-10 text-on-surface-variant/20" />
-            <p className="mt-3 text-sm text-on-surface-variant">
+          <div className="py-16 text-center">
+            <BarChart3 className="mx-auto h-12 w-12 text-on-surface-variant/15" />
+            <p className="mt-4 text-sm leading-relaxed text-on-surface-variant">
               해당 월 데이터가 없습니다.
             </p>
           </div>
         ) : (
-          <div className="h-72 w-full">
+          <div className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthData?.dailyData ?? []}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-outline-variant/30" />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-outline-variant/20" vertical={false} />
                 <XAxis
                   dataKey="day"
                   tick={{ fontSize: 10 }}
@@ -242,35 +264,33 @@ export default function StatsPage() {
                     backgroundColor: 'var(--color-surface-container-lowest)',
                   }}
                 />
-                <Legend wrapperStyle={{ fontSize: 12 }} iconType="circle" iconSize={8} />
-                <Bar dataKey="total" name="전체" fill="var(--color-surface-container-high)" radius={[6, 6, 0, 0]} />
-                <Bar dataKey="completed" name="완료" fill="var(--color-secondary)" radius={[6, 6, 0, 0]} />
+                <Legend wrapperStyle={{ fontSize: 12, paddingTop: 16 }} iconType="circle" iconSize={8} />
+                <Bar dataKey="total" name="전체" fill="var(--color-surface-container-high)" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="completed" name="완료" fill="var(--color-secondary)" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         )}
-      </Card>
+      </div>
 
       {/* Completion rate trend */}
-      <Card className="bg-surface-container-lowest ambient-shadow">
-        <CardHeader>
-          <CardTitle>
-            <CheckCircle2 className="mr-2 inline h-5 w-5 text-primary" />
-            주별 완료율 추이
-          </CardTitle>
-        </CardHeader>
+      <div className="rounded-3xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+        <div className="mb-6 flex items-center gap-2">
+          <TrendingUp className="h-5 w-5 text-primary" />
+          <h2 className="text-lg font-extrabold tracking-tight text-on-surface">주별 완료율 추이</h2>
+        </div>
         {(!monthData || monthData.weeklyRate.length === 0) ? (
-          <div className="py-12 text-center">
-            <CheckCircle2 className="mx-auto h-10 w-10 text-on-surface-variant/20" />
-            <p className="mt-3 text-sm text-on-surface-variant">
+          <div className="py-16 text-center">
+            <CheckCircle2 className="mx-auto h-12 w-12 text-on-surface-variant/15" />
+            <p className="mt-4 text-sm leading-relaxed text-on-surface-variant">
               데이터가 없습니다.
             </p>
           </div>
         ) : (
-          <div className="h-64 w-full">
+          <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={monthData?.weeklyRate ?? []}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-outline-variant/30" />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-outline-variant/20" vertical={false} />
                 <XAxis
                   dataKey="week"
                   tick={{ fontSize: 12 }}
@@ -302,15 +322,15 @@ export default function StatsPage() {
                   dataKey="rate"
                   name="완료율"
                   stroke="var(--color-primary)"
-                  strokeWidth={2.5}
-                  dot={{ r: 4, fill: 'var(--color-primary)', strokeWidth: 0 }}
-                  activeDot={{ r: 6, fill: 'var(--color-primary)', strokeWidth: 0 }}
+                  strokeWidth={3}
+                  dot={{ r: 5, fill: 'var(--color-primary)', strokeWidth: 0 }}
+                  activeDot={{ r: 7, fill: 'var(--color-primary)', strokeWidth: 0 }}
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 }

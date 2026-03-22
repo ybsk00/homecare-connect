@@ -221,11 +221,13 @@ export default function PatientsPage() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-primary">환자 관리</h1>
-          <p className="mt-1 text-on-surface-variant">등록된 환자를 관리하세요</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-secondary">Patient Management</p>
+          <h1 className="mt-1 text-4xl font-extrabold tracking-tight text-primary">환자 관리</h1>
+          <p className="mt-2 text-on-surface-variant">등록된 환자를 관리하세요</p>
         </div>
         {formMode === 'closed' && (
           <button
@@ -233,7 +235,7 @@ export default function PatientsPage() {
               setForm(INITIAL_FORM);
               setFormMode('create');
             }}
-            className="rounded-xl bg-gradient-to-r from-secondary to-secondary-900 px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="rounded-2xl bg-gradient-to-r from-secondary to-secondary-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-secondary/20 transition-all hover:shadow-xl hover:shadow-secondary/30 active:scale-95"
           >
             환자 등록
           </button>
@@ -242,12 +244,15 @@ export default function PatientsPage() {
 
       {/* 등록/수정 폼 */}
       {formMode !== 'closed' && (
-        <div className="rounded-2xl bg-surface-container-lowest p-6 shadow-[0_10px_40px_rgba(24,28,30,0.05)]">
-          <h2 className="text-lg font-bold text-primary">
+        <div className="rounded-2xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+          <h2 className="text-xl font-bold text-primary">
             {formMode === 'create' ? '환자 등록' : '환자 정보 수정'}
           </h2>
+          <p className="mt-1 text-sm text-on-surface-variant/60">
+            {formMode === 'create' ? '새로운 환자 정보를 입력해주세요' : '환자 정보를 수정합니다'}
+          </p>
 
-          <div className="mt-5 grid gap-5 sm:grid-cols-2">
+          <div className="mt-8 grid gap-6 sm:grid-cols-2">
             {/* 이름 */}
             <FormField label="이름" error={errors.full_name} required>
               <input
@@ -255,7 +260,7 @@ export default function PatientsPage() {
                 value={form.full_name}
                 onChange={(e) => updateField('full_name', e.target.value)}
                 placeholder="환자 이름"
-                className="w-full rounded-xl bg-surface px-4 py-3 text-sm text-primary outline-none focus:ring-2 focus:ring-secondary/30"
+                className="w-full rounded-xl bg-surface-container-low px-4 py-3.5 text-sm text-primary outline-none transition-shadow focus:ring-2 focus:ring-secondary/30 focus:shadow-lg focus:shadow-secondary/5"
               />
             </FormField>
 
@@ -265,21 +270,21 @@ export default function PatientsPage() {
                 type="date"
                 value={form.birth_date}
                 onChange={(e) => updateField('birth_date', e.target.value)}
-                className="w-full rounded-xl bg-surface px-4 py-3 text-sm text-primary outline-none focus:ring-2 focus:ring-secondary/30"
+                className="w-full rounded-xl bg-surface-container-low px-4 py-3.5 text-sm text-primary outline-none transition-shadow focus:ring-2 focus:ring-secondary/30 focus:shadow-lg focus:shadow-secondary/5"
               />
             </FormField>
 
             {/* 성별 */}
             <FormField label="성별" error={errors.gender} required>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 {(['male', 'female'] as const).map((g) => (
                   <button
                     key={g}
                     onClick={() => updateField('gender', g)}
-                    className={`flex-1 rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
+                    className={`flex-1 rounded-xl px-4 py-3.5 text-sm font-medium transition-all ${
                       form.gender === g
-                        ? 'bg-primary text-white'
-                        : 'bg-surface text-on-surface-variant'
+                        ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                        : 'bg-surface-container-low text-on-surface-variant hover:bg-primary/5'
                     }`}
                   >
                     {g === 'male' ? '남성' : '여성'}
@@ -295,7 +300,7 @@ export default function PatientsPage() {
                 value={form.phone}
                 onChange={(e) => updateField('phone', e.target.value.replace(/\D/g, ''))}
                 placeholder="01012345678"
-                className="w-full rounded-xl bg-surface px-4 py-3 text-sm text-primary outline-none focus:ring-2 focus:ring-secondary/30"
+                className="w-full rounded-xl bg-surface-container-low px-4 py-3.5 text-sm text-primary outline-none transition-shadow focus:ring-2 focus:ring-secondary/30 focus:shadow-lg focus:shadow-secondary/5"
               />
             </FormField>
 
@@ -306,7 +311,7 @@ export default function PatientsPage() {
                 value={form.address}
                 onChange={(e) => updateField('address', e.target.value)}
                 placeholder="주소를 입력해주세요"
-                className="w-full rounded-xl bg-surface px-4 py-3 text-sm text-primary outline-none focus:ring-2 focus:ring-secondary/30"
+                className="w-full rounded-xl bg-surface-container-low px-4 py-3.5 text-sm text-primary outline-none transition-shadow focus:ring-2 focus:ring-secondary/30 focus:shadow-lg focus:shadow-secondary/5"
               />
             </FormField>
 
@@ -317,7 +322,7 @@ export default function PatientsPage() {
                 value={form.address_detail}
                 onChange={(e) => updateField('address_detail', e.target.value)}
                 placeholder="상세 주소"
-                className="w-full rounded-xl bg-surface px-4 py-3 text-sm text-primary outline-none focus:ring-2 focus:ring-secondary/30"
+                className="w-full rounded-xl bg-surface-container-low px-4 py-3.5 text-sm text-primary outline-none transition-shadow focus:ring-2 focus:ring-secondary/30 focus:shadow-lg focus:shadow-secondary/5"
               />
             </FormField>
 
@@ -326,7 +331,7 @@ export default function PatientsPage() {
               <select
                 value={form.care_grade}
                 onChange={(e) => updateField('care_grade', e.target.value)}
-                className="w-full rounded-xl bg-surface px-4 py-3 text-sm text-primary outline-none focus:ring-2 focus:ring-secondary/30"
+                className="w-full rounded-xl bg-surface-container-low px-4 py-3.5 text-sm text-primary outline-none transition-shadow focus:ring-2 focus:ring-secondary/30 focus:shadow-lg focus:shadow-secondary/5"
               >
                 <option value="">선택 안 함</option>
                 {CARE_GRADES.map((g) => (
@@ -342,7 +347,7 @@ export default function PatientsPage() {
               <select
                 value={form.mobility}
                 onChange={(e) => updateField('mobility', e.target.value)}
-                className="w-full rounded-xl bg-surface px-4 py-3 text-sm text-primary outline-none focus:ring-2 focus:ring-secondary/30"
+                className="w-full rounded-xl bg-surface-container-low px-4 py-3.5 text-sm text-primary outline-none transition-shadow focus:ring-2 focus:ring-secondary/30 focus:shadow-lg focus:shadow-secondary/5"
               >
                 <option value="">선택 안 함</option>
                 {MOBILITY_OPTIONS.map((m) => (
@@ -360,7 +365,7 @@ export default function PatientsPage() {
                 value={form.primary_diagnosis}
                 onChange={(e) => updateField('primary_diagnosis', e.target.value)}
                 placeholder="주요 진단명을 입력해주세요"
-                className="w-full rounded-xl bg-surface px-4 py-3 text-sm text-primary outline-none focus:ring-2 focus:ring-secondary/30"
+                className="w-full rounded-xl bg-surface-container-low px-4 py-3.5 text-sm text-primary outline-none transition-shadow focus:ring-2 focus:ring-secondary/30 focus:shadow-lg focus:shadow-secondary/5"
               />
             </FormField>
 
@@ -371,15 +376,15 @@ export default function PatientsPage() {
               required
               className="sm:col-span-2"
             >
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2.5">
                 {SERVICE_OPTIONS.map((svc) => (
                   <button
                     key={svc.value}
                     onClick={() => toggleService(svc.value)}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                    className={`rounded-full px-5 py-2.5 text-sm font-medium transition-all ${
                       form.needed_services.includes(svc.value)
-                        ? 'bg-secondary text-white'
-                        : 'bg-surface text-on-surface-variant hover:bg-secondary/10'
+                        ? 'bg-secondary text-white shadow-md shadow-secondary/20'
+                        : 'bg-surface-container-low text-on-surface-variant hover:bg-secondary/10'
                     }`}
                   >
                     {svc.label}
@@ -394,7 +399,7 @@ export default function PatientsPage() {
                 <select
                   value={form.relationship}
                   onChange={(e) => updateField('relationship', e.target.value)}
-                  className="w-full rounded-xl bg-surface px-4 py-3 text-sm text-primary outline-none focus:ring-2 focus:ring-secondary/30"
+                  className="w-full rounded-xl bg-surface-container-low px-4 py-3.5 text-sm text-primary outline-none transition-shadow focus:ring-2 focus:ring-secondary/30 focus:shadow-lg focus:shadow-secondary/5"
                 >
                   <option value="">선택해주세요</option>
                   {RELATIONSHIP_OPTIONS.map((r) => (
@@ -413,13 +418,13 @@ export default function PatientsPage() {
                 onChange={(e) => updateField('special_notes', e.target.value)}
                 placeholder="참고할 사항이 있으면 입력해주세요"
                 rows={3}
-                className="w-full resize-none rounded-xl bg-surface px-4 py-3 text-sm text-primary outline-none focus:ring-2 focus:ring-secondary/30"
+                className="w-full resize-none rounded-xl bg-surface-container-low px-4 py-3.5 text-sm text-primary outline-none transition-shadow focus:ring-2 focus:ring-secondary/30 focus:shadow-lg focus:shadow-secondary/5"
               />
             </FormField>
           </div>
 
           {/* 버튼 */}
-          <div className="mt-6 flex gap-3">
+          <div className="mt-8 flex gap-3">
             <button
               onClick={() => {
                 setFormMode('closed');
@@ -427,14 +432,14 @@ export default function PatientsPage() {
                 setForm(INITIAL_FORM);
                 setErrors({});
               }}
-              className="flex-1 rounded-xl bg-surface px-6 py-3 text-sm font-medium text-on-surface-variant transition-colors hover:bg-primary/10"
+              className="flex-1 rounded-2xl bg-surface-container-low px-6 py-3.5 text-sm font-medium text-on-surface-variant transition-colors hover:bg-primary/5"
             >
               취소
             </button>
             <button
               onClick={handleSubmit}
               disabled={isPending}
-              className="flex-1 rounded-xl bg-gradient-to-r from-secondary to-secondary-900 px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="flex-1 rounded-2xl bg-gradient-to-r from-secondary to-secondary-900 px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-secondary/20 transition-all hover:shadow-xl hover:shadow-secondary/30 active:scale-95 disabled:opacity-50 disabled:shadow-none"
             >
               {isPending
                 ? '저장 중...'
@@ -445,7 +450,7 @@ export default function PatientsPage() {
           </div>
 
           {(createMutation.isError || updateMutation.isError) && (
-            <p className="mt-3 text-center text-sm text-error">
+            <p className="mt-4 text-center text-sm text-error">
               저장에 실패했습니다. 다시 시도해주세요.
             </p>
           )}
@@ -454,16 +459,16 @@ export default function PatientsPage() {
 
       {/* 환자 목록 */}
       {isLoading ? (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2">
           {[1, 2].map((i) => (
-            <div key={i} className="h-40 animate-pulse rounded-2xl bg-primary/5" />
+            <div key={i} className="h-48 animate-pulse rounded-2xl bg-primary/5" />
           ))}
         </div>
       ) : patients.length === 0 ? (
-        <div className="rounded-2xl bg-primary/5 p-10 text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+        <div className="rounded-2xl bg-surface-container-lowest p-16 text-center shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-primary/8">
             <svg
-              className="h-8 w-8 text-primary/40"
+              className="h-10 w-10 text-primary/30"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -476,20 +481,20 @@ export default function PatientsPage() {
               />
             </svg>
           </div>
-          <p className="mt-4 text-sm font-medium text-on-surface-variant">등록된 환자가 없습니다</p>
-          <p className="mt-1 text-xs text-on-surface-variant/60">환자를 등록하고 맞춤 케어 서비스를 시작하세요</p>
+          <p className="mt-6 text-base font-semibold text-primary">등록된 환자가 없습니다</p>
+          <p className="mt-2 text-sm text-on-surface-variant/60">환자를 등록하고 맞춤 케어 서비스를 시작하세요</p>
           <button
             onClick={() => {
               setForm(INITIAL_FORM);
               setFormMode('create');
             }}
-            className="mt-5 rounded-xl bg-gradient-to-r from-secondary to-secondary-900 px-5 py-2.5 text-sm font-semibold text-white"
+            className="mt-8 rounded-2xl bg-gradient-to-r from-secondary to-secondary-900 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-secondary/20 transition-all hover:shadow-xl hover:shadow-secondary/30 active:scale-95"
           >
             첫 환자 등록하기
           </button>
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2">
           {patients.map((patient) => {
             const age = patient.birth_date
               ? new Date().getFullYear() - new Date(patient.birth_date).getFullYear()
@@ -498,29 +503,29 @@ export default function PatientsPage() {
             return (
               <div
                 key={patient.id}
-                className="rounded-2xl bg-surface-container-lowest p-5 shadow-[0_10px_40px_rgba(24,28,30,0.05)]"
+                className="group rounded-2xl bg-surface-container-lowest p-6 shadow-[0_10px_40px_rgba(46,71,110,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_20px_60px_rgba(46,71,110,0.1)]"
               >
                 <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-4">
                     {/* 아바타 아이콘 */}
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                      <svg className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/8">
+                      <svg className="h-6 w-6 text-primary/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                       </svg>
                     </div>
                     <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-base font-semibold text-primary">
+                      <div className="flex items-center gap-2.5">
+                        <h3 className="text-lg font-bold text-primary">
                           {patient.full_name}
                         </h3>
                         {/* 등급 배지 */}
                         {patient.care_grade && (
-                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${getCareGradeBadgeColor(patient.care_grade)}`}>
+                          <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${getCareGradeBadgeColor(patient.care_grade)}`}>
                             {formatCareGrade(patient.care_grade)}
                           </span>
                         )}
                       </div>
-                      <p className="mt-0.5 text-sm text-on-surface-variant">
+                      <p className="mt-1 text-sm text-on-surface-variant">
                         {patient.gender === 'male' ? '남' : '여'}
                         {age ? ` · ${age}세` : ''}
                       </p>
@@ -528,7 +533,7 @@ export default function PatientsPage() {
                   </div>
                   <button
                     onClick={() => openEdit(patient)}
-                    className="rounded-lg bg-surface p-2 text-on-surface-variant/60 transition-colors hover:bg-primary/10 hover:text-primary"
+                    className="rounded-xl bg-surface-container-low p-2.5 text-on-surface-variant/50 transition-all hover:bg-secondary/10 hover:text-secondary group-hover:text-secondary/60"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
@@ -538,8 +543,8 @@ export default function PatientsPage() {
 
                 {/* 진단명 태그 */}
                 {patient.primary_diagnosis && (
-                  <div className="mt-3">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-tertiary-50 px-2.5 py-1 text-xs font-medium text-tertiary-700">
+                  <div className="mt-4">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-tertiary-50 px-3 py-1.5 text-xs font-medium text-tertiary-700">
                       <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
                       </svg>
@@ -549,11 +554,11 @@ export default function PatientsPage() {
                 )}
 
                 {patient.needed_services && (patient.needed_services as string[]).length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-1.5">
+                  <div className="mt-4 flex flex-wrap gap-2">
                     {(patient.needed_services as string[]).map((svc: string) => (
                       <span
                         key={svc}
-                        className="rounded-full bg-secondary/10 px-2.5 py-0.5 text-xs font-medium text-secondary"
+                        className="rounded-full bg-secondary/8 px-3 py-1 text-xs font-medium text-secondary"
                       >
                         {formatServiceType(svc)}
                       </span>
@@ -562,18 +567,23 @@ export default function PatientsPage() {
                 )}
 
                 {patient.mobility && (
-                  <p className="mt-2 text-xs text-on-surface-variant/60">
-                    이동: {formatMobility(patient.mobility)}
-                  </p>
+                  <div className="mt-3 flex items-center gap-1.5">
+                    <div className="h-1 w-1 rounded-full bg-on-surface-variant/30" />
+                    <p className="text-xs text-on-surface-variant/60">
+                      이동: {formatMobility(patient.mobility)}
+                    </p>
+                  </div>
                 )}
 
-                <div className="mt-3 flex items-center justify-between text-xs text-on-surface-variant/50">
-                  <span>{(patient as any).relationship ? `관계: ${(patient as any).relationship}` : ''}</span>
+                <div className="mt-4 flex items-center justify-between border-t border-primary/5 pt-4">
+                  <span className="text-[10px] font-medium uppercase tracking-widest text-on-surface-variant/50">
+                    {(patient as any).relationship ? `관계: ${(patient as any).relationship}` : ''}
+                  </span>
                   <span
-                    className={`rounded-full px-2 py-0.5 font-medium ${
+                    className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
                       patient.status === 'active'
                         ? 'bg-secondary/10 text-secondary'
-                        : 'bg-primary/10 text-on-surface-variant'
+                        : 'bg-primary/8 text-on-surface-variant'
                     }`}
                   >
                     {patient.status === 'active' ? '활성' : patient.status ?? ''}
@@ -604,12 +614,12 @@ function FormField({
 }) {
   return (
     <div className={className}>
-      <label className="mb-1.5 block text-sm font-medium text-on-surface-variant">
+      <label className="mb-2 block text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/70">
         {label}
         {required && <span className="ml-0.5 text-error">*</span>}
       </label>
       {children}
-      {error && <p className="mt-1 text-xs text-error">{error}</p>}
+      {error && <p className="mt-1.5 text-xs text-error">{error}</p>}
     </div>
   );
 }

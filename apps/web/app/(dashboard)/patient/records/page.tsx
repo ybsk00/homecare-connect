@@ -131,46 +131,51 @@ export default function RecordsPage() {
   };
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
+      {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-primary">방문 기록</h1>
-        <p className="mt-1 text-on-surface-variant">방문 간호 기록을 확인하세요</p>
+        <h1 className="text-4xl font-extrabold tracking-tight text-primary">방문 기록</h1>
+        <p className="mt-2 text-base text-on-surface-variant">방문 간호 기록을 확인하세요</p>
       </div>
 
-      {/* 환자 선택 */}
+      {/* 환자 선택 — chip style */}
       {patients.length > 1 && (
-        <select
-          value={effectivePatient}
-          onChange={(e) => {
-            setSelectedPatient(e.target.value);
-            setPage(0);
-          }}
-          className="w-full rounded-xl bg-surface-container-lowest px-4 py-3 text-sm text-primary shadow-[0_10px_40px_rgba(24,28,30,0.05)] outline-none focus:ring-2 focus:ring-secondary/30"
-        >
+        <div className="flex flex-wrap gap-3">
           {patients.map((p) => (
-            <option key={p!.id} value={p!.id}>
+            <button
+              key={p!.id}
+              onClick={() => {
+                setSelectedPatient(p!.id);
+                setPage(0);
+              }}
+              className={`rounded-xl px-5 py-2.5 text-sm font-semibold transition-all ${
+                effectivePatient === p!.id
+                  ? 'bg-secondary-container text-on-secondary-container shadow-[0_4px_16px_rgba(46,71,110,0.10)]'
+                  : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high'
+              }`}
+            >
               {p!.full_name} {p!.care_grade ? `(${formatCareGrade(p!.care_grade)})` : ''}
-            </option>
+            </button>
           ))}
-        </select>
+        </div>
       )}
 
       {/* 바이탈 추세 차트 */}
       {chartData.length > 1 && (
-        <div className="rounded-2xl bg-surface-container-lowest p-6 shadow-[0_10px_40px_rgba(24,28,30,0.05)]">
-          <h2 className="text-sm font-semibold text-primary">바이탈 추세</h2>
-          <p className="mt-0.5 text-xs text-on-surface-variant">최근 방문 기록 기반</p>
+        <div className="bento-card rounded-3xl bg-surface-container-lowest p-8">
+          <h2 className="text-lg font-bold tracking-tight text-primary">바이탈 추세</h2>
+          <p className="mt-1 text-sm text-on-surface-variant">최근 방문 기록 기반</p>
 
-          {/* 차트 범례 토글 */}
-          <div className="mt-4 flex flex-wrap gap-2">
+          {/* 차트 범례 토글 — pill style */}
+          <div className="mt-6 flex flex-wrap gap-2.5">
             {CHART_VITALS.map((v) => (
               <button
                 key={v.key}
                 onClick={() => toggleChartKey(v.key)}
-                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                className={`rounded-xl px-4 py-1.5 text-xs font-semibold transition-all ${
                   activeChartKeys.includes(v.key)
-                    ? 'text-white'
-                    : 'bg-surface text-on-surface-variant'
+                    ? 'text-white shadow-[0_4px_12px_rgba(46,71,110,0.12)]'
+                    : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high'
                 }`}
                 style={
                   activeChartKeys.includes(v.key)
@@ -183,7 +188,7 @@ export default function RecordsPage() {
             ))}
           </div>
 
-          <div className="mt-4 h-56">
+          <div className="mt-6 h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E9EB" />
@@ -198,10 +203,14 @@ export default function RecordsPage() {
                 <YAxis tick={{ fontSize: 11, fill: '#42474E' }} />
                 <Tooltip
                   contentStyle={{
-                    borderRadius: 12,
+                    borderRadius: 16,
                     border: 'none',
-                    boxShadow: '0 10px 40px rgba(24,28,30,0.1)',
+                    background: 'rgba(255,255,255,0.85)',
+                    backdropFilter: 'blur(16px)',
+                    WebkitBackdropFilter: 'blur(16px)',
+                    boxShadow: '0 20px 60px rgba(46,71,110,0.12)',
                     fontSize: 12,
+                    padding: '12px 16px',
                   }}
                 />
                 {CHART_VITALS.filter((v) => activeChartKeys.includes(v.key)).map((v) => (
@@ -210,8 +219,9 @@ export default function RecordsPage() {
                     type="monotone"
                     dataKey={v.key}
                     stroke={v.color}
-                    strokeWidth={2}
-                    dot={{ r: 3, fill: v.color }}
+                    strokeWidth={2.5}
+                    dot={{ r: 4, fill: v.color, strokeWidth: 2, stroke: '#fff' }}
+                    activeDot={{ r: 6, fill: v.color, strokeWidth: 2, stroke: '#fff' }}
                     name={`${v.label} (${v.unit})`}
                     connectNulls
                   />
@@ -224,16 +234,16 @@ export default function RecordsPage() {
 
       {/* 타임라인 */}
       {isLoading ? (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 animate-pulse rounded-2xl bg-primary/5" />
+            <div key={i} className="h-36 animate-pulse rounded-3xl bg-primary/5" />
           ))}
         </div>
       ) : completedVisits.length === 0 ? (
-        <div className="rounded-2xl bg-surface-container-lowest p-12 text-center shadow-[0_10px_40px_rgba(24,28,30,0.05)]">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/5">
+        <div className="bento-card rounded-3xl bg-surface-container-lowest p-16 text-center">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/5">
             <svg
-              className="h-8 w-8 text-primary/30"
+              className="h-10 w-10 text-primary/30"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -246,25 +256,22 @@ export default function RecordsPage() {
               />
             </svg>
           </div>
-          <p className="mt-4 text-sm font-medium text-primary">완료된 방문 기록이 없습니다</p>
-          <p className="mt-1 text-xs text-on-surface-variant">
+          <p className="mt-6 text-base font-semibold text-primary">완료된 방문 기록이 없습니다</p>
+          <p className="mt-2 text-sm text-on-surface-variant">
             방문 간호가 완료되면 이곳에서 기록을 확인하실 수 있습니다
           </p>
         </div>
       ) : (
-        <div className="relative pl-6">
-          {/* 타임라인 세로선 */}
-          <div className="absolute left-2.5 top-0 bottom-0 w-px bg-secondary/20" />
-
+        <div className="timeline-line relative pl-8">
           {visitsByDate.map(([date, visits], dateIdx) => (
-            <div key={date} className="relative pb-8">
+            <div key={date} className="relative pb-10">
               {/* 날짜 마커 */}
-              <div className="absolute -left-[18px] top-0 flex h-6 w-6 items-center justify-center rounded-full bg-secondary">
-                <div className="h-2 w-2 rounded-full bg-white" />
+              <div className="timeline-marker absolute -left-[19px] top-0.5">
+                <div className="timeline-marker-dot" />
               </div>
-              <p className="mb-4 text-sm font-semibold text-primary">{formatDate(date)}</p>
+              <p className="mb-5 text-sm font-bold tracking-tight text-primary">{formatDate(date)}</p>
 
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {visits.map((visit) => {
                   const record = visit.visit_record as any;
                   const vitals = record?.vitals as Record<string, number> | undefined;
@@ -274,18 +281,18 @@ export default function RecordsPage() {
                   return (
                     <div
                       key={visit.id}
-                      className={`rounded-2xl bg-surface-container-lowest p-6 shadow-[0_10px_40px_rgba(24,28,30,0.05)] ${
-                        isLatest ? 'border-l-4 border-primary' : ''
+                      className={`card-interactive rounded-2xl bg-surface-container-lowest p-6 shadow-[0_8px_32px_rgba(46,71,110,0.06)] ${
+                        isLatest ? 'ring-2 ring-secondary/20' : ''
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div>
-                          <p className="text-sm font-semibold text-primary">
+                          <p className="text-sm font-bold text-primary">
                             {(visit.nurse as any)?.user?.full_name ?? '간호사'}
                           </p>
-                          <div className="mt-1.5 flex items-center gap-2">
+                          <div className="mt-2 flex items-center gap-2.5">
                             {(visit as any).service_type && (
-                              <span className="rounded-full bg-secondary/10 px-2.5 py-0.5 text-xs font-medium text-secondary">
+                              <span className="rounded-full bg-secondary/10 px-3 py-1 text-xs font-semibold text-secondary">
                                 {formatServiceType((visit as any).service_type)}
                               </span>
                             )}
@@ -294,14 +301,14 @@ export default function RecordsPage() {
                             </span>
                           </div>
                         </div>
-                        <span className="rounded-full bg-secondary/10 px-3 py-1 text-xs font-medium text-secondary">
+                        <span className="rounded-full bg-secondary/10 px-3.5 py-1.5 text-xs font-semibold text-secondary">
                           {formatVisitStatus(visit.status)}
                         </span>
                       </div>
 
-                      {/* 바이탈 요약 */}
+                      {/* 바이탈 요약 — pills */}
                       {vitals && Object.keys(vitals).length > 0 && (
-                        <div className="mt-4 flex flex-wrap gap-2">
+                        <div className="mt-5 flex flex-wrap gap-2.5">
                           {vitalDisplayKeys.map((key) => {
                             const value = vitals[key];
                             if (value == null) return null;
@@ -310,7 +317,7 @@ export default function RecordsPage() {
                             return (
                               <span
                                 key={key}
-                                className="rounded-full px-2.5 py-1 text-xs font-medium"
+                                className="rounded-full px-3 py-1.5 text-xs font-semibold"
                                 style={{
                                   backgroundColor: `${color}15`,
                                   color,
@@ -326,12 +333,12 @@ export default function RecordsPage() {
 
                       {/* 수행내역 체크리스트 */}
                       {performedItems && performedItems.length > 0 && (
-                        <div className="mt-4">
-                          <p className="mb-2 text-xs font-medium text-on-surface-variant">수행 내역</p>
-                          <div className="space-y-1.5">
+                        <div className="mt-5">
+                          <p className="mb-2.5 text-xs font-semibold text-on-surface-variant">수행 내역</p>
+                          <div className="space-y-2">
                             {performedItems.map((item: any, idx: number) => (
-                              <div key={idx} className="flex items-center gap-2">
-                                <div className={`flex h-4.5 w-4.5 items-center justify-center rounded ${
+                              <div key={idx} className="flex items-center gap-2.5">
+                                <div className={`flex h-5 w-5 items-center justify-center rounded-full ${
                                   item.done !== false ? 'bg-secondary/10' : 'bg-surface-container-high'
                                 }`}>
                                   {item.done !== false ? (
@@ -343,7 +350,7 @@ export default function RecordsPage() {
                                   )}
                                 </div>
                                 <span className={`text-xs ${
-                                  item.done !== false ? 'text-primary' : 'text-on-surface-variant line-through'
+                                  item.done !== false ? 'font-medium text-primary' : 'text-on-surface-variant line-through'
                                 }`}>
                                   {item.name ?? item.item ?? item.label ?? `항목 ${idx + 1}`}
                                 </span>
@@ -355,16 +362,16 @@ export default function RecordsPage() {
 
                       {/* 간호 노트 */}
                       {record?.nurse_note && (
-                        <p className="mt-4 line-clamp-2 text-xs text-on-surface-variant">
+                        <p className="mt-5 line-clamp-2 rounded-xl bg-surface-container-low/60 px-4 py-3 text-xs leading-relaxed text-on-surface-variant">
                           {record.nurse_note}
                         </p>
                       )}
 
                       {/* 보호자 메시지 */}
                       {record?.message_to_guardian && (
-                        <div className="mt-4 rounded-xl bg-secondary/5 p-3">
-                          <p className="text-xs font-medium text-secondary">보호자 전달 사항</p>
-                          <p className="mt-1 text-xs text-on-surface-variant">
+                        <div className="mt-5 rounded-2xl bg-secondary/5 p-4">
+                          <p className="text-xs font-semibold text-secondary">보호자 전달 사항</p>
+                          <p className="mt-1.5 text-xs leading-relaxed text-on-surface-variant">
                             {record.message_to_guardian}
                           </p>
                         </div>
@@ -380,21 +387,21 @@ export default function RecordsPage() {
 
       {/* 페이지네이션 */}
       {completedVisits.length > 0 && (
-        <div className="flex items-center justify-center gap-3">
+        <div className="flex items-center justify-center gap-4">
           <button
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            className="rounded-xl bg-surface-container-lowest px-4 py-2 text-sm text-on-surface-variant shadow-[0_10px_40px_rgba(24,28,30,0.05)] transition-colors hover:bg-surface disabled:opacity-30"
+            className="card-interactive rounded-xl bg-surface-container-lowest px-5 py-2.5 text-sm font-semibold text-on-surface-variant shadow-[0_8px_32px_rgba(46,71,110,0.06)] transition-colors hover:bg-surface-container-low disabled:opacity-30"
           >
             이전
           </button>
-          <span className="text-sm text-on-surface-variant">
+          <span className="text-sm font-semibold text-primary">
             {page + 1} 페이지
           </span>
           <button
             onClick={() => setPage((p) => p + 1)}
             disabled={!hasMore}
-            className="rounded-xl bg-surface-container-lowest px-4 py-2 text-sm text-on-surface-variant shadow-[0_10px_40px_rgba(24,28,30,0.05)] transition-colors hover:bg-surface disabled:opacity-30"
+            className="card-interactive rounded-xl bg-surface-container-lowest px-5 py-2.5 text-sm font-semibold text-on-surface-variant shadow-[0_8px_32px_rgba(46,71,110,0.06)] transition-colors hover:bg-surface-container-low disabled:opacity-30"
           >
             다음
           </button>
