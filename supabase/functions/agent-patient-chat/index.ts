@@ -57,7 +57,7 @@ async function getEmbedding(text: string): Promise<number[]> {
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: { parts: [{ text }] }, taskType: 'RETRIEVAL_QUERY' }),
+      body: JSON.stringify({ content: { parts: [{ text }] }, taskType: 'RETRIEVAL_QUERY', outputDimensionality: 1536 }),
     },
   );
   if (!res.ok) throw new Error('임베딩 API 오류');
