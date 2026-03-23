@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "홈케어커넥트",
+    "slug": "homecare-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "homecare",
+    "splash": {
+      "backgroundColor": "#002045"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "kr.homecareconnect.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "방문 위치 확인을 위해 위치 정보를 사용합니다.",
+        "NSCameraUsageDescription": "상처 사진 촬영 및 식사 사진 분석을 위해 카메라를 사용합니다.",
+        "NSMicrophoneUsageDescription": "음성 메모 및 음성 입력을 위해 마이크를 사용합니다."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#002045"
+      },
+      "package": "kr.homecareconnect.app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "CAMERA",
+        "RECORD_AUDIO"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-location",
+      "expo-camera",
+      "expo-av",
+      "expo-asset",
+      "expo-font"
+    ],
+    "install": {
+      "exclude": ["react-native", "react"]
+    },
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "enabled": false
+      }
+    }
+  }
+}
