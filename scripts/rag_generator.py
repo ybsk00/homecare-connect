@@ -18,12 +18,17 @@ RAG FAQ 대량 생성기
 
 import os
 import sys
+import io
 import json
 import time
 import argparse
 import requests
 from pathlib import Path
 from dotenv import load_dotenv
+
+# Windows cp949 인코딩 문제 해결
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 # .env 로드
 env_path = Path(__file__).parent.parent / ".env"
