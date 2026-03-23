@@ -97,8 +97,8 @@ export default function SettingsPage() {
         </div>
 
         <div className="flex items-start gap-6">
-          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-primary-container shadow-[0_8px_24px_rgba(0,32,69,0.15)]">
-            <User className="h-10 w-10 text-white" />
+          <div className="h-20 w-20 shrink-0 rounded-3xl overflow-hidden bg-gradient-to-br from-primary to-primary-container shadow-[0_8px_24px_rgba(0,32,69,0.15)]">
+            <img src="/images/nurse.jpg" alt="프로필" className="h-full w-full object-cover" />
           </div>
           <div className="flex-1 space-y-5">
             <div>

@@ -507,11 +507,13 @@ export default function PatientsPage() {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
-                    {/* 아바타 아이콘 */}
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/8">
-                      <svg className="h-6 w-6 text-primary/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                      </svg>
+                    {/* 아바타 */}
+                    <div className="h-12 w-12 shrink-0 rounded-full overflow-hidden bg-primary/8">
+                      <img
+                        src={patient.gender === 'male' ? '/images/patient_man.jpg' : '/images/patient_women.jpg'}
+                        alt={patient.full_name}
+                        className="h-full w-full object-cover"
+                      />
                     </div>
                     <div>
                       <div className="flex items-center gap-2.5">

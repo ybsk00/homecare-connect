@@ -32,7 +32,6 @@ import {
   AlertTriangle,
   Calendar,
   Clock,
-  User,
   Brain,
   ClipboardList,
   Sparkles,
@@ -259,8 +258,8 @@ export default function PatientDashboardPage() {
                 </p>
               </div>
               <div className="flex items-center gap-4 bg-surface-container-low p-4 rounded-xl">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-                  <User className="h-6 w-6 text-primary" />
+                <div className="h-14 w-14 rounded-full overflow-hidden bg-primary/10 shrink-0">
+                  <img src="/images/nurse.jpg" alt="간호사" className="h-full w-full object-cover" />
                 </div>
                 <div className="flex-1">
                   <p className="text-primary font-bold">

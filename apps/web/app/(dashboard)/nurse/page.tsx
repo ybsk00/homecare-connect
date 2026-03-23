@@ -18,7 +18,6 @@ import {
   Route,
   ChevronRight,
   Calendar,
-  User,
   Heart,
   Thermometer,
   Plus,
@@ -236,8 +235,8 @@ export default function NurseDashboardPage() {
               {/* 하단: 환자 정보 + 바이탈 */}
               <div className="mt-8 flex items-end justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-5">
-                  <div className="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-md p-1 flex items-center justify-center">
-                    <User className="h-10 w-10 text-white/70" />
+                  <div className="w-20 h-20 rounded-2xl bg-white/10 backdrop-blur-md overflow-hidden">
+                    <img src="/images/patient_women.jpg" alt="환자" className="h-full w-full object-cover" />
                   </div>
                   <div>
                     <h2 className="text-2xl sm:text-3xl font-bold mb-1">{heroVisit.patient.full_name}</h2>
@@ -335,8 +334,8 @@ export default function NurseDashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {alerts.slice(0, 2).map((alert) => (
                 <div key={alert.id} className="bg-white rounded-2xl p-6 flex gap-5 items-start shadow-sm">
-                  <div className="w-14 h-14 rounded-xl bg-surface-container-low flex items-center justify-center shrink-0">
-                    <User className="h-7 w-7 text-on-surface-variant" />
+                  <div className="w-14 h-14 rounded-xl bg-surface-container-low overflow-hidden shrink-0">
+                    <img src="/images/patient_man.jpg" alt="환자" className="h-full w-full object-cover" />
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between mb-1">
@@ -504,8 +503,8 @@ export default function NurseDashboardPage() {
                 onClick={() => router.push(`/nurse/patients/${patient.id}`)}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-surface-container-low border-2 border-white shadow-sm flex items-center justify-center overflow-hidden">
-                    <User className="h-5 w-5 text-on-surface-variant" />
+                  <div className="w-10 h-10 rounded-full bg-surface-container-low border-2 border-white shadow-sm overflow-hidden">
+                    <img src="/images/patient_women.jpg" alt="환자" className="h-full w-full object-cover" />
                   </div>
                   <span className="text-sm font-bold">{patient.full_name}</span>
                 </div>

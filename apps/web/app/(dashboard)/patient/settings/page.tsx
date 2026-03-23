@@ -101,10 +101,8 @@ export default function SettingsPage() {
       <section className="rounded-2xl bg-surface-container-lowest p-8 shadow-[0_10px_40px_rgba(46,71,110,0.06)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/8">
-              <svg className="h-6 w-6 text-primary/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-              </svg>
+            <div className="h-12 w-12 rounded-full overflow-hidden bg-primary/8 shrink-0">
+              <img src="/images/patient_women.jpg" alt="프로필" className="h-full w-full object-cover" />
             </div>
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-widest text-on-surface-variant/60">프로필</p>
