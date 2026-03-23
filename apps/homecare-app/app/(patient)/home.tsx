@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
 import { Colors, Spacing, Radius, FontSize, Shadows } from '@/constants/theme';
@@ -287,6 +288,37 @@ export default function PatientHomeScreen() {
             ))}
           </View>
         </View>
+      </View>
+
+      {/* AI 도우미 카드 */}
+      <View style={styles.sectionContainer}>
+        <TouchableOpacity
+          style={styles.agentCard}
+          activeOpacity={0.85}
+          onPress={() => router.push('/patient/agent')}
+        >
+          <LinearGradient
+            colors={[Colors.secondary, '#004D47']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.agentCardGradient}
+          >
+            <View style={styles.agentCardLeft}>
+              <View style={styles.agentCardIcon}>
+                <Text style={{ fontSize: 24 }}>💬</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.agentCardTitle}>AI 돌봄 도우미</Text>
+                <Text style={styles.agentCardDesc}>
+                  음성으로 일정 확인, 복약 관리, 건강 상담을 해보세요
+                </Text>
+              </View>
+            </View>
+            <View style={styles.agentCardArrow}>
+              <Text style={{ color: '#fff', fontSize: 20 }}>→</Text>
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
 
       {/* 케어 타임라인 */}
@@ -641,5 +673,53 @@ const styles = StyleSheet.create({
   emptyTimelineText: {
     fontSize: FontSize.body,
     color: Colors.onSurfaceVariant,
+  },
+
+  // AI 에이전트 카드
+  agentCard: {
+    borderRadius: Radius.xl,
+    overflow: 'hidden',
+    ...Shadows.float,
+  },
+  agentCardGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: Spacing.xl,
+    minHeight: 88,
+  },
+  agentCardLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.lg,
+    flex: 1,
+  },
+  agentCardIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: Radius.md,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  agentCardTitle: {
+    fontSize: FontSize.body,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 2,
+  },
+  agentCardDesc: {
+    fontSize: FontSize.label,
+    color: 'rgba(255,255,255,0.7)',
+    lineHeight: 17,
+  },
+  agentCardArrow: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: Spacing.md,
   },
 });

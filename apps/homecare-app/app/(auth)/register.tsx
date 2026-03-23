@@ -45,6 +45,8 @@ export default function RegisterScreen() {
     });
     if (result.error) {
       setError(result.error);
+    } else {
+      router.replace('/');
     }
   };
 

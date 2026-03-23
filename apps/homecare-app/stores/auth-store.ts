@@ -99,27 +99,33 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (!userId) return;
 
     // 프로필 조회
-    const { data: profile } = await supabase
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id, role, full_name, phone, avatar_url')
       .eq('id', userId)
       .single();
+
+    console.log('[Auth] fetchProfile:', { userId, profile, profileError });
 
     if (profile) {
       set({ profile: profile as Profile });
 
       // 간호사/의사/기관관리자인 경우 staffInfo 조회
       if (['nurse', 'doctor', 'org_admin'].includes(profile.role)) {
-        const { data: staff } = await supabase
+        const { data: staff, error: staffError } = await supabase
           .from('staff')
           .select('id, organization_id, staff_type, license_number, specialties, is_active, max_patients')
           .eq('user_id', userId)
           .single();
 
+        console.log('[Auth] staffInfo:', { staff, staffError });
+
         if (staff) {
           set({ staffInfo: staff as StaffInfo });
         }
       }
+    } else {
+      console.error('[Auth] Profile not found for userId:', userId);
     }
   },
 }));

@@ -43,15 +43,14 @@ export default function NurseLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
+          
+          
+          
           height: 72 + insets.bottom,
           paddingBottom: insets.bottom,
           borderTopWidth: 0,
           elevation: 0,
-          backgroundColor: Platform.OS === 'ios' ? 'transparent' : Colors.glass.light,
+          backgroundColor: Colors.surfaceContainerLowest,
         },
         tabBarBackground: () =>
           Platform.OS === 'ios' ? (
@@ -64,7 +63,7 @@ export default function NurseLayout() {
             <View
               style={[
                 StyleSheet.absoluteFill,
-                { backgroundColor: Colors.glass.light },
+                { backgroundColor: Colors.surfaceContainerLowest },
               ]}
             />
           ),

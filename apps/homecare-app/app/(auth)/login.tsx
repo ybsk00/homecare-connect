@@ -3,7 +3,7 @@ import {
   View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView,
   Platform, ScrollView, ActivityIndicator,
 } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '@/stores/auth-store';
 import { Colors, Spacing, Radius, FontSize, Shadows } from '@/constants/theme';
@@ -25,6 +25,9 @@ export default function LoginScreen() {
     const result = await signIn(email.trim(), password);
     if (result.error) {
       setError('이메일 또는 비밀번호가 올바르지 않습니다.');
+    } else {
+      // 로그인 성공 → index로 이동 → 역할별 자동 분기
+      router.replace('/');
     }
   };
 

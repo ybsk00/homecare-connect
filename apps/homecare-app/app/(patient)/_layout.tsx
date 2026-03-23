@@ -31,17 +31,16 @@ export default function PatientLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
+          
+          
+          
           height: 60 + insets.bottom,
           paddingBottom: insets.bottom,
           borderTopWidth: 0,
-          backgroundColor: Platform.OS === 'ios' ? 'transparent' : Colors.glass.light,
+          backgroundColor: Colors.surfaceContainerLowest,
           elevation: 0,
         },
-        tabBarBackground: Platform.OS === 'ios' ? TabBarBackground : undefined,
+        
         tabBarActiveTintColor: Colors.secondary,
         tabBarInactiveTintColor: `${Colors.onSurfaceVariant}66`,
         tabBarLabelStyle: {
@@ -98,6 +97,6 @@ export default function PatientLayout() {
 const styles = StyleSheet.create({
   glassOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: Colors.glass.light,
+    backgroundColor: Colors.surfaceContainerLowest,
   },
 });

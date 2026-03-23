@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
@@ -106,6 +107,31 @@ export default function AdminKPI() {
           <Text style={[styles.statNumber, { color: Colors.onSurface }]}>{stats.totalOrgs}</Text>
           <Text style={styles.statLabel}>가입기관</Text>
         </View>
+      </View>
+
+      {/* AI 플랫폼 모니터링 카드 */}
+      <View style={{ paddingHorizontal: Spacing.xl, marginBottom: Spacing.xl }}>
+        <TouchableOpacity activeOpacity={0.85} onPress={() => Alert.alert('준비 중', 'AI 모니터링이 곧 출시됩니다')} style={styles.agentCard}>
+          <LinearGradient
+            colors={[Colors.primary, Colors.secondary]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.agentCardGradient}
+          >
+            <View style={styles.agentCardLeft}>
+              <View style={styles.agentCardIcon}>
+                <Text style={{ fontSize: 22 }}>🤖</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.agentCardTitle}>AI 플랫폼 모니터링</Text>
+                <Text style={styles.agentCardDesc}>기관 심사, 구독 현황, 민원 처리를 AI가 분석합니다</Text>
+              </View>
+            </View>
+            <View style={styles.agentCardArrow}>
+              <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>→</Text>
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
 
       {/* 30일 추이 차트 */}
@@ -297,5 +323,56 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: Colors.surfaceContainerHigh,
+  },
+  // ── AI 에이전트 카드 ──
+  agentCard: {
+    borderRadius: 24,
+    overflow: 'hidden',
+    shadowColor: '#002045',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 5,
+  },
+  agentCardGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 24,
+    minHeight: 88,
+  },
+  agentCardLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    flex: 1,
+  },
+  agentCardIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  agentCardTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 2,
+  },
+  agentCardDesc: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.7)',
+    lineHeight: 17,
+  },
+  agentCardArrow: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 12,
   },
 });

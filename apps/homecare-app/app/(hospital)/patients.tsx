@@ -231,12 +231,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
     paddingBottom: Spacing.md,
     gap: Spacing.sm,
+    alignItems: 'center',
   },
   filterChip: {
     paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
-    borderRadius: Radius.xl,
+    paddingVertical: 10,
+    borderRadius: 20,
     backgroundColor: Colors.surfaceContainerLow,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   filterChipActive: {
     backgroundColor: Colors.primary,

@@ -33,12 +33,17 @@ export default function LandingScreen() {
   }, [isInitialized, user, profile]);
 
   const navigateByRole = (role: string) => {
-    switch (role) {
-      case 'guardian': router.replace('/(patient)/home'); break;
-      case 'nurse': case 'doctor': router.replace('/(nurse)/today'); break;
-      case 'org_admin': router.replace('/(hospital)/dashboard'); break;
-      case 'platform_admin': router.replace('/(admin)/kpi'); break;
-      default: router.push('/(auth)/login');
+    console.log('[Navigate] role:', role);
+    try {
+      switch (role) {
+        case 'guardian': router.replace('/(patient)/home'); break;
+        case 'nurse': case 'doctor': router.replace('/(nurse)/today'); break;
+        case 'org_admin': router.replace('/(hospital)/dashboard'); break;
+        case 'platform_admin': router.replace('/(admin)/kpi'); break;
+        default: router.push('/(auth)/login');
+      }
+    } catch (e) {
+      console.error('[Navigate] error:', e);
     }
   };
 
