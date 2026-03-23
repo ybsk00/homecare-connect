@@ -27,8 +27,12 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Windows cp949 인코딩 문제 해결
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
-sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+if hasattr(sys.stdout, 'buffer') and not isinstance(sys.stdout, io.TextIOWrapper) or (hasattr(sys.stdout, 'encoding') and sys.stdout.encoding != 'utf-8'):
+    try:
+        sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding='utf-8', errors='replace', line_buffering=True)
+        sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding='utf-8', errors='replace', line_buffering=True)
+    except Exception:
+        pass
 
 # .env 로드
 env_path = Path(__file__).parent.parent / ".env"
@@ -51,25 +55,79 @@ HEADERS = {
 }
 
 
+def parse_json_response(text: str) -> list:
+    """Gemini 응답에서 JSON 배열을 강력하게 추출"""
+    import re
+    # 1. 마크다운 코드블록 제거
+    cleaned = re.sub(r'```(?:json)?\s*', '', text).strip()
+    cleaned = re.sub(r'```\s*$', '', cleaned).strip()
+
+    # 2. 직접 파싱 시도
+    try:
+        result = json.loads(cleaned)
+        if isinstance(result, list):
+            return result
+        return [result]
+    except json.JSONDecodeError:
+        pass
+
+    # 3. 첫 번째 [ ... ] 블록 추출
+    match = re.search(r'\[[\s\S]*\]', cleaned)
+    if match:
+        try:
+            return json.loads(match.group())
+        except json.JSONDecodeError:
+            pass
+
+    # 4. 줄 단위로 JSON 객체 추출
+    objects = []
+    for m in re.finditer(r'\{[^{}]*\}', cleaned):
+        try:
+            obj = json.loads(m.group())
+            if 'question' in obj and 'answer' in obj:
+                objects.append(obj)
+        except json.JSONDecodeError:
+            continue
+    if objects:
+        return objects
+
+    return []
+
+
 # ── Gemini API ──
 
-def gemini_generate(system_prompt: str, user_prompt: str, temperature: float = 0.3) -> str:
-    """Gemini 텍스트 생성"""
+def gemini_generate(system_prompt: str, user_prompt: str, temperature: float = 0.3, retries: int = 3) -> str:
+    """Gemini 텍스트 생성 (재시도 포함)"""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
     body = {
         "system_instruction": {"parts": [{"text": system_prompt}]},
         "contents": [{"parts": [{"text": user_prompt}]}],
         "generationConfig": {"temperature": temperature, "maxOutputTokens": 8192},
     }
-    resp = requests.post(url, json=body, timeout=120)
-    resp.raise_for_status()
-    result = resp.json()
-    return result.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+    for attempt in range(retries):
+        try:
+            resp = requests.post(url, json=body, timeout=120)
+            if resp.status_code == 500 or resp.status_code == 503 or resp.status_code == 429:
+                wait = (attempt + 1) * 10
+                print(f"    API {resp.status_code}, {wait}초 대기 후 재시도...")
+                time.sleep(wait)
+                continue
+            resp.raise_for_status()
+            result = resp.json()
+            return result.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+        except requests.exceptions.RequestException as e:
+            if attempt < retries - 1:
+                wait = (attempt + 1) * 10
+                print(f"    요청 실패, {wait}초 대기 후 재시도: {e}")
+                time.sleep(wait)
+            else:
+                raise
+    return ""
 
 
 def gemini_embed(text: str) -> list[float]:
     """Gemini 임베딩 (1536차원)"""
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key={GEMINI_API_KEY}"
     body = {
         "content": {"parts": [{"text": text}]},
         "taskType": "RETRIEVAL_DOCUMENT",
@@ -263,14 +321,11 @@ def generate_patient_faqs(category: str, info: dict, count: int = 50) -> list[di
 어르신이 실제로 궁금해할 만한 질문을 만들어주세요."""
 
     text = gemini_generate(system_prompt, user_prompt)
-    cleaned = text.replace("```json", "").replace("```", "").strip()
-
-    try:
-        faqs = json.loads(cleaned)
-        return [{"question": f["question"], "answer": f["answer"]} for f in faqs if "question" in f and "answer" in f]
-    except json.JSONDecodeError:
-        print(f"  ⚠️ JSON 파싱 실패 ({name}), 재시도...")
-        return []
+    faqs = parse_json_response(text)
+    result = [{"question": f["question"], "answer": f["answer"]} for f in faqs if "question" in f and "answer" in f]
+    if not result:
+        print(f"  ⚠️ FAQ 추출 실패 ({name}), 응답 첫 200자: {text[:200]}")
+    return result
 
 
 def generate_nurse_faqs(category: str, info: dict, count: int = 50) -> list[dict]:
@@ -300,14 +355,11 @@ def generate_nurse_faqs(category: str, info: dict, count: int = 50) -> list[dict
 방문간호 현장에서 실제로 판단에 필요한 질문 중심으로."""
 
     text = gemini_generate(system_prompt, user_prompt)
-    cleaned = text.replace("```json", "").replace("```", "").strip()
-
-    try:
-        faqs = json.loads(cleaned)
-        return [{"question": f["question"], "answer": f["answer"]} for f in faqs if "question" in f and "answer" in f]
-    except json.JSONDecodeError:
-        print(f"  ⚠️ JSON 파싱 실패 ({name}), 재시도...")
-        return []
+    faqs = parse_json_response(text)
+    result = [{"question": f["question"], "answer": f["answer"]} for f in faqs if "question" in f and "answer" in f]
+    if not result:
+        print(f"  ⚠️ FAQ 추출 실패 ({name}), 응답 첫 200자: {text[:200]}")
+    return result
 
 
 def generate_emergency_faqs(category: str, symptoms: list[str]) -> list[dict]:
@@ -328,13 +380,10 @@ def generate_emergency_faqs(category: str, symptoms: list[str]) -> list[dict]:
 각 증상별로 2~3개의 다양한 질문을 만들어주세요 (총 {len(symptoms) * 3}개 목표)."""
 
     text = gemini_generate(system_prompt, user_prompt)
-    cleaned = text.replace("```json", "").replace("```", "").strip()
-
-    try:
-        return json.loads(cleaned)
-    except json.JSONDecodeError:
-        print(f"  ⚠️ JSON 파싱 실패 (emergency-{category})")
-        return []
+    faqs = parse_json_response(text)
+    if not faqs:
+        print(f"  ⚠️ FAQ 추출 실패 (emergency-{category}), 응답 첫 200자: {text[:200]}")
+    return faqs
 
 
 def generate_assessment_faqs(atype: str, description: str, count: int = 30) -> list[dict]:
@@ -353,13 +402,10 @@ def generate_assessment_faqs(atype: str, description: str, count: int = 30) -> l
 사정 도구, 정상/비정상 기준, 수치 해석, 보고 기준 등을 포함하세요."""
 
     text = gemini_generate(system_prompt, user_prompt)
-    cleaned = text.replace("```json", "").replace("```", "").strip()
-
-    try:
-        return json.loads(cleaned)
-    except json.JSONDecodeError:
-        print(f"  ⚠️ JSON 파싱 실패 (assessment-{atype})")
-        return []
+    faqs = parse_json_response(text)
+    if not faqs:
+        print(f"  ⚠️ FAQ 추출 실패 (assessment-{atype}), 응답 첫 200자: {text[:200]}")
+    return faqs
 
 
 # ── PubMed ──
