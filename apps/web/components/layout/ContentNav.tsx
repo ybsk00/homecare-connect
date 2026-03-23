@@ -21,6 +21,8 @@ import {
   Menu,
   X,
   LayoutDashboard,
+  Heart,
+  Stethoscope,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useAppStore } from '@/lib/store';
@@ -42,6 +44,7 @@ const guardianTabs: TabItem[] = [
   { label: 'AI 리포트', href: '/patient/ai-report', icon: Sparkles },
   { label: '알림', href: '/patient/notifications', icon: Bell },
   { label: 'AI 상담', href: '/patient/chat', icon: Brain },
+  { label: 'AI 도우미', href: '/patient/agent', icon: Heart },
 ];
 
 const nurseTabs: TabItem[] = [
@@ -50,6 +53,7 @@ const nurseTabs: TabItem[] = [
   { label: '레드플래그', href: '/nurse/alerts', icon: AlertTriangle },
   { label: '월간 통계', href: '/nurse/stats', icon: BarChart3 },
   { label: '알림', href: '/nurse/notifications', icon: Bell },
+  { label: 'AI 어시스턴트', href: '/nurse/agent', icon: Stethoscope },
 ];
 
 function getTabs(role: string): TabItem[] {
