@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { Colors, Spacing, Radius, FontSize, Shadows } from '@/constants/theme';
@@ -125,7 +126,12 @@ export default function AdminOrganizations() {
       >
         {filteredOrgs.length > 0 ? (
           filteredOrgs.map((org: any) => (
-            <View key={org.id} style={styles.orgCard}>
+            <TouchableOpacity
+              key={org.id}
+              style={styles.orgCard}
+              activeOpacity={0.7}
+              onPress={() => router.push(`/admin/organizations/${org.id}`)}
+            >
               <View style={styles.orgHeader}>
                 <View style={styles.orgIcon}>
                   <Building2 color={Colors.onPrimary} size={20} />
@@ -157,7 +163,7 @@ export default function AdminOrganizations() {
                   </View>
                 )}
               </View>
-            </View>
+            </TouchableOpacity>
           ))
         ) : (
           <View style={styles.emptyState}>

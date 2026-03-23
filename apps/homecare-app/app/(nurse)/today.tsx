@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
+import { router } from 'expo-router';
 import { Colors, Spacing, Radius, FontSize, Shadows, TouchTarget } from '@/constants/theme';
 
 // ── 날짜 포맷 ──
@@ -284,7 +285,11 @@ export default function TodayScreen() {
                 )}
               </View>
               {visit.status === 'scheduled' && (
-                <TouchableOpacity style={styles.startButton} activeOpacity={0.8}>
+                <TouchableOpacity
+                  style={styles.startButton}
+                  activeOpacity={0.8}
+                  onPress={() => router.push(`/nurse/visit/${visit.id}`)}
+                >
                   <Text style={styles.startButtonText}>방문시작</Text>
                 </TouchableOpacity>
               )}

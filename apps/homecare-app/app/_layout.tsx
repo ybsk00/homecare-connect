@@ -31,6 +31,10 @@ export default function RootLayout() {
           <Stack.Screen name="(nurse)" options={{ animation: 'fade' }} />
           <Stack.Screen name="(hospital)" options={{ animation: 'fade' }} />
           <Stack.Screen name="(admin)" options={{ animation: 'fade' }} />
+          <Stack.Screen name="nurse" options={{ headerShown: false }} />
+          <Stack.Screen name="patient" options={{ headerShown: false }} />
+          <Stack.Screen name="hospital" options={{ headerShown: false }} />
+          <Stack.Screen name="admin" options={{ headerShown: false }} />
         </Stack>
       </QueryClientProvider>
     </SafeAreaProvider>

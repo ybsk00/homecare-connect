@@ -33,37 +33,37 @@ export default function HospitalMore() {
       icon: Users,
       label: '직원 관리',
       sublabel: '간호사, 의사 인력 관리',
-      onPress: () => {},
+      onPress: () => router.push('/hospital/staff'),
     },
     {
       icon: FileText,
       label: '서비스 요청',
       sublabel: '서비스 요청 접수 및 관리',
-      onPress: () => {},
+      onPress: () => router.push('/hospital/requests'),
     },
     {
       icon: Briefcase,
       label: '의사 방문',
       sublabel: '소견 입력 및 AI 변환',
-      onPress: () => {},
+      onPress: () => router.push('/hospital/doctor'),
     },
     {
       icon: DollarSign,
       label: '수납 관리',
       sublabel: '수납 내역 및 정산',
-      onPress: () => {},
+      onPress: () => router.push('/hospital/billing'),
     },
     {
       icon: Shield,
       label: '건보 청구 자료',
       sublabel: '건강보험 청구 데이터 관리',
-      onPress: () => {},
+      onPress: () => router.push('/hospital/claims'),
     },
     {
       icon: Settings,
       label: '설정',
       sublabel: '기관 정보, 알림 설정',
-      onPress: () => {},
+      onPress: () => router.push('/hospital/settings'),
     },
   ];
 

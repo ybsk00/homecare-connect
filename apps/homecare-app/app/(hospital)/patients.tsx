@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
@@ -140,7 +141,12 @@ export default function HospitalPatients() {
       >
         {filteredPatients.length > 0 ? (
           filteredPatients.map((patient: any) => (
-            <View key={patient.id} style={styles.patientCard}>
+            <TouchableOpacity
+              key={patient.id}
+              style={styles.patientCard}
+              activeOpacity={0.7}
+              onPress={() => router.push(`/hospital/patients/${patient.id}`)}
+            >
               <View style={styles.avatar}>
                 <User color={Colors.onPrimary} size={22} />
               </View>
@@ -165,7 +171,7 @@ export default function HospitalPatients() {
                   {getStatusLabel(patient.status)}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
           ))
         ) : (
           <View style={styles.emptyState}>

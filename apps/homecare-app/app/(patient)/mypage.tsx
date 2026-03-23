@@ -35,13 +35,13 @@ interface MenuItem {
 }
 
 const MENU_ITEMS: MenuItem[] = [
-  { icon: Users, label: '환자 관리', subtitle: '연결된 환자 정보를 관리합니다', route: '/(patient)/home' },
-  { icon: FileText, label: 'AI 리포트', subtitle: 'AI 건강 분석 리포트', route: '/(patient)/records' },
-  { icon: Star, label: '리뷰', subtitle: '방문 서비스 리뷰 작성', route: '/(patient)/records' },
-  { icon: MessageCircle, label: 'AI 상담', subtitle: 'AI 기반 건강 상담', route: '/(patient)/home' },
-  { icon: Shield, label: 'AI 도우미', subtitle: '스마트 케어 어시스턴트', route: '/(patient)/home' },
-  { icon: Bell, label: '알림', subtitle: '알림 및 공지사항', route: '/(patient)/home' },
-  { icon: Settings, label: '설정', subtitle: '앱 설정 및 계정 관리', route: '/(patient)/home' },
+  { icon: Users, label: '환자 관리', subtitle: '연결된 환자 정보를 관리합니다', route: '/patient/register' },
+  { icon: FileText, label: 'AI 리포트', subtitle: 'AI 건강 분석 리포트', route: '/patient/ai-report' },
+  { icon: Star, label: '리뷰', subtitle: '방문 서비스 리뷰 작성', route: '/patient/review/write' },
+  { icon: MessageCircle, label: 'AI 상담', subtitle: 'AI 기반 건강 상담', route: '/patient/chat' },
+  { icon: Shield, label: 'AI 도우미', subtitle: '스마트 케어 어시스턴트', route: '/patient/agent' },
+  { icon: Bell, label: '알림', subtitle: '알림 및 공지사항', route: '/patient/notifications' },
+  { icon: Settings, label: '설정', subtitle: '앱 설정 및 계정 관리', route: '/patient/settings' },
 ];
 
 export default function MyPageScreen() {

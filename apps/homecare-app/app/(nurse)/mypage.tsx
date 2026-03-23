@@ -92,8 +92,16 @@ export default function MyPageScreen() {
   };
 
   const handleMenuPress = (key: string) => {
-    // 추후 각 화면으로 라우팅
-    Alert.alert('준비 중', '해당 기능은 추후 업데이트 예정입니다.');
+    const routes: Record<string, string> = {
+      stats: '/nurse/stats',
+      ai: '/nurse/agent',
+      notifications: '/nurse/settings',
+      license: '/nurse/settings',
+    };
+    const route = routes[key];
+    if (route) {
+      router.push(route as any);
+    }
   };
 
   // ── 기관 유형 한글 ──

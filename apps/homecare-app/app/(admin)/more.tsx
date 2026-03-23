@@ -30,13 +30,13 @@ export default function AdminMore() {
       icon: Database,
       label: 'RAG 관리',
       sublabel: 'AI 지식베이스 및 대화 로그',
-      onPress: () => {},
+      onPress: () => router.push('/admin/rag'),
     },
     {
       icon: Bot,
       label: 'AI 모니터링',
       sublabel: 'AI 매칭, 레드플래그 모니터링',
-      onPress: () => {},
+      onPress: () => router.push('/admin/monitoring'),
     },
     {
       icon: Shield,

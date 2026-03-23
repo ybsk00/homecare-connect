@@ -126,7 +126,7 @@ export default function PatientsScreen() {
               style={styles.patientCard}
               activeOpacity={0.7}
               onPress={() => {
-                // 환자 상세 화면으로 이동 (추후 구현)
+                router.push(`/nurse/patients/${patient.id}`);
               }}
             >
               <View style={styles.cardLeft}>
