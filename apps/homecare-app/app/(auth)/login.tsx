@@ -219,6 +219,7 @@ export default function LoginScreen() {
             <Text style={styles.kakaoButtonText}>카카오로 로그인</Text>
           </TouchableOpacity>
 
+          {/* 네이버 로그인 — 도메인 승인 후 활성화 예정
           <TouchableOpacity
             onPress={handleNaverLogin}
             disabled={isLoading || naverLoading}
@@ -234,6 +235,7 @@ export default function LoginScreen() {
               </>
             )}
           </TouchableOpacity>
+          */}
         </View>
 
         {/* 하단 링크 */}

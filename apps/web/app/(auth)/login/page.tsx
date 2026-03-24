@@ -234,6 +234,7 @@ export default function LoginPage() {
           카카오로 로그인
         </button>
 
+        {/* 네이버 로그인 — 도메인 승인 후 활성화 예정
         <button
           type="button"
           onClick={() => { window.location.href = '/api/auth/naver'; }}
@@ -244,6 +245,7 @@ export default function LoginPage() {
           <span className="text-base font-extrabold">N</span>
           네이버로 로그인
         </button>
+        */}
       </div>
 
       <div className="mt-6 text-center">
