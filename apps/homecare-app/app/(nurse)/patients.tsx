@@ -8,11 +8,13 @@ import {
   RefreshControl,
   ActivityIndicator,
   TextInput,
+  Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
+import { getPatientAvatar } from '@/constants/avatars';
 import { useAuthStore } from '@/stores/auth-store';
 import { Colors, Spacing, Radius, FontSize, Shadows } from '@/constants/theme';
 
@@ -130,9 +132,10 @@ export default function PatientsScreen() {
               }}
             >
               <View style={styles.cardLeft}>
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>{patient.full_name?.charAt(0) ?? '?'}</Text>
-                </View>
+                <Image
+                  source={getPatientAvatar(patient.gender)}
+                  style={styles.avatar}
+                />
               </View>
               <View style={styles.cardCenter}>
                 <View style={styles.nameRow}>
@@ -244,14 +247,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: Colors.surfaceContainerHigh,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  avatarText: {
-    fontSize: FontSize.subtitle,
-    fontWeight: '700',
-    color: Colors.primary,
   },
   cardCenter: {
     flex: 1,

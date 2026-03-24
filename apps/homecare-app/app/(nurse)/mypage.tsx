@@ -6,12 +6,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
+import { Avatars } from '@/constants/avatars';
 import { Colors, Spacing, Radius, FontSize, Shadows, TouchTarget } from '@/constants/theme';
 
 // ── 직종 한글 ──
@@ -124,11 +126,7 @@ export default function MyPageScreen() {
 
       {/* ── 프로필 카드 ── */}
       <View style={styles.profileCard}>
-        <View style={styles.profileAvatar}>
-          <Text style={styles.profileAvatarText}>
-            {profile?.full_name?.charAt(0) ?? '?'}
-          </Text>
-        </View>
+        <Image source={Avatars.nurse} style={styles.profileAvatar} />
         <View style={styles.profileInfo}>
           <Text style={styles.profileName}>{profile?.full_name ?? '간호사'}</Text>
           <Text style={styles.profileType}>
@@ -256,15 +254,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: Colors.primaryContainer,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginRight: Spacing.lg,
-  },
-  profileAvatarText: {
-    fontSize: FontSize.hero,
-    fontWeight: '800',
-    color: Colors.onPrimaryContainer,
   },
   profileInfo: {
     flex: 1,

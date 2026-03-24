@@ -1,10 +1,11 @@
 import { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, Image } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { Colors, Spacing, Radius, FontSize, Shadows } from '@/constants/theme';
-import { User, Activity, Calendar, Users } from '@/components/icons/TabIcons';
+import { Activity, Calendar, Users } from '@/components/icons/TabIcons';
+import { Avatars, getPatientAvatar } from '@/constants/avatars';
 
 export default function HospitalPatientDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -16,7 +17,7 @@ export default function HospitalPatientDetail() {
       const { data } = await supabase
         .from('patients')
         .select(`
-          id, care_level, status, diagnosis, service_type, notes, created_at,
+          id, care_level, status, diagnosis, service_type, notes, created_at, gender,
           user:profiles!inner(full_name, phone, avatar_url, email),
           organization:organizations(name)
         `)
@@ -120,9 +121,10 @@ export default function HospitalPatientDetail() {
       >
         {/* 환자 정보 카드 */}
         <View style={styles.heroCard}>
-          <View style={styles.avatar}>
-            <User color={Colors.onPrimary} size={32} />
-          </View>
+          <Image
+            source={getPatientAvatar(p?.gender)}
+            style={styles.avatar}
+          />
           <Text style={styles.heroName}>{p?.user?.full_name ?? '환자'}</Text>
           {p?.status && (
             <View style={[styles.statusBadge, { backgroundColor: `${getStatusColor(p.status)}20` }]}>
@@ -268,9 +270,7 @@ export default function HospitalPatientDetail() {
           </View>
           {assignedNurse ? (
             <View style={styles.nurseCard}>
-              <View style={styles.nurseAvatar}>
-                <User color={Colors.onPrimary} size={22} />
-              </View>
+              <Image source={Avatars.nurse} style={styles.nurseAvatar} />
               <View style={styles.nurseInfo}>
                 <Text style={styles.nurseName}>{(assignedNurse as any).user?.full_name}</Text>
                 <Text style={styles.nurseType}>{(assignedNurse as any).staff_type ?? '간호사'}</Text>
@@ -305,9 +305,6 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: Colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: Spacing.md,
   },
   heroName: {
@@ -488,9 +485,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: Colors.secondary,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginRight: Spacing.md,
   },
   nurseInfo: {

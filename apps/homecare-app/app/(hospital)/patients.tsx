@@ -1,12 +1,13 @@
 import { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, RefreshControl, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
 import { Colors, Spacing, Radius, FontSize, Shadows } from '@/constants/theme';
-import { Search, User } from '@/components/icons/TabIcons';
+import { Search, Users } from '@/components/icons/TabIcons';
+import { getPatientAvatar } from '@/constants/avatars';
 
 type PatientStatus = 'all' | 'active' | 'paused' | 'discharged';
 
@@ -33,7 +34,7 @@ export default function HospitalPatients() {
       let query = supabase
         .from('patients')
         .select(`
-          id, care_level, status, created_at,
+          id, care_level, status, created_at, gender,
           user:profiles!inner(full_name, phone, avatar_url),
           assigned_nurse:staff(id, user:profiles!inner(full_name))
         `)
@@ -147,9 +148,10 @@ export default function HospitalPatients() {
               activeOpacity={0.7}
               onPress={() => router.push(`/hospital/patients/${patient.id}`)}
             >
-              <View style={styles.avatar}>
-                <User color={Colors.onPrimary} size={22} />
-              </View>
+              <Image
+                source={getPatientAvatar(patient.gender)}
+                style={styles.avatar}
+              />
               <View style={styles.patientInfo}>
                 <View style={styles.patientNameRow}>
                   <Text style={styles.patientName}>{patient.user?.full_name ?? '이름없음'}</Text>
@@ -270,9 +272,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: Colors.primaryContainer,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginRight: Spacing.md,
   },
   patientInfo: {

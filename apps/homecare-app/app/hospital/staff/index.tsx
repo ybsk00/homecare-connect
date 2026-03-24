@@ -1,14 +1,15 @@
 import { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl,
-  Modal, TextInput, Alert,
+  Modal, TextInput, Alert, Image,
 } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
 import { Colors, Spacing, Radius, FontSize, Shadows } from '@/constants/theme';
-import { Users, User, Plus, Mail, XCircle, CheckCircle } from '@/components/icons/TabIcons';
+import { Users, Plus, Mail, XCircle, CheckCircle } from '@/components/icons/TabIcons';
+import { Avatars } from '@/constants/avatars';
 
 const ROLE_OPTIONS = [
   { key: 'nurse', label: '간호사' },
@@ -132,9 +133,10 @@ export default function HospitalStaffList() {
                 activeOpacity={0.7}
                 onPress={() => router.push(`/hospital/staff/${staff.id}`)}
               >
-                <View style={[styles.avatar, !staff.is_active && styles.avatarInactive]}>
-                  <User color={Colors.onPrimary} size={20} />
-                </View>
+                <Image
+                  source={Avatars.nurse}
+                  style={[styles.avatar, !staff.is_active && styles.avatarInactive]}
+                />
                 <View style={styles.staffInfo}>
                   <View style={styles.nameRow}>
                     <Text style={styles.staffName}>{staff.user?.full_name ?? '이름없음'}</Text>
@@ -289,13 +291,10 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: Colors.primaryContainer,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginRight: Spacing.md,
   },
   avatarInactive: {
-    backgroundColor: Colors.surfaceContainerHigh,
+    opacity: 0.4,
   },
   staffInfo: {
     flex: 1,

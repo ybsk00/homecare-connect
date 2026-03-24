@@ -1,11 +1,12 @@
 import { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, Image } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
 import { Colors, Spacing, Radius, FontSize, Shadows } from '@/constants/theme';
-import { User, Users, BarChart3 } from '@/components/icons/TabIcons';
+import { Users, BarChart3 } from '@/components/icons/TabIcons';
+import { Avatars, getPatientAvatar } from '@/constants/avatars';
 
 export default function HospitalStaffDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -35,7 +36,7 @@ export default function HospitalStaffDetail() {
       const { data } = await supabase
         .from('patients')
         .select(`
-          id, care_level, status,
+          id, care_level, status, gender,
           user:profiles!inner(full_name, phone)
         `)
         .eq('assigned_nurse_id', id)
@@ -97,9 +98,7 @@ export default function HospitalStaffDetail() {
       >
         {/* 직원 프로필 카드 */}
         <View style={styles.heroCard}>
-          <View style={styles.avatar}>
-            <User color={Colors.onPrimary} size={32} />
-          </View>
+          <Image source={Avatars.nurse} style={styles.avatar} />
           <Text style={styles.heroName}>{s?.user?.full_name ?? '직원'}</Text>
           <View style={styles.typeBadge}>
             <Text style={styles.typeText}>{getStaffTypeLabel(s?.staff_type)}</Text>
@@ -185,9 +184,10 @@ export default function HospitalStaffDetail() {
           {(assignedPatients ?? []).length > 0 ? (
             (assignedPatients ?? []).map((patient: any) => (
               <View key={patient.id} style={styles.patientCard}>
-                <View style={styles.patientAvatar}>
-                  <User color={Colors.onPrimary} size={18} />
-                </View>
+                <Image
+                  source={getPatientAvatar(patient.gender)}
+                  style={styles.patientAvatar}
+                />
                 <View style={styles.patientInfo}>
                   <Text style={styles.patientName}>{patient.user?.full_name ?? '이름없음'}</Text>
                   <Text style={styles.patientPhone}>{patient.user?.phone ?? ''}</Text>
@@ -227,9 +227,6 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: Colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: Spacing.md,
   },
   heroName: {
@@ -338,9 +335,6 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: Colors.primaryContainer,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginRight: Spacing.md,
   },
   patientInfo: {

@@ -8,6 +8,7 @@ import {
   Animated,
   RefreshControl,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,6 +17,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
 import { router } from 'expo-router';
 import { Colors, Spacing, Radius, FontSize, Shadows, TouchTarget } from '@/constants/theme';
+import { getPatientAvatar } from '@/constants/avatars';
 
 // ── 날짜 포맷 ──
 function formatDate(date: Date) {
@@ -100,7 +102,7 @@ export default function TodayScreen() {
       if (!nurseId) return [];
       const { data, error } = await supabase
         .from('visits')
-        .select('id, scheduled_date, scheduled_time, visit_order, estimated_duration_min, status, checkin_at, checkout_at, patient:patients(id, full_name, address, primary_diagnosis, care_grade)')
+        .select('id, scheduled_date, scheduled_time, visit_order, estimated_duration_min, status, checkin_at, checkout_at, patient:patients(id, full_name, address, primary_diagnosis, care_grade, gender)')
         .eq('nurse_id', nurseId)
         .eq('scheduled_date', today)
         .order('scheduled_time', { ascending: true });
@@ -201,11 +203,10 @@ export default function TodayScreen() {
             </Text>
           </View>
           <View style={styles.heroBottom}>
-            <View style={styles.heroAvatar}>
-              <Text style={styles.heroAvatarText}>
-                {(activeVisit.patient as any)?.full_name?.charAt(0) ?? '?'}
-              </Text>
-            </View>
+            <Image
+              source={getPatientAvatar((activeVisit.patient as any)?.gender)}
+              style={styles.heroAvatar}
+            />
             <View style={styles.heroInfo}>
               <Text style={styles.heroName}>{(activeVisit.patient as any)?.full_name ?? '환자'}</Text>
               <Text style={styles.heroAddress} numberOfLines={1}>
@@ -332,9 +333,10 @@ export default function TodayScreen() {
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.patientScroll}>
             {assignedPatients.map((p: any) => (
               <View key={p.id} style={styles.patientBubble}>
-                <View style={styles.patientAvatar}>
-                  <Text style={styles.patientAvatarText}>{p.full_name?.charAt(0) ?? '?'}</Text>
-                </View>
+                <Image
+                  source={getPatientAvatar(p.gender)}
+                  style={styles.patientAvatar}
+                />
                 <Text style={styles.patientBubbleName} numberOfLines={1}>{p.full_name}</Text>
               </View>
             ))}
@@ -422,15 +424,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
     marginRight: Spacing.md,
-  },
-  heroAvatarText: {
-    fontSize: FontSize.subtitle,
-    fontWeight: '700',
-    color: Colors.onPrimary,
   },
   heroInfo: {
     flex: 1,
@@ -642,15 +636,7 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: Colors.surfaceContainerHigh,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: Spacing.xs,
-  },
-  patientAvatarText: {
-    fontSize: FontSize.subtitle,
-    fontWeight: '700',
-    color: Colors.primary,
   },
   patientBubbleName: {
     fontSize: FontSize.overline,

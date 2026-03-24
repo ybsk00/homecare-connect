@@ -20,7 +20,6 @@ import { Plus, MessageCircle, Phone, Clock, Activity } from '@/components/icons/
 
 // 아바타 이미지
 const nurseAvatar = require('@/assets/images/nurse.jpg');
-const patientManAvatar = require('@/assets/images/patient_man.jpg');
 
 export default function PatientHomeScreen() {
   const insets = useSafeAreaInsets();

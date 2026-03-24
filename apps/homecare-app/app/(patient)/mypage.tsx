@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth-store';
 import { Colors, Spacing, Radius, FontSize, Shadows, TouchTarget } from '@/constants/theme';
 import {
@@ -24,7 +26,7 @@ import {
   Users,
 } from '@/components/icons/TabIcons';
 
-const patientAvatar = require('@/assets/images/patient_man.jpg');
+import { Avatars, getPatientAvatar } from '@/constants/avatars';
 
 interface MenuItem {
   icon: React.ComponentType<{ color: string; size: number }>;
@@ -48,9 +50,26 @@ export default function MyPageScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const profile = useAuthStore((s) => s.profile);
+  const user = useAuthStore((s) => s.user);
   const signOut = useAuthStore((s) => s.signOut);
 
   const displayName = profile?.full_name || '사용자';
+
+  // 연결된 환자의 성별 조회 (아바타 분기용)
+  const { data: patientGender } = useQuery({
+    queryKey: ['patient-gender', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data } = await supabase
+        .from('guardian_patient_links')
+        .select('patient:patients(gender)')
+        .eq('guardian_id', user.id)
+        .limit(1)
+        .single();
+      return (data?.patient as any)?.gender ?? null;
+    },
+    enabled: !!user?.id,
+  });
 
   const handleLogout = () => {
     Alert.alert(
@@ -82,7 +101,7 @@ export default function MyPageScreen() {
       {/* 프로필 섹션 */}
       <View style={styles.profileSection}>
         <View style={styles.profileCard}>
-          <Image source={patientAvatar} style={styles.avatar} />
+          <Image source={getPatientAvatar(patientGender)} style={styles.avatar} />
           <View style={styles.profileInfo}>
             <Text style={styles.profileName}>{displayName}</Text>
             <View style={styles.roleChip}>
