@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Mail, Lock } from 'lucide-react';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
@@ -15,7 +15,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // 네이버 OAuth 콜백 에러 처리
+  // OAuth 콜백 에러 처리
   useEffect(() => {
     const errorParam = searchParams.get('error');
     if (errorParam) {
@@ -100,7 +100,6 @@ export default function LoginPage() {
       if (role === 'guardian') {
         router.push('/patient');
       } else if (role === 'nurse') {
-        // Check if staff record exists
         const { data: staffRecord } = await supabase
           .from('staff')
           .select('id')
@@ -115,7 +114,6 @@ export default function LoginPage() {
       } else if (role === 'org_admin') {
         router.push('/hospital');
       } else if (role === 'platform_admin') {
-        // Verify admin role
         const { data: adminProfile } = await supabase
           .from('profiles')
           .select('role')
@@ -130,7 +128,6 @@ export default function LoginPage() {
         }
         router.push('/admin');
       } else {
-        // Default fallback
         router.push('/patient');
       }
 
@@ -260,5 +257,18 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="rounded-2xl bg-white p-8 shadow-[0_10px_40px_rgba(24,28,30,0.05)]">
+        <h2 className="text-center text-xl font-bold text-on-surface">로그인</h2>
+        <p className="mt-1 text-center text-sm text-on-surface-variant">로딩 중...</p>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
