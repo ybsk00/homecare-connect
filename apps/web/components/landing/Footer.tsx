@@ -10,14 +10,6 @@ const linkGroups = [
     ],
   },
   {
-    title: '회사',
-    links: [
-      { label: '소개', href: '#' },
-      { label: '채용', href: '#' },
-      { label: '블로그', href: '#' },
-    ],
-  },
-  {
     title: '지원',
     links: [
       { label: '고객센터', href: '#' },
@@ -39,7 +31,7 @@ export function Footer() {
   return (
     <footer id="contact" className="bg-primary py-16 text-white/80">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="grid gap-12 md:grid-cols-5">
+        <div className="grid gap-12 md:grid-cols-4">
           {/* Brand */}
           <div className="md:col-span-1">
             <a href="/" className="flex items-center gap-2">
@@ -51,7 +43,7 @@ export function Footer() {
             <p className="mt-4 text-sm leading-relaxed text-white/60">
               AI 기반 방문치료 매칭 &amp; 운영 SaaS 플랫폼
             </p>
-            <p className="mt-2 text-sm text-white/60">주식회사 루미브리즈</p>
+            <p className="mt-2 text-sm text-white/60">주식회사 온케어</p>
           </div>
 
           {/* Link columns */}
