@@ -14,7 +14,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
-  const { signIn, signInWithKakao, isLoading } = useAuthStore();
+  const { signIn, isLoading } = useAuthStore();
   const [naverLoading, setNaverLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -79,12 +79,13 @@ export default function LoginScreen() {
     }
   };
 
-  const handleKakaoLogin = async () => {
+  const handleOAuthLogin = async (provider: 'kakao' | 'google') => {
     setError('');
+    const label = provider === 'kakao' ? '카카오' : '구글';
     try {
       const redirectUrl = Linking.createURL('/');
       const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
-        provider: 'kakao',
+        provider,
         options: {
           skipBrowserRedirect: true,
           redirectTo: redirectUrl,
@@ -92,7 +93,7 @@ export default function LoginScreen() {
       });
 
       if (oauthError || !data.url) {
-        setError('카카오 로그인 요청에 실패했습니다.');
+        setError(`${label} 로그인 요청에 실패했습니다.`);
         return;
       }
 
@@ -112,11 +113,11 @@ export default function LoginScreen() {
           });
           router.replace('/');
         } else {
-          setError('카카오 로그인 인증에 실패했습니다.');
+          setError(`${label} 로그인 인증에 실패했습니다.`);
         }
       }
     } catch {
-      setError('카카오 로그인 중 오류가 발생했습니다.');
+      setError(`${label} 로그인 중 오류가 발생했습니다.`);
     }
   };
 
@@ -199,7 +200,17 @@ export default function LoginScreen() {
           </View>
 
           <TouchableOpacity
-            onPress={handleKakaoLogin}
+            onPress={() => handleOAuthLogin('google')}
+            disabled={isLoading}
+            activeOpacity={0.85}
+            style={styles.googleButton}
+          >
+            <Text style={styles.googleIcon}>G</Text>
+            <Text style={styles.googleButtonText}>구글로 로그인</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => handleOAuthLogin('kakao')}
             disabled={isLoading}
             activeOpacity={0.85}
             style={styles.kakaoButton}
@@ -354,6 +365,27 @@ const styles = StyleSheet.create({
     fontSize: FontSize.caption,
     color: Colors.onSurfaceVariant,
     fontWeight: '500',
+  },
+  googleButton: {
+    height: 56,
+    backgroundColor: Colors.surfaceContainerLowest,
+    borderRadius: Radius.lg,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    borderWidth: 1,
+    borderColor: Colors.outlineVariant + '40',
+  },
+  googleIcon: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#4285F4',
+  },
+  googleButtonText: {
+    fontSize: FontSize.body,
+    fontWeight: '700',
+    color: Colors.onSurface,
   },
   kakaoButton: {
     height: 56,
