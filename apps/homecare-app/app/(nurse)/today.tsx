@@ -9,6 +9,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   Image,
+  Linking,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,6 +19,23 @@ import { useAuthStore } from '@/stores/auth-store';
 import { router } from 'expo-router';
 import { Colors, Spacing, Radius, FontSize, Shadows, TouchTarget } from '@/constants/theme';
 import { getPatientAvatar } from '@/constants/avatars';
+
+// ── 카카오맵 딥링크 네비게이션 ──
+const openNavigation = async (address: string) => {
+  const kakaoMapUrl = `kakaomap://search?q=${encodeURIComponent(address)}`;
+  const webUrl = `https://map.kakao.com/link/search/${encodeURIComponent(address)}`;
+
+  try {
+    const canOpen = await Linking.canOpenURL(kakaoMapUrl);
+    if (canOpen) {
+      await Linking.openURL(kakaoMapUrl);
+    } else {
+      await Linking.openURL(webUrl);
+    }
+  } catch {
+    await Linking.openURL(webUrl);
+  }
+};
 
 // ── 날짜 포맷 ──
 function formatDate(date: Date) {
@@ -214,9 +232,20 @@ export default function TodayScreen() {
               </Text>
             </View>
           </View>
-          <View style={styles.heroVitals}>
-            <VitalChip label="심박" value="72bpm" />
-            <VitalChip label="체온" value="36.5°C" />
+          <View style={styles.heroVitalsRow}>
+            <View style={styles.heroVitals}>
+              <VitalChip label="심박" value="72bpm" />
+              <VitalChip label="체온" value="36.5°C" />
+            </View>
+            {(activeVisit.patient as any)?.address && (
+              <TouchableOpacity
+                style={styles.navButton}
+                activeOpacity={0.8}
+                onPress={() => openNavigation((activeVisit.patient as any).address)}
+              >
+                <Text style={styles.navButtonText}>길찾기</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </LinearGradient>
       ) : (
@@ -308,15 +337,26 @@ export default function TodayScreen() {
                   <Text style={styles.visitDiag}>{visit.patient.primary_diagnosis}</Text>
                 )}
               </View>
-              {visit.status === 'scheduled' && (
-                <TouchableOpacity
-                  style={styles.startButton}
-                  activeOpacity={0.8}
-                  onPress={() => router.push(`/nurse/visit/${visit.id}`)}
-                >
-                  <Text style={styles.startButtonText}>방문시작</Text>
-                </TouchableOpacity>
-              )}
+              <View style={styles.visitActions}>
+                {visit.patient?.address && (
+                  <TouchableOpacity
+                    style={styles.navButtonSmall}
+                    activeOpacity={0.8}
+                    onPress={() => openNavigation(visit.patient.address)}
+                  >
+                    <Text style={styles.navButtonSmallText}>길찾기</Text>
+                  </TouchableOpacity>
+                )}
+                {visit.status === 'scheduled' && (
+                  <TouchableOpacity
+                    style={styles.startButton}
+                    activeOpacity={0.8}
+                    onPress={() => router.push(`/nurse/visit/${visit.id}`)}
+                  >
+                    <Text style={styles.startButtonText}>방문시작</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
           ))
         ) : (
@@ -439,9 +479,25 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.7)',
     marginTop: 2,
   },
+  heroVitalsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   heroVitals: {
     flexDirection: 'row',
     gap: Spacing.sm,
+  },
+  navButton: {
+    backgroundColor: Colors.secondary,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.md,
+  },
+  navButtonText: {
+    fontSize: FontSize.label,
+    fontWeight: '700',
+    color: Colors.onPrimary,
   },
 
   // ── 바이탈 칩 ──
@@ -596,6 +652,22 @@ const styles = StyleSheet.create({
     fontSize: FontSize.label,
     color: Colors.secondary,
     marginTop: 2,
+  },
+  visitActions: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    gap: Spacing.xs,
+  },
+  navButtonSmall: {
+    backgroundColor: Colors.secondary,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: Radius.sm,
+  },
+  navButtonSmallText: {
+    fontSize: FontSize.overline,
+    fontWeight: '700',
+    color: Colors.onPrimary,
   },
   startButton: {
     backgroundColor: Colors.secondary,

@@ -125,7 +125,7 @@ export default function VitalsScreen() {
               </View>
               <View style={styles.inputRow}>
                 <TextInput
-                  style={[styles.vitalInput, st && { borderColor: st.text, borderWidth: 1.5 }]}
+                  style={[styles.vitalInput, st && { backgroundColor: st.bg }]}
                   value={vitals[field.key] ?? ''}
                   onChangeText={(v) => updateVital(field.key, v)}
                   placeholder={field.placeholder}

@@ -214,11 +214,11 @@ const styles = StyleSheet.create({
   },
   checkbox: {
     width: TouchTarget.min, height: TouchTarget.min, borderRadius: Radius.md,
-    borderWidth: 2.5, borderColor: Colors.outlineVariant,
+    backgroundColor: Colors.surfaceContainerHigh,
     justifyContent: 'center', alignItems: 'center', marginRight: Spacing.md,
   },
   checkboxDone: {
-    backgroundColor: Colors.secondary, borderColor: Colors.secondary,
+    backgroundColor: Colors.secondary,
   },
   checkmark: {
     fontSize: FontSize.subtitle, fontWeight: '800', color: Colors.onPrimary,

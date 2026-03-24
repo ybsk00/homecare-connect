@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Image,
+  Linking,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,6 +16,23 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { supabase } from '@/lib/supabase';
 import { Colors, Spacing, Radius, FontSize, Shadows, TouchTarget } from '@/constants/theme';
 import { getPatientAvatar } from '@/constants/avatars';
+
+// -- 카카오맵 딥링크 네비게이션 --
+const openNavigation = async (address: string) => {
+  const kakaoMapUrl = `kakaomap://search?q=${encodeURIComponent(address)}`;
+  const webUrl = `https://map.kakao.com/link/search/${encodeURIComponent(address)}`;
+
+  try {
+    const canOpen = await Linking.canOpenURL(kakaoMapUrl);
+    if (canOpen) {
+      await Linking.openURL(kakaoMapUrl);
+    } else {
+      await Linking.openURL(webUrl);
+    }
+  } catch {
+    await Linking.openURL(webUrl);
+  }
+};
 
 // -- Stepper --
 const STEPS = [
@@ -206,6 +224,15 @@ export default function VisitDetailScreen() {
             </Text>
           </View>
         </View>
+        {patient?.address && (
+          <TouchableOpacity
+            style={styles.navButton}
+            activeOpacity={0.8}
+            onPress={() => openNavigation(patient.address)}
+          >
+            <Text style={styles.navButtonText}>길찾기</Text>
+          </TouchableOpacity>
+        )}
       </LinearGradient>
 
       {/* -- Service Plan -- */}
@@ -314,6 +341,19 @@ const styles = StyleSheet.create({
   patientAddress: { fontSize: FontSize.caption, color: 'rgba(255,255,255,0.7)', marginTop: 2 },
   patientDiag: { fontSize: FontSize.caption, color: 'rgba(255,255,255,0.85)', marginTop: 2 },
 
+  navButton: {
+    backgroundColor: Colors.secondary,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.md,
+    alignItems: 'center',
+    marginTop: Spacing.md,
+  },
+  navButtonText: {
+    fontSize: FontSize.caption,
+    fontWeight: '700',
+    color: Colors.onPrimary,
+  },
   visitMeta: { flexDirection: 'row', gap: Spacing.md },
   metaItem: {
     flex: 1, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: Radius.md,

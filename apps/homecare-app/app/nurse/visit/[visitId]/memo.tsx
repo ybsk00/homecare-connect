@@ -201,7 +201,7 @@ export default function MemoScreen() {
                   key={opt.key}
                   style={[
                     styles.conditionButton,
-                    selected && { backgroundColor: opt.color, borderColor: opt.color },
+                    selected && { backgroundColor: opt.color },
                   ]}
                   onPress={() => setCondition(opt.key)}
                   activeOpacity={0.7}
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   conditionButton: {
     flex: 1, alignItems: 'center', paddingVertical: Spacing.lg,
     borderRadius: Radius.lg, backgroundColor: Colors.surfaceContainerLowest,
-    borderWidth: 2, borderColor: Colors.surfaceContainerHigh, ...Shadows.ambient,
+    ...Shadows.ambient,
   },
   conditionIcon: { fontSize: 32, marginBottom: Spacing.sm },
   conditionLabel: { fontSize: FontSize.caption, fontWeight: '700', color: Colors.onSurfaceVariant },
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     width: 72, height: 72, borderRadius: Radius.md,
     backgroundColor: Colors.surfaceContainerLow,
     justifyContent: 'center', alignItems: 'center',
-    borderWidth: 2, borderColor: Colors.outlineVariant, borderStyle: 'dashed',
+    borderWidth: 2, borderColor: 'rgba(196, 198, 207, 0.2)', borderStyle: 'dashed',
   },
   photoAddIcon: { fontSize: FontSize.title, color: Colors.onSurfaceVariant },
   photoAddText: { fontSize: FontSize.overline, color: Colors.onSurfaceVariant, marginTop: 2 },
