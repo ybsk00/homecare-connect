@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   topBarBrand: {
     fontSize: FontSize.body,
     fontWeight: '700',
-    color: '#fff',
+    color: Colors.onPrimary,
     letterSpacing: -0.3,
   },
   topBarLabel: {
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 30,
     fontWeight: '800',
-    color: '#fff',
+    color: Colors.onPrimary,
     lineHeight: 42,
     letterSpacing: -0.5,
   },
@@ -276,11 +276,11 @@ const styles = StyleSheet.create({
   ctaText: {
     fontSize: FontSize.body,
     fontWeight: '700',
-    color: '#fff',
+    color: Colors.onPrimary,
   },
   ctaArrow: {
     fontSize: 18,
-    color: '#fff',
+    color: Colors.onPrimary,
     fontWeight: '300',
   },
 
@@ -351,7 +351,7 @@ const styles = StyleSheet.create({
   agentCardTitle: {
     fontSize: FontSize.body,
     fontWeight: '700',
-    color: '#fff',
+    color: Colors.onPrimary,
     lineHeight: 22,
   },
 
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
   },
   trustBadgeText: {
     fontSize: 18,
-    color: '#fff',
+    color: Colors.onPrimary,
     fontWeight: '700',
   },
   trustTitle: {

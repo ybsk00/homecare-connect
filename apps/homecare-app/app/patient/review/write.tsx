@@ -95,7 +95,7 @@ export default function ReviewWriteScreen() {
 
     setSubmitting(true);
     try {
-      const { error } = await supabase.from('reviews').insert({
+      const { error } = await (supabase.from('reviews') as any).insert({
         organization_id: selectedOrgId,
         reviewer_id: user?.id,
         rating: overallRating,

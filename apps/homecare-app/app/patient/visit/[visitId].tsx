@@ -39,7 +39,7 @@ export default function VisitDetailScreen() {
         .eq('id', visitId)
         .single();
       if (error) throw error;
-      return data;
+      return data as any;
     },
     enabled: !!visitId,
   });
@@ -55,7 +55,7 @@ export default function VisitDetailScreen() {
         .eq('visit_id', visitId)
         .single();
       if (error) return null;
-      return data;
+      return data as any;
     },
     enabled: !!visitId,
   });

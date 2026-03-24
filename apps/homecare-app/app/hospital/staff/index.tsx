@@ -67,7 +67,7 @@ export default function HospitalStaffList() {
   const inviteMutation = useMutation({
     mutationFn: async () => {
       // 실제로는 초대 이메일 발송 Edge Function 호출
-      const { error } = await supabase.from('staff_invitations').insert({
+      const { error } = await (supabase.from('staff_invitations') as any).insert({
         organization_id: orgId,
         email: inviteEmail,
         role: inviteRole,

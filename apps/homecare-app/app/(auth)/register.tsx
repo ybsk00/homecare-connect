@@ -143,7 +143,7 @@ export default function RegisterScreen() {
                 end={{ x: 1, y: 1 }}
                 style={styles.button}
               >
-                {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>가입하기</Text>}
+                {isLoading ? <ActivityIndicator color={Colors.onPrimary} /> : <Text style={styles.buttonText}>가입하기</Text>}
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
   },
   roleCardActive: { backgroundColor: Colors.primary },
   roleLabel: { fontSize: FontSize.subtitle, fontWeight: '700', color: Colors.onSurface },
-  roleLabelActive: { color: '#fff' },
+  roleLabelActive: { color: Colors.onPrimary },
   roleDesc: { fontSize: FontSize.caption, color: Colors.onSurfaceVariant, marginTop: 4 },
   form: { gap: Spacing.lg },
   input: {
@@ -183,5 +183,5 @@ const styles = StyleSheet.create({
   error: { fontSize: FontSize.caption, color: Colors.error, textAlign: 'center' },
   buttonWrapper: { marginTop: Spacing.md },
   button: { height: 56, borderRadius: Radius.lg, justifyContent: 'center', alignItems: 'center', ...Shadows.float },
-  buttonText: { fontSize: FontSize.body, fontWeight: '700', color: '#fff' },
+  buttonText: { fontSize: FontSize.body, fontWeight: '700', color: Colors.onPrimary },
 });

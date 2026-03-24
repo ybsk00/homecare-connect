@@ -51,7 +51,7 @@ export default function MatchingScreen() {
         .from('service_requests')
         .select('*')
         .eq('patient_id', patientId)
-        .in('status', ['pending', 'matching', 'matched'])
+        .in('status', ['pending', 'matching', 'matched'] as any)
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data ?? [];

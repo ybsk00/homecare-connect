@@ -40,7 +40,7 @@ export default function HospitalRequests() {
         .order('created_at', { ascending: false });
 
       if (statusFilter !== 'all') {
-        query = query.eq('status', statusFilter);
+        query = query.eq('status', statusFilter as any);
       }
 
       const { data } = await query;
@@ -53,7 +53,7 @@ export default function HospitalRequests() {
     mutationFn: async ({ requestId, status }: { requestId: string; status: string }) => {
       const { error } = await supabase
         .from('service_requests')
-        .update({ status })
+        .update({ status } as any)
         .eq('id', requestId);
       if (error) throw error;
     },

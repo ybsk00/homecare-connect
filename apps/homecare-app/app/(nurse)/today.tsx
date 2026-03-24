@@ -255,7 +255,7 @@ export default function TodayScreen() {
             </View>
           </View>
           <View style={styles.agentCardArrow}>
-            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>→</Text>
+            <Text style={{ color: Colors.onPrimary, fontSize: 16, fontWeight: '700' }}>→</Text>
           </View>
         </LinearGradient>
       </TouchableOpacity>
@@ -679,7 +679,7 @@ const styles = StyleSheet.create({
   agentCardTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#fff',
+    color: Colors.onPrimary,
     marginBottom: 2,
   },
   agentCardDesc: {

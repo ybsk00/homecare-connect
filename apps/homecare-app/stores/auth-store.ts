@@ -32,6 +32,7 @@ interface AuthState {
 
   initialize: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
+  signInWithKakao: () => Promise<{ error?: string; url?: string }>;
   signUp: (email: string, password: string, meta: { full_name: string; phone: string; role: UserRole }) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
   fetchProfile: () => Promise<void>;
@@ -75,6 +76,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ isLoading: false });
     if (error) return { error: error.message };
     return {};
+  },
+
+  signInWithKakao: async () => {
+    set({ isLoading: true });
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'kakao',
+      options: {
+        skipBrowserRedirect: true,
+      },
+    });
+    set({ isLoading: false });
+    if (error) return { error: error.message };
+    return { url: data.url };
   },
 
   signUp: async (email, password, meta) => {
@@ -121,7 +135,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         console.log('[Auth] staffInfo:', { staff, staffError });
 
         if (staff) {
-          set({ staffInfo: staff as StaffInfo });
+          set({ staffInfo: staff as unknown as StaffInfo });
         }
       }
     } else {

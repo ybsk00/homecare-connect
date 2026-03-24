@@ -80,7 +80,7 @@ export default function NotificationsScreen() {
   const markAsRead = async (notificationId: string) => {
     await supabase
       .from('notifications')
-      .update({ is_read: true })
+      .update({ is_read: true } as any)
       .eq('id', notificationId);
     queryClient.invalidateQueries({ queryKey: ['notifications'] });
   };

@@ -31,7 +31,7 @@ export default function AdminSubscriptions() {
         .order('created_at', { ascending: false });
 
       if (planFilter !== 'all') {
-        query = query.eq('plan', planFilter);
+        query = query.eq('plan', planFilter as any);
       }
 
       const { data } = await query;

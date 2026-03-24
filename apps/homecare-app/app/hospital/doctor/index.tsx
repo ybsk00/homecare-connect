@@ -39,8 +39,8 @@ export default function HospitalDoctorVisits() {
 
   const saveOpinionMutation = useMutation({
     mutationFn: async ({ visitId, opinion }: { visitId: string; opinion: string }) => {
-      const { error } = await supabase
-        .from('doctor_visits')
+      const { error } = await (supabase
+        .from('doctor_visits') as any)
         .update({ opinion })
         .eq('id', visitId);
       if (error) throw error;

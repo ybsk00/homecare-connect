@@ -5,13 +5,16 @@ import {
 } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
 import { useAuthStore } from '@/stores/auth-store';
+import { supabase } from '@/lib/supabase';
 import { Colors, Spacing, Radius, FontSize, Shadows } from '@/constants/theme';
 import { LinearGradient } from 'expo-linear-gradient';
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
-  const { signIn, isLoading } = useAuthStore();
+  const { signIn, signInWithKakao, isLoading } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -28,6 +31,47 @@ export default function LoginScreen() {
     } else {
       // 로그인 성공 → index로 이동 → 역할별 자동 분기
       router.replace('/');
+    }
+  };
+
+  const handleKakaoLogin = async () => {
+    setError('');
+    try {
+      const redirectUrl = Linking.createURL('/');
+      const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: 'kakao',
+        options: {
+          skipBrowserRedirect: true,
+          redirectTo: redirectUrl,
+        },
+      });
+
+      if (oauthError || !data.url) {
+        setError('카카오 로그인 요청에 실패했습니다.');
+        return;
+      }
+
+      const result = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
+
+      if (result.type === 'success' && result.url) {
+        // URL에서 토큰 파라미터 추출
+        const url = new URL(result.url);
+        const params = new URLSearchParams(url.hash.substring(1));
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+
+        if (accessToken && refreshToken) {
+          await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          router.replace('/');
+        } else {
+          setError('카카오 로그인 인증에 실패했습니다.');
+        }
+      }
+    } catch {
+      setError('카카오 로그인 중 오류가 발생했습니다.');
     }
   };
 
@@ -93,11 +137,30 @@ export default function LoginScreen() {
               style={styles.button}
             >
               {isLoading ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={Colors.onPrimary} />
               ) : (
                 <Text style={styles.buttonText}>로그인</Text>
               )}
             </LinearGradient>
+          </TouchableOpacity>
+        </View>
+
+        {/* 소셜 로그인 */}
+        <View style={styles.socialSection}>
+          <View style={styles.dividerRow}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>또는</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <TouchableOpacity
+            onPress={handleKakaoLogin}
+            disabled={isLoading}
+            activeOpacity={0.85}
+            style={styles.kakaoButton}
+          >
+            <Text style={styles.kakaoIcon}>K</Text>
+            <Text style={styles.kakaoButtonText}>카카오로 로그인</Text>
           </TouchableOpacity>
         </View>
 
@@ -141,7 +204,7 @@ const styles = StyleSheet.create({
   },
   logoEmoji: {
     fontSize: 28,
-    color: '#fff',
+    color: Colors.onPrimary,
     fontWeight: '700',
   },
   logoText: {
@@ -194,7 +257,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: FontSize.body,
     fontWeight: '700',
-    color: '#fff',
+    color: Colors.onPrimary,
   },
   links: {
     flexDirection: 'row',
@@ -211,5 +274,43 @@ const styles = StyleSheet.create({
   linkDivider: {
     fontSize: FontSize.caption,
     color: Colors.outlineVariant,
+  },
+  socialSection: {
+    marginTop: Spacing.xxl,
+    gap: Spacing.lg,
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: Colors.outlineVariant + '40',
+  },
+  dividerText: {
+    fontSize: FontSize.caption,
+    color: Colors.onSurfaceVariant,
+    fontWeight: '500',
+  },
+  kakaoButton: {
+    height: 56,
+    backgroundColor: '#FEE500',
+    borderRadius: Radius.lg,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  kakaoIcon: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#000000',
+  },
+  kakaoButtonText: {
+    fontSize: FontSize.body,
+    fontWeight: '700',
+    color: '#000000',
   },
 });

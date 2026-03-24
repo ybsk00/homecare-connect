@@ -57,7 +57,7 @@ export default function AdminSupportTicketDetail() {
 
   const replyMutation = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from('ticket_replies').insert({
+      const { error } = await (supabase.from('ticket_replies') as any).insert({
         ticket_id: ticketId,
         content: replyText,
         is_admin: true,
@@ -75,8 +75,8 @@ export default function AdminSupportTicketDetail() {
 
   const updateStatusMutation = useMutation({
     mutationFn: async (status: TicketStatus) => {
-      const { error } = await supabase
-        .from('support_tickets')
+      const { error } = await (supabase
+        .from('support_tickets') as any)
         .update({ status })
         .eq('id', ticketId);
       if (error) throw error;

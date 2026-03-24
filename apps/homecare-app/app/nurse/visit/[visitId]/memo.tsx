@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
     borderRadius: 10, backgroundColor: 'rgba(0,0,0,0.6)',
     justifyContent: 'center', alignItems: 'center',
   },
-  photoRemoveText: { fontSize: 10, color: '#FFF', fontWeight: '800' },
+  photoRemoveText: { fontSize: 10, color: Colors.onPrimary, fontWeight: '800' },
   photoAddButton: {
     width: 72, height: 72, borderRadius: Radius.md,
     backgroundColor: Colors.surfaceContainerLow,

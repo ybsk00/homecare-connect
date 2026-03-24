@@ -36,7 +36,7 @@ export default function OrgDetailScreen() {
         .eq('id', orgId)
         .single();
       if (error) throw error;
-      return data;
+      return data as any;
     },
     enabled: !!orgId,
   });

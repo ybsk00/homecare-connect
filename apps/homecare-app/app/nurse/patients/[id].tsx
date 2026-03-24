@@ -50,7 +50,7 @@ export default function PatientDetailScreen() {
         .eq('id', id!)
         .single();
       if (error) throw error;
-      return data;
+      return data as any;
     },
     enabled: !!id,
   });

@@ -86,7 +86,7 @@ export default function MatchingRequestScreen() {
 
     setSubmitting(true);
     try {
-      const { error } = await supabase.from('service_requests').insert({
+      const { error } = await (supabase.from('service_requests') as any).insert({
         patient_id: selectedPatientId,
         guardian_id: userId,
         service_type: selectedServices[0],

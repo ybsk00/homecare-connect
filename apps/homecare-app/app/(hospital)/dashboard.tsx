@@ -25,9 +25,9 @@ export default function HospitalDashboard() {
         .select('status')
         .eq('organization_id', orgId);
 
-      const pending = requests?.filter(r => r.status === 'pending').length ?? 0;
-      const inProgress = requests?.filter(r => r.status === 'approved').length ?? 0;
-      const completed = requests?.filter(r => r.status === 'completed').length ?? 0;
+      const pending = requests?.filter(r => (r.status as any) === 'pending').length ?? 0;
+      const inProgress = requests?.filter(r => (r.status as any) === 'approved').length ?? 0;
+      const completed = requests?.filter(r => (r.status as any) === 'completed').length ?? 0;
 
       return { pending, inProgress, completed };
     },
@@ -69,7 +69,7 @@ export default function HospitalDashboard() {
           patient:patients!inner(id, user:profiles!inner(full_name))
         `)
         .eq('organization_id', orgId)
-        .eq('status', 'pending')
+        .eq('status', 'pending' as any)
         .order('created_at', { ascending: false })
         .limit(5);
 
@@ -112,7 +112,7 @@ export default function HospitalDashboard() {
   const handleApprove = async (requestId: string) => {
     await supabase
       .from('service_requests')
-      .update({ status: 'approved' })
+      .update({ status: 'approved' } as any)
       .eq('id', requestId);
     refetchRequests();
     refetchStats();
@@ -121,7 +121,7 @@ export default function HospitalDashboard() {
   const handleReject = async (requestId: string) => {
     await supabase
       .from('service_requests')
-      .update({ status: 'rejected' })
+      .update({ status: 'rejected' } as any)
       .eq('id', requestId);
     refetchRequests();
     refetchStats();
@@ -246,7 +246,7 @@ export default function HospitalDashboard() {
               </View>
             </View>
             <View style={styles.agentCardArrow}>
-              <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>→</Text>
+              <Text style={{ color: Colors.onPrimary, fontSize: 16, fontWeight: '700' }}>→</Text>
             </View>
           </LinearGradient>
         </TouchableOpacity>
@@ -546,7 +546,7 @@ const styles = StyleSheet.create({
   agentCardTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#fff',
+    color: Colors.onPrimary,
     marginBottom: 2,
   },
   agentCardDesc: {

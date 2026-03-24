@@ -65,8 +65,8 @@ export default function PatientRegisterScreen() {
         ? parseInt(careLevel.replace(/[^0-9]/g, '')) || null
         : null;
 
-      const { data: patient, error: patientError } = await supabase
-        .from('patients')
+      const { data: patient, error: patientError } = await (supabase
+        .from('patients') as any)
         .insert({
           name: name.trim(),
           birth_date: birthDate || null,

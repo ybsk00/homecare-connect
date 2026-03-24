@@ -14,6 +14,27 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const handleKakaoLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const supabase = createBrowserSupabaseClient();
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: 'kakao',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (oauthError) {
+        setError('카카오 로그인 요청에 실패했습니다.');
+      }
+    } catch {
+      setError('카카오 로그인 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -162,7 +183,27 @@ export default function LoginPage() {
         </Button>
       </form>
 
-      <div className="mt-8 text-center">
+      {/* 소셜 로그인 */}
+      <div className="mt-8">
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1 bg-on-surface-variant/10" />
+          <span className="text-xs font-medium text-on-surface-variant">또는</span>
+          <div className="h-px flex-1 bg-on-surface-variant/10" />
+        </div>
+
+        <button
+          type="button"
+          onClick={handleKakaoLogin}
+          disabled={loading}
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold text-black transition-opacity hover:opacity-90 disabled:opacity-50"
+          style={{ backgroundColor: '#FEE500' }}
+        >
+          <span className="text-base font-extrabold">K</span>
+          카카오로 로그인
+        </button>
+      </div>
+
+      <div className="mt-6 text-center">
         <p className="text-sm text-on-surface-variant">
           계정이 없으신가요?{' '}
           <Link

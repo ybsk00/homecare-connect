@@ -96,7 +96,7 @@ export default function PatientHomeScreen() {
         .from('visits')
         .select('id, scheduled_date, scheduled_time, status, visit_type, nurse:staff(user:profiles(full_name))')
         .eq('patient_id', patientId)
-        .in('status', ['completed', 'confirmed', 'scheduled'])
+        .in('status', ['completed', 'confirmed', 'scheduled'] as any)
         .order('scheduled_date', { ascending: false })
         .limit(5);
       if (error) throw error;
@@ -223,7 +223,7 @@ export default function PatientHomeScreen() {
                   {(nextVisit as any)?.nurse?.user?.full_name ?? '간호사 배정중'}
                 </Text>
                 <Text style={styles.nextVisitType}>
-                  {nextVisit.visit_type === 'regular' ? '정기 방문' : '특별 방문'}
+                  {(nextVisit as any).visit_type === 'regular' ? '정기 방문' : '특별 방문'}
                 </Text>
               </View>
               <View style={styles.nextVisitRight}>
@@ -314,7 +314,7 @@ export default function PatientHomeScreen() {
               </View>
             </View>
             <View style={styles.agentCardArrow}>
-              <Text style={{ color: '#fff', fontSize: 20 }}>→</Text>
+              <Text style={{ color: Colors.onPrimary, fontSize: 20 }}>→</Text>
             </View>
           </LinearGradient>
         </TouchableOpacity>
@@ -704,7 +704,7 @@ const styles = StyleSheet.create({
   agentCardTitle: {
     fontSize: FontSize.body,
     fontWeight: '700',
-    color: '#fff',
+    color: Colors.onPrimary,
     marginBottom: 2,
   },
   agentCardDesc: {

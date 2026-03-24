@@ -24,7 +24,7 @@ export default function AIReportDetailScreen() {
         .eq('id', reportId)
         .single();
       if (error) throw error;
-      return data;
+      return data as any;
     },
     enabled: !!reportId,
   });

@@ -36,7 +36,7 @@ export default function PatientProfileScreen() {
         .eq('id', patientId)
         .single();
       if (error) throw error;
-      return data;
+      return data as any;
     },
     enabled: !!patientId,
   });
@@ -70,7 +70,7 @@ export default function PatientProfileScreen() {
         .order('scheduled_date', { ascending: false })
         .limit(5);
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as any[];
     },
     enabled: !!patientId,
   });
@@ -88,7 +88,7 @@ export default function PatientProfileScreen() {
         .order('created_at', { ascending: false })
         .limit(1);
       if (error) throw error;
-      return data?.[0] ?? null;
+      return (data?.[0] ?? null) as any;
     },
     enabled: !!patientId,
   });

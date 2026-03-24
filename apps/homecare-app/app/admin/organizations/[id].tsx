@@ -54,7 +54,7 @@ export default function AdminOrganizationDetail() {
     mutationFn: async (status: string) => {
       const { error } = await supabase
         .from('organizations')
-        .update({ status })
+        .update({ status } as any)
         .eq('id', id);
       if (error) throw error;
     },
