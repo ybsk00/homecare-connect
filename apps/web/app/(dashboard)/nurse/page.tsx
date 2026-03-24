@@ -177,6 +177,45 @@ export default function NurseDashboardPage() {
 
   return (
     <div className="space-y-8 pb-8">
+      {/* ── AI 어시스턴트 히어로 카드 ── */}
+      <section
+        className="rounded-3xl bg-gradient-to-br from-primary to-[#001a3a] p-8 md:p-10 shadow-2xl shadow-primary/20 min-h-[180px] relative overflow-hidden cursor-pointer group"
+        onClick={() => router.push('/nurse/agent')}
+      >
+        <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 h-full">
+          {/* 좌측: 텍스트 + CTA */}
+          <div className="flex-1">
+            <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight mb-2">
+              AI 업무 어시스턴트
+            </h2>
+            <p className="text-white/80 text-sm md:text-base leading-relaxed mb-6">
+              오늘 브리핑, 환자 요약, 주의사항을 바로 확인하세요
+            </p>
+            <span className="inline-flex items-center gap-2 bg-white text-primary font-bold text-sm px-6 py-3 rounded-xl shadow-lg group-hover:shadow-xl transition-shadow">
+              브리핑 시작하기
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </span>
+          </div>
+
+          {/* 우측: 기능 칩 */}
+          <div className="flex flex-row md:flex-col gap-3">
+            <div className="flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white text-sm font-semibold px-4 py-2.5 rounded-xl">
+              <span className="text-lg">📋</span> 오늘 브리핑
+            </div>
+            <div className="flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white text-sm font-semibold px-4 py-2.5 rounded-xl">
+              <span className="text-lg">👤</span> 환자 요약
+            </div>
+            <div className="flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white text-sm font-semibold px-4 py-2.5 rounded-xl">
+              <span className="text-lg">⚠️</span> 주의 환자
+            </div>
+          </div>
+        </div>
+
+        {/* 배경 장식 */}
+        <div className="absolute -right-16 -bottom-16 w-72 h-72 bg-white/5 rounded-full blur-3xl" />
+        <div className="absolute -left-10 -top-10 w-40 h-40 bg-white/5 rounded-full blur-2xl" />
+      </section>
+
       {/* ── 헤더: Editorial 스타일 ── */}
       <header className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>

@@ -162,6 +162,21 @@ export default function HospitalDashboard() {
         <Text style={styles.subtitle}>기관 관리 대시보드</Text>
       </View>
 
+      {/* AI 에이전트 안내 배너 */}
+      <View style={styles.aiBannerContainer}>
+        <LinearGradient
+          colors={[Colors.secondary, '#004D47']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.aiBanner}
+        >
+          <Text style={styles.aiBannerIcon}>🤖</Text>
+          <Text style={styles.aiBannerText}>
+            AI가 환자 매칭과 레드플래그 감지를 자동으로 처리합니다
+          </Text>
+        </LinearGradient>
+      </View>
+
       {/* StatCard 3개 */}
       <View style={styles.statsRow}>
         <View style={[styles.statCard, { backgroundColor: Colors.redFlag.yellow.bg }]}>
@@ -348,6 +363,27 @@ const styles = StyleSheet.create({
     fontSize: FontSize.caption,
     color: Colors.onSurfaceVariant,
     marginTop: Spacing.xs,
+  },
+  aiBannerContainer: {
+    paddingHorizontal: Spacing.xl,
+    marginBottom: Spacing.xl,
+  },
+  aiBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: Spacing.lg,
+    borderRadius: Radius.lg,
+    gap: Spacing.md,
+  },
+  aiBannerIcon: {
+    fontSize: 20,
+  },
+  aiBannerText: {
+    fontSize: FontSize.caption,
+    fontWeight: '600',
+    color: Colors.onPrimary,
+    flex: 1,
+    lineHeight: 20,
   },
   statsRow: {
     flexDirection: 'row',

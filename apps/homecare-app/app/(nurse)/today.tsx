@@ -51,6 +51,37 @@ function getToday() {
   return d.toISOString().split('T')[0];
 }
 
+// ── AI 활성 펄스 인디케이터 ──
+function AgentPulseDot() {
+  const pulse = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulse, { toValue: 1.8, duration: 900, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 1, duration: 900, useNativeDriver: true }),
+      ]),
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [pulse]);
+
+  return (
+    <View style={styles.agentPulseContainer}>
+      <Animated.View
+        style={[
+          styles.agentPulseOuter,
+          {
+            transform: [{ scale: pulse }],
+            opacity: pulse.interpolate({ inputRange: [1, 1.8], outputRange: [0.5, 0] }),
+          },
+        ]}
+      />
+      <View style={styles.agentPulseDotInner} />
+    </View>
+  );
+}
+
 // ── LIVE 펄스 인디케이터 ──
 function PulseDot() {
   const pulse = useRef(new Animated.Value(1)).current;
@@ -254,6 +285,48 @@ export default function TodayScreen() {
         </View>
       )}
 
+      {/* ── AI 어시스턴트 카드 (최상단) ── */}
+      <TouchableOpacity activeOpacity={0.85} onPress={() => router.push('/nurse/agent')} style={styles.agentCard}>
+        <LinearGradient
+          colors={[Colors.primary, '#001a3a']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.agentCardGradient}
+        >
+          <View style={styles.agentCardLeft}>
+            <View style={styles.agentCardIcon}>
+              <Text style={{ fontSize: 36 }}>🩺</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <View style={styles.agentCardTitleRow}>
+                <Text style={styles.agentCardTitle}>AI 어시스턴트</Text>
+                <View style={styles.agentActiveBadge}>
+                  <AgentPulseDot />
+                  <Text style={styles.agentActiveText}>AI 활성</Text>
+                </View>
+              </View>
+              <Text style={styles.agentCardDesc}>
+                오늘 브리핑, 환자 요약, 주의사항을 음성으로 바로 확인하세요
+              </Text>
+              <View style={styles.agentChipRow}>
+                <View style={styles.agentChip}>
+                  <Text style={styles.agentChipText}>📋 브리핑</Text>
+                </View>
+                <View style={styles.agentChip}>
+                  <Text style={styles.agentChipText}>👤 환자</Text>
+                </View>
+                <View style={styles.agentChip}>
+                  <Text style={styles.agentChipText}>⚠️ 주의</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+          <View style={styles.agentCardArrow}>
+            <Text style={{ color: Colors.onPrimary, fontSize: 20, fontWeight: '700' }}>→</Text>
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
+
       {/* ── 통계 카드 ── */}
       <View style={styles.statsRow}>
         <View style={styles.statCard}>
@@ -265,29 +338,6 @@ export default function TodayScreen() {
           <Text style={styles.statLabel}>예상 시간</Text>
         </View>
       </View>
-
-      {/* ── AI 어시스턴트 카드 ── */}
-      <TouchableOpacity activeOpacity={0.85} onPress={() => router.push('/nurse/agent')} style={styles.agentCard}>
-        <LinearGradient
-          colors={[Colors.primary, '#001a3a']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.agentCardGradient}
-        >
-          <View style={styles.agentCardLeft}>
-            <View style={styles.agentCardIcon}>
-              <Text style={{ fontSize: 22 }}>🩺</Text>
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.agentCardTitle}>AI 어시스턴트</Text>
-              <Text style={styles.agentCardDesc}>오늘 브리핑, 다음 환자, 주의사항을 음성으로 확인하세요</Text>
-            </View>
-          </View>
-          <View style={styles.agentCardArrow}>
-            <Text style={{ color: Colors.onPrimary, fontSize: 16, fontWeight: '700' }}>→</Text>
-          </View>
-        </LinearGradient>
-      </TouchableOpacity>
 
       {/* ── 레드플래그 ── */}
       {alerts && alerts.length > 0 && (
@@ -719,54 +769,106 @@ const styles = StyleSheet.create({
 
   // ── AI 에이전트 카드 ──
   agentCard: {
-    borderRadius: 24,
+    borderRadius: Radius.xl,
     overflow: 'hidden',
-    shadowColor: '#002045',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    elevation: 5,
+    marginBottom: Spacing.xl,
+    ...Shadows.hero,
   },
   agentCardGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 24,
-    minHeight: 88,
+    padding: Spacing.xl,
+    minHeight: 140,
   },
   agentCardLeft: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
+    alignItems: 'flex-start',
+    gap: Spacing.lg,
     flex: 1,
   },
   agentCardIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
+    width: 64,
+    height: 64,
+    borderRadius: Radius.lg,
     backgroundColor: 'rgba(255,255,255,0.15)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  agentCardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
   },
   agentCardTitle: {
-    fontSize: 16,
+    fontSize: FontSize.subtitle,
     fontWeight: '700',
     color: Colors.onPrimary,
-    marginBottom: 2,
   },
   agentCardDesc: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.7)',
-    lineHeight: 17,
+    fontSize: FontSize.label,
+    color: 'rgba(255,255,255,0.75)',
+    lineHeight: 18,
+    marginBottom: Spacing.md,
   },
   agentCardArrow: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: 'rgba(255,255,255,0.15)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 12,
+    marginLeft: Spacing.md,
+  },
+  agentActiveBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 3,
+    borderRadius: Radius.sm,
+  },
+  agentActiveText: {
+    fontSize: FontSize.overline,
+    fontWeight: '700',
+    color: '#4ADE80',
+  },
+  agentChipRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  agentChip: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    borderRadius: Radius.lg,
+  },
+  agentChipText: {
+    fontSize: FontSize.label,
+    color: Colors.onPrimary,
+    fontWeight: '600',
+  },
+  // 에이전트 펄스 인디케이터
+  agentPulseContainer: {
+    width: 10,
+    height: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  agentPulseOuter: {
+    position: 'absolute',
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#4ADE80',
+  },
+  agentPulseDotInner: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#4ADE80',
   },
 
   // ── 펄스 ──

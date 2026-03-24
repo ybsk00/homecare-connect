@@ -1,6 +1,6 @@
 'use client';
 
-import { Brain, Activity, ShieldCheck } from 'lucide-react';
+import { Brain, Activity, ShieldCheck, Mic, Bell, AlertTriangle, BookOpen } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 const features = [
@@ -65,8 +65,80 @@ export function FeatureCards() {
           </p>
         </div>
 
+        {/* AI Agent Hero Section */}
+        <div
+          className={`mt-14 rounded-3xl bg-gradient-to-br from-secondary to-[#004D47] p-8 md:p-12 shadow-2xl shadow-secondary/20 relative overflow-hidden transition-all duration-800 ease-out ${
+            visible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
+          }`}
+          style={{ transitionDelay: visible ? '200ms' : '0ms' }}
+        >
+          <div className="relative z-10 flex flex-col lg:flex-row gap-10 lg:gap-16">
+            {/* 좌측: 채팅 UI 미리보기 */}
+            <div className="flex-1 max-w-md">
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 space-y-4">
+                {/* AI 말풍선 */}
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                    <Brain className="h-4 w-4 text-white" />
+                  </div>
+                  <div className="bg-white/15 rounded-2xl rounded-tl-sm px-4 py-3 text-white text-sm leading-relaxed">
+                    안녕하세요! 오늘 오후 2시에 방문 간호 일정이 있어요. 약 복용은 잘 하고 계신가요?
+                  </div>
+                </div>
+                {/* 사용자 말풍선 */}
+                <div className="flex items-start gap-3 justify-end">
+                  <div className="bg-white rounded-2xl rounded-tr-sm px-4 py-3 text-secondary text-sm font-medium leading-relaxed">
+                    아침 약은 먹었는데 점심 약을 깜빡했어요
+                  </div>
+                </div>
+                {/* AI 답변 말풍선 */}
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                    <Brain className="h-4 w-4 text-white" />
+                  </div>
+                  <div className="bg-white/15 rounded-2xl rounded-tl-sm px-4 py-3 text-white text-sm leading-relaxed">
+                    지금이라도 점심 약을 드시는 게 좋겠어요. 저녁 약과 2시간 이상 간격을 두세요. 알림을 설정해 드릴까요?
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 우측: 기능 설명 리스트 */}
+            <div className="flex-1 flex flex-col justify-center">
+              <h3 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight mb-2">
+                AI 에이전트와 대화하세요
+              </h3>
+              <p className="text-white/70 text-sm mb-8">
+                홈케어커넥트의 AI가 24시간 건강을 돌봅니다
+              </p>
+              <div className="space-y-5">
+                {[
+                  { icon: Mic, label: '음성으로 대화하세요', desc: 'STT/TTS 지원으로 편하게 말로 소통' },
+                  { icon: Bell, label: '복약 시간을 관리해드려요', desc: '자동 알림과 미복약 시 간호사 연계' },
+                  { icon: AlertTriangle, label: '건강 이상을 감지해요', desc: '바이탈 분석 기반 레드플래그 자동 알림' },
+                  { icon: BookOpen, label: '맞춤 건강 정보 제공', desc: 'RAG 기반 1,800+ FAQ에서 즉시 답변' },
+                ].map(({ icon: Icon, label, desc }) => (
+                  <div key={label} className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+                      <Icon className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-white font-bold text-sm">{label}</p>
+                      <p className="text-white/60 text-xs mt-0.5">{desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 배경 장식 */}
+          <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
+          <div className="absolute -left-10 -top-10 w-48 h-48 bg-white/5 rounded-full blur-2xl" />
+        </div>
+
         {/* Cards */}
-        <div className="mt-14 grid gap-6 md:grid-cols-3 lg:gap-8">
+        <div className="mt-10 grid gap-6 md:grid-cols-3 lg:gap-8">
           {features.map((feature, i) => (
             <div
               key={feature.title}
