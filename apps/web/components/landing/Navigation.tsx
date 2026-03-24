@@ -5,9 +5,9 @@ import { HeartPulse, Menu, X } from 'lucide-react';
 import clsx from 'clsx';
 
 const navLinks = [
-  { label: '서비스', href: '#hero' },
-  { label: '기능', href: '#features' },
-  { label: '기관 안내', href: '#institutions' },
+  { label: '서비스', href: '#why-homecare' },
+  { label: '에이전트', href: '#agents' },
+  { label: '이용방법', href: '#how-it-works' },
   { label: '문의', href: '#contact' },
 ];
 
