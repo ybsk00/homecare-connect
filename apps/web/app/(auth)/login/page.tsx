@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createBrowserSupabaseClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
@@ -9,10 +9,31 @@ import { Mail, Lock } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // 네이버 OAuth 콜백 에러 처리
+  useEffect(() => {
+    const errorParam = searchParams.get('error');
+    if (errorParam) {
+      const errorMessages: Record<string, string> = {
+        naver_config: '네이버 로그인 설정이 올바르지 않습니다.',
+        naver_missing_params: '네이버 인증 파라미터가 누락되었습니다.',
+        naver_invalid_state: '네이버 인증 상태가 유효하지 않습니다. 다시 시도해주세요.',
+        naver_token_failed: '네이버 인증 토큰 교환에 실패했습니다.',
+        naver_profile_failed: '네이버 프로필 조회에 실패했습니다.',
+        naver_no_email: '네이버 계정에 이메일이 없습니다. 이메일 제공에 동의해주세요.',
+        naver_create_user_failed: '네이버 계정으로 회원가입에 실패했습니다.',
+        naver_signin_failed: '네이버 로그인 세션 생성에 실패했습니다.',
+        naver_server_error: '네이버 로그인 중 서버 오류가 발생했습니다.',
+        server_config: '서버 설정 오류입니다. 관리자에게 문의하세요.',
+      };
+      setError(errorMessages[errorParam] || '로그인 중 오류가 발생했습니다.');
+    }
+  }, [searchParams]);
 
   const handleKakaoLogin = async () => {
     setError('');
@@ -200,6 +221,17 @@ export default function LoginPage() {
         >
           <span className="text-base font-extrabold">K</span>
           카카오로 로그인
+        </button>
+
+        <button
+          type="button"
+          onClick={() => { window.location.href = '/api/auth/naver'; }}
+          disabled={loading}
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+          style={{ backgroundColor: '#03C75A' }}
+        >
+          <span className="text-base font-extrabold">N</span>
+          네이버로 로그인
         </button>
       </div>
 

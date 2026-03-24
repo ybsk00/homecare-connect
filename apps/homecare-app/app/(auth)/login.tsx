@@ -15,6 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const { signIn, signInWithKakao, isLoading } = useAuthStore();
+  const [naverLoading, setNaverLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -31,6 +32,50 @@ export default function LoginScreen() {
     } else {
       // 로그인 성공 → index로 이동 → 역할별 자동 분기
       router.replace('/');
+    }
+  };
+
+  const handleNaverLogin = async () => {
+    setError('');
+    setNaverLoading(true);
+    try {
+      // 웹앱의 네이버 OAuth API Route를 통해 인증 시작
+      const webBaseUrl = process.env.EXPO_PUBLIC_WEB_URL || 'https://hospital-web--homecare-connect-ce904.asia-east1.hosted.app';
+      const naverAuthUrl = `${webBaseUrl}/api/auth/naver`;
+      const callbackUrl = Linking.createURL('/');
+
+      const result = await WebBrowser.openAuthSessionAsync(
+        naverAuthUrl,
+        callbackUrl
+      );
+
+      if (result.type === 'success' && result.url) {
+        // 콜백 URL에서 세션 토큰 추출
+        const url = new URL(result.url);
+        const params = new URLSearchParams(url.hash.substring(1));
+        const accessToken = params.get('access_token');
+        const refreshToken = params.get('refresh_token');
+
+        if (accessToken && refreshToken) {
+          await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          router.replace('/');
+        } else {
+          // 웹 콜백에서 리다이렉트된 경우 — 세션 확인
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            router.replace('/');
+          } else {
+            setError('네이버 로그인 인증에 실패했습니다.');
+          }
+        }
+      }
+    } catch {
+      setError('네이버 로그인 중 오류가 발생했습니다.');
+    } finally {
+      setNaverLoading(false);
     }
   };
 
@@ -161,6 +206,22 @@ export default function LoginScreen() {
           >
             <Text style={styles.kakaoIcon}>K</Text>
             <Text style={styles.kakaoButtonText}>카카오로 로그인</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleNaverLogin}
+            disabled={isLoading || naverLoading}
+            activeOpacity={0.85}
+            style={styles.naverButton}
+          >
+            {naverLoading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <>
+                <Text style={styles.naverIcon}>N</Text>
+                <Text style={styles.naverButtonText}>네이버로 로그인</Text>
+              </>
+            )}
           </TouchableOpacity>
         </View>
 
@@ -312,5 +373,24 @@ const styles = StyleSheet.create({
     fontSize: FontSize.body,
     fontWeight: '700',
     color: '#000000',
+  },
+  naverButton: {
+    height: 56,
+    backgroundColor: '#03C75A',
+    borderRadius: Radius.lg,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  naverIcon: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#FFFFFF',
+  },
+  naverButtonText: {
+    fontSize: FontSize.body,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 });
