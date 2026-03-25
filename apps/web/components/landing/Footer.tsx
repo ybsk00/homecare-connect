@@ -1,5 +1,3 @@
-import { HeartPulse } from 'lucide-react';
-
 const linkGroups = [
   {
     title: '서비스',
@@ -29,27 +27,24 @@ const linkGroups = [
 
 export function Footer() {
   return (
-    <footer id="contact" className="bg-primary py-16 text-white/80">
-      <div className="mx-auto max-w-7xl px-6">
+    <footer id="contact" className="bg-surface-container-low py-16">
+      <div className="mx-auto max-w-7xl px-8">
         <div className="grid gap-12 md:grid-cols-4">
           {/* Brand */}
           <div className="md:col-span-1">
-            <a href="/" className="flex items-center gap-2">
-              <HeartPulse className="h-6 w-6 text-secondary-container" />
-              <span className="text-base font-bold text-white">
-                HomeCare Connect
-              </span>
+            <a href="/" className="text-lg font-bold tracking-tighter text-primary font-headline">
+              HomeCare Connect
             </a>
-            <p className="mt-4 text-sm leading-relaxed text-white/60">
+            <p className="mt-4 text-sm leading-relaxed text-on-surface/80 font-body">
               AI 기반 방문치료 매칭 &amp; 운영 SaaS 플랫폼
             </p>
-            <p className="mt-2 text-sm text-white/60">주식회사 온케어</p>
+            <p className="mt-2 text-sm text-on-surface/80 font-body">주식회사 온케어</p>
           </div>
 
           {/* Link columns */}
           {linkGroups.map((group) => (
             <div key={group.title}>
-              <h4 className="text-sm font-semibold text-white">
+              <h4 className="text-sm font-semibold text-on-surface font-headline">
                 {group.title}
               </h4>
               <ul className="mt-4 space-y-3">
@@ -57,7 +52,7 @@ export function Footer() {
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="text-sm text-white/60 transition-colors hover:text-white"
+                      className="text-sm text-on-surface/60 transition-colors hover:text-on-surface hover:underline decoration-secondary underline-offset-4 font-body"
                     >
                       {link.label}
                     </a>
@@ -69,9 +64,9 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-14 border-t border-white/10 pt-8">
-          <p className="text-center text-sm text-white/40">
-            &copy; 2024 HomeCare Connect. All Rights Reserved.
+        <div className="mt-14 border-t border-outline-variant/15 pt-8">
+          <p className="text-center text-sm text-on-surface/40 font-body">
+            &copy; 2026 HomeCare Connect. AI-Driven Empathetic Care.
           </p>
         </div>
       </div>

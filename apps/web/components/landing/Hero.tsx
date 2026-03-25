@@ -1,39 +1,7 @@
 'use client';
 
-import { ArrowRight, Heart, Droplets, Thermometer, Activity } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-
-function VitalCard({
-  icon: Icon,
-  label,
-  value,
-  unit,
-  color,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  value: string;
-  unit: string;
-  color: string;
-}) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${color}`}>
-        <Icon className="h-5 w-5 text-white" />
-      </div>
-      <div>
-        <p className="text-xs text-on-surface-variant">{label}</p>
-        <p className="text-sm font-bold text-on-surface">
-          {value}
-          <span className="ml-1 text-xs font-normal text-on-surface-variant">
-            {unit}
-          </span>
-        </p>
-      </div>
-    </div>
-  );
-}
 
 export function Hero() {
   const [mounted, setMounted] = useState(false);
@@ -53,177 +21,138 @@ export function Hero() {
         <div className="absolute -bottom-40 -left-40 h-[400px] w-[400px] rounded-full bg-primary/5 blur-3xl" />
       </div>
 
-      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-6 lg:grid-cols-2 lg:gap-16">
+      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-8 lg:grid-cols-12 lg:gap-16">
         {/* Left: Text content */}
         <div
-          className={`max-w-xl transition-all duration-1000 ease-out ${
+          className={`lg:col-span-6 space-y-8 transition-all duration-1000 ease-out ${
             mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}
         >
           {/* Badge */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-secondary/10 px-4 py-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-secondary" />
-            <span className="text-xs font-semibold tracking-widest text-secondary uppercase">
+          <div className="inline-flex items-center gap-2 rounded-full bg-secondary/10 px-4 py-1.5">
+            <span className="material-symbols-outlined text-secondary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
+              verified_user
+            </span>
+            <span className="text-secondary font-semibold text-sm tracking-wide uppercase font-headline">
               Trust & Authority
             </span>
           </div>
 
           {/* Heading */}
-          <h1 className="text-4xl leading-tight font-bold tracking-tight text-primary lg:text-5xl lg:leading-tight">
-            가족을 위한
-            <br />
-            가장 따뜻한 기술,
-            <br />
-            <span className="text-secondary">홈케어커넥트</span>
-          </h1>
+          <div className="space-y-4">
+            <h1 className="font-headline text-5xl leading-[1.15] font-extrabold tracking-tight text-primary lg:text-6xl">
+              가족을 위한
+              <br />
+              가장 따뜻한 기술,
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary to-secondary">
+                홈케어커넥트
+              </span>
+            </h1>
 
-          {/* Subtitle */}
-          <p className="mt-6 text-lg leading-relaxed text-on-surface-variant">
-            AI 기반 방문간호 매칭부터 실시간 건강 모니터링까지,
-            <br className="hidden sm:block" />
-            더 이상 걱정하지 마세요. 전문적인 케어를 경험하세요.
-          </p>
+            {/* Subtitle */}
+            <p className="text-lg leading-relaxed text-on-surface-variant max-w-xl font-body md:text-xl">
+              AI 기반 방문간호 매칭부터 실시간 건강 모니터링까지,
+              <br className="hidden sm:block" />
+              이제 집에서도 전문적인 케어를 경험하세요.
+            </p>
+          </div>
 
           {/* CTA buttons */}
-          <div className="mt-8 flex flex-wrap gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <a
               href="/login"
-              className="btn-gradient inline-flex items-center gap-2 rounded-2xl px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-primary/20 transition-all hover:opacity-90 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
+              className="btn-gradient inline-flex items-center justify-center gap-2 rounded-lg px-8 py-4 text-lg font-bold text-white shadow-lg shadow-primary/20 transition-all hover:shadow-2xl hover:-translate-y-0.5 group"
             >
               지금 서비스 신청하기
-              <ArrowRight className="h-4 w-4" />
+              <span className="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">
+                arrow_forward
+              </span>
             </a>
             <a
               href="/login"
-              className="inline-flex items-center gap-2 rounded-2xl border border-secondary px-7 py-3.5 text-base font-semibold text-secondary transition-all hover:bg-secondary/5 hover:-translate-y-0.5"
+              className="inline-flex items-center justify-center gap-2 bg-secondary-container rounded-lg px-8 py-4 text-lg font-bold text-on-secondary-container transition-colors hover:bg-secondary/10"
             >
-              AI 내담 체험하기
+              AI 매칭 체험하기
+              <span className="material-symbols-outlined text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                auto_awesome
+              </span>
             </a>
           </div>
 
           {/* Social proof */}
-          <div className="mt-10 flex items-center gap-3">
-            <div className="flex -space-x-2">
-              {[
-                'bg-primary/80',
-                'bg-secondary/80',
-                'bg-primary-container',
-                'bg-secondary',
-              ].map((bg, i) => (
+          <div className="pt-8 border-t border-outline-variant/20 flex items-center gap-6">
+            <div className="flex -space-x-3">
+              {['local_hospital', 'medical_services', 'health_metrics'].map((icon, i) => (
                 <div
                   key={i}
-                  className={`flex h-8 w-8 items-center justify-center rounded-full ${bg} ring-2 ring-surface text-xs font-bold text-white`}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-high ring-2 ring-surface"
                 >
-                  {['K', 'J', 'L', 'P'][i]}
+                  <span className="material-symbols-outlined text-sm text-primary">
+                    {icon}
+                  </span>
                 </div>
               ))}
             </div>
-            <p className="text-sm text-on-surface-variant">
-              <span className="font-bold text-on-surface">2,000명 이상</span>의
-              보호자가 신뢰합니다
+            <p className="text-sm font-medium text-on-surface-variant">
+              <span className="font-bold text-primary">2,000개 이상의</span> 의료기관과 함께합니다
             </p>
           </div>
         </div>
 
         {/* Right: Visual with hero image */}
         <div
-          className={`relative flex items-center justify-center lg:justify-end transition-all duration-1000 delay-300 ease-out ${
+          className={`lg:col-span-6 relative transition-all duration-1000 delay-300 ease-out ${
             mounted ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
           }`}
         >
           {/* Main hero image */}
-          <div className="relative h-[420px] w-full max-w-md overflow-hidden rounded-3xl shadow-2xl shadow-primary/10 lg:h-[500px]">
+          <div className="relative rounded-lg overflow-hidden shadow-2xl">
             <Image
-              src="/images/hero.jpg"
-              alt="방문간호 서비스"
-              fill
-              className="object-cover"
+              src="/images/hero-care.jpg"
+              alt="방문간호 서비스 - 따뜻한 돌봄"
+              width={800}
+              height={1000}
+              className="w-full aspect-[4/5] object-cover"
               priority
             />
-            {/* Soft gradient overlay at bottom */}
-            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/20 to-transparent" />
-          </div>
 
-          {/* Floating glassmorphism vitals card - bottom right, not overlapping image too much */}
-          <div
-            className={`glass absolute -right-4 bottom-8 w-64 rounded-2xl p-5 shadow-xl transition-all duration-1000 delay-700 ease-out lg:right-[-2rem] lg:bottom-12 ${
-              mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-            }`}
-            style={{ animation: mounted ? 'float 6s ease-in-out infinite' : 'none' }}
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-sm font-bold text-primary">건강 지표</h3>
-              <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold text-green-700">
-                정상
+            {/* Floating glassmorphism health summary card */}
+            <div
+              className={`glass absolute bottom-8 left-8 right-8 rounded-lg p-6 shadow-xl border border-white/20 transition-all duration-1000 delay-700 ease-out ${
+                mounted ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+              }`}
+            >
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-sm font-bold text-primary font-headline">오늘의 건강 요약</span>
+                <span className="flex h-2 w-2 rounded-full bg-secondary animate-pulse" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-xs text-on-surface-variant font-medium">실시간 맥박</p>
+                  <p className="text-xl font-bold text-primary">72 <span className="text-xs font-normal">bpm</span></p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-on-surface-variant font-medium">활동량</p>
+                  <p className="text-xl font-bold text-secondary">85 <span className="text-xs font-normal">%</span></p>
+                </div>
+              </div>
+            </div>
+
+            {/* Vitality Chip - top right */}
+            <div
+              className={`absolute top-8 right-8 bg-secondary/10 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-2 border border-secondary/20 transition-all duration-1000 delay-500 ease-out ${
+                mounted ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0'
+              }`}
+            >
+              <span className="material-symbols-outlined text-secondary text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>
+                favorite
               </span>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <VitalCard
-                icon={Droplets}
-                label="혈압"
-                value="120/80"
-                unit="mmHg"
-                color="bg-primary"
-              />
-              <VitalCard
-                icon={Thermometer}
-                label="체온"
-                value="36.5"
-                unit="°C"
-                color="bg-secondary"
-              />
-              <VitalCard
-                icon={Activity}
-                label="심박수"
-                value="72"
-                unit="bpm"
-                color="bg-rose-500"
-              />
-              <VitalCard
-                icon={Heart}
-                label="산소포화도"
-                value="98"
-                unit="%"
-                color="bg-blue-500"
-              />
-            </div>
-          </div>
-
-          {/* Floating notification card - top left, outside image area */}
-          <div
-            className={`glass absolute -left-6 top-4 rounded-2xl p-4 shadow-lg transition-all duration-1000 delay-500 ease-out lg:-left-8 lg:top-8 ${
-              mounted ? 'translate-y-0 opacity-100' : '-translate-y-8 opacity-0'
-            }`}
-            style={{ animation: mounted ? 'floatReverse 5s ease-in-out infinite' : 'none' }}
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary/10">
-                <Activity className="h-5 w-5 text-secondary" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-on-surface">
-                  AI 매칭 완료
-                </p>
-                <p className="text-xs text-on-surface-variant">
-                  최적의 간호사를 찾았습니다
-                </p>
-              </div>
+              <span className="text-secondary font-bold text-sm">실시간 안심 케어 중</span>
             </div>
           </div>
         </div>
       </div>
-
-      {/* CSS Animations */}
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-12px); }
-        }
-        @keyframes floatReverse {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-8px); }
-        }
-      `}</style>
     </section>
   );
 }

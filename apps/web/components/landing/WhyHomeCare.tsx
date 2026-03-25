@@ -1,11 +1,12 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
 const stats = [
   { value: '1,000만+', label: '65세 이상 인구', bg: 'bg-primary text-white' },
   { value: '78%', label: '재가요양 선호율', bg: 'bg-secondary text-white' },
-  { value: '2.3배', label: '시설 대비 만족도', bg: 'bg-primary-container text-on-primary-container' },
+  { value: '2.3배', label: '시설 대비 만족도', bg: 'bg-primary-container text-on-primary' },
 ];
 
 export function WhyHomeCare() {
@@ -28,7 +29,7 @@ export function WhyHomeCare() {
 
   return (
     <section id="why-homecare" ref={sectionRef} className="bg-surface py-20 lg:py-28">
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-7xl px-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
           {/* 좌측: 이미지 */}
           <div
@@ -36,22 +37,13 @@ export function WhyHomeCare() {
               visible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
             }`}
           >
-            <div className="relative overflow-hidden rounded-3xl shadow-2xl h-[400px] lg:h-[500px] bg-gradient-to-br from-secondary/20 to-primary/10">
-              <img
-                src="/images/hero-homecare.jpg"
+            <div className="relative overflow-hidden rounded-lg shadow-2xl h-[400px] lg:h-[500px]">
+              <Image
+                src="/images/hero-care.jpg"
                 alt="방문요양 서비스"
-                className="h-full w-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                }}
+                fill
+                className="object-cover"
               />
-              {/* placeholder overlay in case image doesn't load */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center text-on-surface-variant/40">
-                  <div className="text-6xl mb-4">🏠</div>
-                  <p className="text-lg font-medium">홈케어 방문치료</p>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -62,13 +54,13 @@ export function WhyHomeCare() {
             }`}
             style={{ transitionDelay: visible ? '200ms' : '0ms' }}
           >
-            <span className="inline-block rounded-full bg-secondary/10 px-4 py-1.5 text-sm font-semibold text-secondary">
+            <span className="inline-block rounded-full bg-secondary/10 px-4 py-1.5 text-sm font-semibold text-secondary font-headline">
               고령화 시대
             </span>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-primary lg:text-4xl">
+            <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-primary lg:text-4xl font-headline">
               방문요양, 왜 중요한가요?
             </h2>
-            <div className="mt-6 space-y-4 text-on-surface-variant leading-relaxed">
+            <div className="mt-6 space-y-4 text-on-surface-variant leading-relaxed font-body">
               <p>
                 대한민국은 2025년 초고령사회에 진입하며, 65세 이상 인구가 전체의 20%를
                 넘어섰습니다. 어르신들은 익숙한 자택에서 전문적인 케어를 받길 원합니다.
@@ -90,12 +82,12 @@ export function WhyHomeCare() {
           {stats.map((stat, i) => (
             <div
               key={stat.label}
-              className={`rounded-2xl ${stat.bg} p-6 text-center transition-all duration-700 ease-out ${
+              className={`rounded-lg ${stat.bg} p-6 text-center transition-all duration-700 ease-out ${
                 visible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
               }`}
               style={{ transitionDelay: visible ? `${400 + i * 150}ms` : '0ms' }}
             >
-              <p className="text-3xl font-extrabold">{stat.value}</p>
+              <p className="text-3xl font-extrabold font-headline">{stat.value}</p>
               <p className="mt-1 text-sm opacity-80">{stat.label}</p>
             </div>
           ))}

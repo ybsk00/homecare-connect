@@ -1,6 +1,5 @@
 'use client';
 
-import { Star } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 const testimonials = [
@@ -54,17 +53,17 @@ export function Testimonials() {
       ref={sectionRef}
       className="bg-surface-container-low py-20 lg:py-28"
     >
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto max-w-7xl px-8">
         {/* Section header */}
         <div
           className={`mx-auto max-w-2xl text-center transition-all duration-800 ease-out ${
             visible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}
         >
-          <h2 className="text-3xl font-bold tracking-tight text-primary lg:text-4xl">
+          <h2 className="text-3xl font-extrabold tracking-tight text-primary lg:text-4xl font-headline">
             이용자 후기
           </h2>
-          <p className="mt-4 text-lg text-on-surface-variant">
+          <p className="mt-4 text-lg text-on-surface-variant font-body">
             홈케어커넥트와 함께하는 분들의 이야기
           </p>
         </div>
@@ -74,26 +73,29 @@ export function Testimonials() {
           {testimonials.map((t, i) => (
             <div
               key={t.name}
-              className={`rounded-2xl bg-surface-container-lowest p-8 shadow-sm transition-all duration-700 ease-out ${
+              className={`rounded-lg bg-surface-container-lowest p-8 premium-shadow transition-all duration-700 ease-out ${
                 visible ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'
               }`}
               style={{ transitionDelay: visible ? `${200 + i * 150}ms` : '0ms' }}
             >
               {/* 인용부호 */}
-              <p className="text-6xl font-bold leading-none text-primary/10">
+              <p className="text-6xl font-bold leading-none text-primary/10 font-headline">
                 &ldquo;
               </p>
 
               {/* 후기 내용 */}
-              <p className="mt-2 leading-relaxed text-on-surface-variant">{t.review}</p>
+              <p className="mt-2 leading-relaxed text-on-surface-variant font-body">{t.review}</p>
 
               {/* 별점 */}
               <div className="mt-5 flex gap-0.5">
                 {Array.from({ length: 5 }).map((_, idx) => (
-                  <Star
+                  <span
                     key={idx}
-                    className="h-4 w-4 fill-secondary text-secondary"
-                  />
+                    className="material-symbols-outlined text-secondary text-lg"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
+                    star
+                  </span>
                 ))}
               </div>
 

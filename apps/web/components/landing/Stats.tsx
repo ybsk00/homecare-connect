@@ -1,13 +1,12 @@
 'use client';
 
-import { BookOpen, Cpu, Clock, Bot } from 'lucide-react';
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 const stats = [
-  { value: 1800, suffix: '+', label: 'AI 학습 의료 FAQ', icon: BookOpen },
-  { value: 16, suffix: '', label: 'AI Edge Functions', icon: Cpu },
-  { value: 24, suffix: '시간', label: '에이전트 모니터링', icon: Clock },
-  { value: 4, suffix: '', label: '멀티 에이전트 시스템', icon: Bot },
+  { value: 1800, suffix: '+', label: 'AI 학습 의료 FAQ', icon: 'menu_book' },
+  { value: 16, suffix: '', label: 'AI Edge Functions', icon: 'memory' },
+  { value: 24, suffix: '시간', label: '에이전트 모니터링', icon: 'schedule' },
+  { value: 4, suffix: '', label: '멀티 에이전트 시스템', icon: 'smart_toy' },
 ];
 
 function useCountUp(target: number, duration: number, start: boolean) {
@@ -20,7 +19,6 @@ function useCountUp(target: number, duration: number, start: boolean) {
     function step(currentTime: number) {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      // ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       setCount(Math.round(eased * target));
       if (progress < 1) {
@@ -48,7 +46,6 @@ function StatItem({
   delay: number;
 }) {
   const count = useCountUp(stat.value, 2000, visible);
-  const Icon = stat.icon;
 
   return (
     <div
@@ -57,8 +54,10 @@ function StatItem({
       }`}
       style={{ transitionDelay: visible ? `${delay}ms` : '0ms' }}
     >
-      <Icon className="mx-auto mb-4 h-10 w-10 text-white/40" />
-      <p className="text-5xl font-black text-white">
+      <span className="material-symbols-outlined mx-auto mb-4 text-4xl text-white/40">
+        {stat.icon}
+      </span>
+      <p className="text-5xl font-black text-white font-headline">
         {visible ? count.toLocaleString() : '0'}
         {stat.suffix}
       </p>
@@ -91,10 +90,10 @@ export function Stats() {
       ref={sectionRef}
       className="relative overflow-hidden bg-gradient-to-br from-secondary to-[#004D47] py-20 lg:py-28"
     >
-      <div className="relative z-10 mx-auto max-w-7xl px-6">
+      <div className="relative z-10 mx-auto max-w-7xl px-8">
         {/* Header */}
         <p
-          className={`text-center text-2xl font-bold text-white/80 transition-all duration-800 ease-out ${
+          className={`text-center text-2xl font-bold text-white/80 font-headline transition-all duration-800 ease-out ${
             visible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           }`}
         >
