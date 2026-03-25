@@ -39,7 +39,7 @@ export function WhyHomeCare() {
           >
             <div className="relative overflow-hidden rounded-lg shadow-2xl h-[400px] lg:h-[500px]">
               <Image
-                src="/images/hero-care.jpg"
+                src="/images/hero-mobile.jpg"
                 alt="방문요양 서비스"
                 fill
                 className="object-cover"

@@ -63,9 +63,13 @@ patient_agent_rag_diseases, patient_agent_rag_emergency, nurse_agent_rag_clinica
 - **Secondary**: #006A63 (teal)
 - **Tertiary**: #321B00 (warm brown, alerts)
 - **Surface**: #F7FAFC (background)
-- **Font**: Pretendard (웹), System (모바일)
-- **규칙**: No borders (tonal layering), gradient buttons, 16px radius, editorial spacing, 56px 터치 타겟
-- **참고**: 홈컨넥트_디자인/ 디렉토리의 DESIGN.md, screen.png, NEW/ (Stitch 디자인)
+- **Font (웹 랜딩)**: Manrope(제목, font-headline) + Public Sans(본문, font-body) + Pretendard(한글 fallback)
+- **Font (웹 앱/모바일)**: Pretendard (웹), System (모바일)
+- **아이콘 (웹 랜딩)**: Material Symbols Outlined (Google Fonts)
+- **아이콘 (웹 앱/모바일)**: Lucide React (기존)
+- **규칙**: No borders (tonal layering), gradient buttons, rounded-lg(8px) 랜딩/rounded-2xl(16px) 앱, editorial spacing, 56px 터치 타겟
+- **이미지**: AI 생성 사람 얼굴 절대 금지. 손/도구/공간/정물만 사용
+- **참고**: DESIGN.md (디자인 시스템 전체 명세), 홈컨넥트_디자인/ 디렉토리
 
 ## 주요 커맨드
 
@@ -187,3 +191,12 @@ Navigation, Hero, WhyHomeCare(방문요양 중요성), PlatformValue(Before/Afte
 - 환자/간호사 라우팅: `/patient/...`, `/nurse/...` (절대 `/dashboard/...` 사용 금지)
 - 모바일 필터칩: height 40px 고정, borderRadius 20, 그림자 없음
 - 모바일 탭바: 불투명 흰색 배경 (글래스모피즘 사용 금지)
+
+## Design System
+Always read DESIGN.md before making any visual or UI decisions.
+Do not deviate without explicit user approval.
+- AI 생성 사람 얼굴 이미지 사용 절대 금지 (불쾌한 골짜기)
+- 랜딩 페이지: Material Symbols Outlined + Manrope/Public Sans + rounded-lg(8px)
+- 웹 앱 내부(환자/간호사/병원/관리자): Lucide React + Pretendard + rounded-2xl(16px)
+- No-Line Rule: 1px 보더 대신 tonal layering으로 경계 정의
+- 그림자: premium-shadow (0 4px 24px rgba(0,32,69,0.06))
