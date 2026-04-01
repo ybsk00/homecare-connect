@@ -5,11 +5,8 @@
 // Input: { patient_id, condition_check_id }
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.0';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
+import { parseAndValidate, isValidationError, type FieldSchema } from '../_shared/validate.ts';
 
 async function analyzeWithGemini(prompt: string): Promise<{ risk_level: string; summary: string }> {
   const apiKey = Deno.env.get('GEMINI_API_KEY');
@@ -55,21 +52,27 @@ async function analyzeWithGemini(prompt: string): Promise<{ risk_level: string; 
   }
 }
 
+const inputSchema: FieldSchema[] = [
+  { name: 'patient_id', type: 'string', required: true },
+  { name: 'condition_check_id', type: 'string', required: false },
+];
+
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
+    // 이 함수는 내부 트리거로 호출되므로 서비스 롤 키로 직접 인증
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
-    const { patient_id, condition_check_id } = await req.json();
-    if (!patient_id) {
-      return new Response(JSON.stringify({ error: 'patient_id 필요' }), {
-        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    // 입력 검증
+    const input = await parseAndValidate<{
+      patient_id: string;
+      condition_check_id?: string;
+    }>(req, inputSchema);
+    if (isValidationError(input)) return input;
+    const { patient_id, condition_check_id } = input;
 
     // 1. 오늘 컨디션 체크 조회
     const today = new Date().toISOString().split('T')[0];
@@ -225,19 +228,13 @@ ${recentMeals?.map((m) => `${m.meal_date} ${m.meal_type}: 단백질 ${(m.ai_nutr
       }
     }
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        risk_level: analysis.risk_level,
-        summary: analysis.summary,
-      }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return jsonResponse({
+      success: true,
+      risk_level: analysis.risk_level,
+      summary: analysis.summary,
+    });
   } catch (err) {
     console.error('컨디션 분석 오류:', err);
-    return new Response(
-      JSON.stringify({ error: '분석 중 오류 발생' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return errorResponse('INTERNAL_ERROR', '분석 중 오류 발생', 500);
   }
 });

@@ -5,11 +5,10 @@
 // Input: { patient_id, message, input_method, image_base64?, context_type? }
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.0';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
+import { authenticateRequest, isAuthError } from '../_shared/auth.ts';
+import { parseAndValidate, isValidationError, type FieldSchema } from '../_shared/validate.ts';
+import { checkRateLimit } from '../_shared/rate-limit.ts';
 
 // ── Gemini API 헬퍼 ──
 
@@ -289,44 +288,40 @@ function buildSystemPrompt(patientName: string, gender: string): string {
 - "간호사 선생님한테 한번 여쭤볼게요~" (불안 최소화)`;
 }
 
+// ── 입력 스키마 ──
+
+const inputSchema: FieldSchema[] = [
+  { name: 'patient_id', type: 'string', required: true },
+  { name: 'message', type: 'string', required: true, maxLength: 5000 },
+  { name: 'input_method', type: 'string', required: false },
+  { name: 'context_type', type: 'string', required: false },
+];
+
 // ── 메인 핸들러 ──
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: '인증 필요' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    // 인증 확인
+    const authResult = await authenticateRequest(req);
+    if (isAuthError(authResult)) return authResult;
+    const { user, supabase } = authResult;
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-    const supabaseAuth = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {
-      global: { headers: { Authorization: authHeader } },
-    });
+    // Rate limiting
+    const rateLimitResponse = await checkRateLimit(supabase, user.id, 'agent-patient-chat');
+    if (rateLimitResponse) return rateLimitResponse;
 
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: '인증 실패' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const { patient_id, message, input_method = 'text', context_type } = await req.json();
-
-    if (!patient_id || !message) {
-      return new Response(JSON.stringify({ error: 'patient_id와 message가 필요합니다' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    // 입력 검증
+    const input = await parseAndValidate<{
+      patient_id: string;
+      message: string;
+      input_method?: string;
+      context_type?: string;
+    }>(req, inputSchema);
+    if (isValidationError(input)) return input;
+    const { patient_id, message, input_method = 'text', context_type } = input;
 
     // 환자 정보 조회
     const { data: patient } = await supabase
@@ -406,18 +401,12 @@ Deno.serve(async (req) => {
       function_calls: functionCallLog.length > 0 ? functionCallLog : null,
     });
 
-    return new Response(
-      JSON.stringify({
-        response: responseText,
-        function_calls: functionCallLog,
-      }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return jsonResponse({
+      response: responseText,
+      function_calls: functionCallLog,
+    });
   } catch (err) {
     console.error('환자 에이전트 오류:', err);
-    return new Response(
-      JSON.stringify({ error: '서버 오류가 발생했어요. 잠시 후 다시 시도해주세요.' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return errorResponse('INTERNAL_ERROR', '서버 오류가 발생했어요. 잠시 후 다시 시도해주세요.', 500);
   }
 });

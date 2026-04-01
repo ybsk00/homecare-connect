@@ -7,12 +7,9 @@
 // ORANGE (주의): 5회 연속 고혈압, 인지 변화, 2주 내 체중 +-3kg
 // YELLOW (관찰): 3회 연속 혈압 상승, 2회 연속 투약 누락, 영양 불량
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.0';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
+import { authenticateRequest, isAuthError } from '../_shared/auth.ts';
+import { parseAndValidate, isValidationError, type FieldSchema } from '../_shared/validate.ts';
 
 // 활력징후 타입
 interface Vitals {
@@ -57,45 +54,24 @@ interface DetectedAlert {
   trend_data: unknown | null;
 }
 
+const inputSchema: FieldSchema[] = [
+  { name: 'visit_record_id', type: 'string', required: true },
+];
+
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // 인증 확인
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ code: 'UNAUTHORIZED', message: '인증 토큰이 필요합니다.' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
+    const authResult = await authenticateRequest(req);
+    if (isAuthError(authResult)) return authResult;
+    const { supabase } = authResult;
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // 요청자 인증
-    const supabaseAuth = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ code: 'UNAUTHORIZED', message: '유효하지 않은 인증 토큰입니다.' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
-
-    const { visit_record_id } = await req.json();
-
-    if (!visit_record_id) {
-      return new Response(
-        JSON.stringify({ code: 'BAD_REQUEST', message: 'visit_record_id는 필수입니다.' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
+    // 입력 검증
+    const input = await parseAndValidate<{ visit_record_id: string }>(req, inputSchema);
+    if (isValidationError(input)) return input;
+    const { visit_record_id } = input;
 
     // 1. 현재 방문 기록 조회
     const { data: currentRecord, error: recordError } = await supabase
@@ -105,10 +81,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (recordError || !currentRecord) {
-      return new Response(
-        JSON.stringify({ code: 'NOT_FOUND', message: '방문 기록을 찾을 수 없습니다.' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return errorResponse('NOT_FOUND', '방문 기록을 찾을 수 없습니다.', 404);
     }
 
     const record = currentRecord as VisitRecord;
@@ -330,7 +303,7 @@ Deno.serve(async (req) => {
         status: 'active',
       }));
 
-      const { data: insertedAlerts, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from('red_flag_alerts')
         .insert(alertRecords)
         .select('id, severity');
@@ -344,6 +317,9 @@ Deno.serve(async (req) => {
       if (redAlerts.length > 0) {
         // send-notification 함수 호출
         try {
+          const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+          const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
           // 보호자 ID 조회
           const { data: guardianLinks } = await supabase
             .from('guardian_patient_links')
@@ -383,24 +359,18 @@ Deno.serve(async (req) => {
     }
 
     // 응답 반환
-    return new Response(
-      JSON.stringify({
-        visit_record_id,
-        patient_id: record.patient_id,
-        alerts_detected: detectedAlerts.length,
-        alerts: detectedAlerts.map((a) => ({
-          severity: a.severity,
-          category: a.category,
-          title: a.title,
-        })),
-      }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return jsonResponse({
+      visit_record_id,
+      patient_id: record.patient_id,
+      alerts_detected: detectedAlerts.length,
+      alerts: detectedAlerts.map((a) => ({
+        severity: a.severity,
+        category: a.category,
+        title: a.title,
+      })),
+    });
   } catch (err) {
     console.error('레드플래그 탐지 중 예외:', err);
-    return new Response(
-      JSON.stringify({ code: 'INTERNAL_ERROR', message: '서버 오류가 발생했습니다.' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return errorResponse('INTERNAL_ERROR', '서버 오류가 발생했습니다.', 500);
   }
 });

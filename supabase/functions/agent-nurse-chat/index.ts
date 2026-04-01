@@ -5,11 +5,10 @@
 // Input: { nurse_id, message, input_method }
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.0';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
+import { authenticateRequest, isAuthError } from '../_shared/auth.ts';
+import { parseAndValidate, isValidationError, type FieldSchema } from '../_shared/validate.ts';
+import { checkRateLimit } from '../_shared/rate-limit.ts';
 
 async function callGemini(
   systemPrompt: string,
@@ -283,38 +282,34 @@ function buildSystemPrompt(nurseName: string): string {
 - 컨디션 체크 결과 (get_condition_check_results)`;
 }
 
+const inputSchema: FieldSchema[] = [
+  { name: 'nurse_id', type: 'string', required: true },
+  { name: 'message', type: 'string', required: true, maxLength: 5000 },
+  { name: 'input_method', type: 'string', required: false },
+];
+
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: '인증 필요' }), {
-        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    // 인증 확인
+    const authResult = await authenticateRequest(req);
+    if (isAuthError(authResult)) return authResult;
+    const { user, supabase } = authResult;
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-    const supabaseAuth = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {
-      global: { headers: { Authorization: authHeader } },
-    });
+    // Rate limiting
+    const rateLimitResponse = await checkRateLimit(supabase, user.id, 'agent-nurse-chat');
+    if (rateLimitResponse) return rateLimitResponse;
 
-    const { data: { user } } = await supabaseAuth.auth.getUser();
-    if (!user) {
-      return new Response(JSON.stringify({ error: '인증 실패' }), {
-        status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const { nurse_id, message, input_method = 'text' } = await req.json();
-    if (!nurse_id || !message) {
-      return new Response(JSON.stringify({ error: 'nurse_id, message 필요' }), {
-        status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    // 입력 검증
+    const input = await parseAndValidate<{
+      nurse_id: string;
+      message: string;
+      input_method?: string;
+    }>(req, inputSchema);
+    if (isValidationError(input)) return input;
+    const { nurse_id, message, input_method = 'text' } = input;
 
     // 간호사 프로필
     const { data: profile } = await supabase
@@ -384,15 +379,9 @@ Deno.serve(async (req) => {
       function_calls: functionCallLog.length > 0 ? functionCallLog : null,
     });
 
-    return new Response(
-      JSON.stringify({ response: responseText, function_calls: functionCallLog }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return jsonResponse({ response: responseText, function_calls: functionCallLog });
   } catch (err) {
     console.error('간호사 에이전트 오류:', err);
-    return new Response(
-      JSON.stringify({ error: '서버 오류가 발생했습니다.' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return errorResponse('INTERNAL_ERROR', '서버 오류가 발생했습니다.', 500);
   }
 });

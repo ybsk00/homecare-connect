@@ -10,11 +10,8 @@
 // }
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.0';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
+import { parseAndValidate, isValidationError, type FieldSchema } from '../_shared/validate.ts';
 
 // Expo Push API로 푸시 알림 발송
 async function sendExpoPush(
@@ -133,26 +130,28 @@ async function sendKakaoAlimtalk(
   return { success, failed };
 }
 
+const inputSchema: FieldSchema[] = [
+  { name: 'user_ids', type: 'array', required: true, maxLength: 1000 },
+  { name: 'type', type: 'string', required: true, maxLength: 100 },
+  { name: 'title', type: 'string', required: true, maxLength: 200 },
+  { name: 'body', type: 'string', required: true, maxLength: 2000 },
+];
+
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
-    // 인증 확인
+    // 인증 확인 — 서비스 롤 키 또는 인증된 사용자 모두 허용
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return new Response(
-        JSON.stringify({ code: 'UNAUTHORIZED', message: '인증 토큰이 필요합니다.' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return errorResponse('UNAUTHORIZED', '인증 토큰이 필요합니다.', 401);
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 서비스 롤 키로의 호출 또는 인증된 사용자의 호출 모두 허용
     const isServiceRole = authHeader.includes(supabaseServiceKey);
     if (!isServiceRole) {
       const supabaseAuth = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {
@@ -160,28 +159,22 @@ Deno.serve(async (req) => {
       });
       const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
       if (authError || !user) {
-        return new Response(
-          JSON.stringify({ code: 'UNAUTHORIZED', message: '유효하지 않은 인증 토큰입니다.' }),
-          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-        );
+        return errorResponse('UNAUTHORIZED', '유효하지 않은 인증 토큰입니다.', 401);
       }
     }
 
-    const { user_ids, type, title, body, data = {}, channels = ['in_app', 'push'] } = await req.json();
+    // 입력 검증
+    const input = await parseAndValidate<{
+      user_ids: string[];
+      type: string;
+      title: string;
+      body: string;
+      data?: Record<string, unknown>;
+      channels?: string[];
+    }>(req, inputSchema);
+    if (isValidationError(input)) return input;
 
-    if (!user_ids || !Array.isArray(user_ids) || user_ids.length === 0) {
-      return new Response(
-        JSON.stringify({ code: 'BAD_REQUEST', message: 'user_ids 배열은 필수입니다.' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
-
-    if (!type || !title || !body) {
-      return new Response(
-        JSON.stringify({ code: 'BAD_REQUEST', message: 'type, title, body는 필수입니다.' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
+    const { user_ids, type, title, body, data = {}, channels = ['in_app', 'push'] } = input;
 
     const results = {
       in_app: { success: 0, failed: 0 },
@@ -275,19 +268,13 @@ Deno.serve(async (req) => {
     }
 
     // 응답 반환
-    return new Response(
-      JSON.stringify({
-        user_count: user_ids.length,
-        channels_used: channels,
-        results,
-      }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return jsonResponse({
+      user_count: user_ids.length,
+      channels_used: channels,
+      results,
+    });
   } catch (err) {
     console.error('알림 발송 중 예외:', err);
-    return new Response(
-      JSON.stringify({ code: 'INTERNAL_ERROR', message: '서버 오류가 발생했습니다.' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return errorResponse('INTERNAL_ERROR', '서버 오류가 발생했습니다.', 500);
   }
 });

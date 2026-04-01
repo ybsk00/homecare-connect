@@ -2,13 +2,9 @@
 // 환자에게 적합한 의료기관을 찾아 추천 이유와 함께 반환합니다.
 // Input: { patient_id: string, radius_km?: number }
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.0';
-
-// CORS 헤더 설정
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
+import { authenticateRequest, isAuthError } from '../_shared/auth.ts';
+import { parseAndValidate, isValidationError, type FieldSchema } from '../_shared/validate.ts';
 
 // 서비스 유형 한국어 매핑
 const serviceLabels: Record<string, string> = {
@@ -71,48 +67,25 @@ function generateReasons(match: {
   return reasons;
 }
 
+const inputSchema: FieldSchema[] = [
+  { name: 'patient_id', type: 'string', required: true },
+  { name: 'radius_km', type: 'number', required: false, min: 0.1, max: 100 },
+];
+
 Deno.serve(async (req) => {
-  // CORS preflight 처리
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
-    // 인증 토큰 검증
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ code: 'UNAUTHORIZED', message: '인증 토큰이 필요합니다.' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
+    // 인증
+    const authResult = await authenticateRequest(req);
+    if (isAuthError(authResult)) return authResult;
+    const { user, supabase } = authResult;
 
-    // Supabase 클라이언트 생성 (서비스 롤 키 사용)
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // 요청자 인증 확인
-    const supabaseAuth = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ code: 'UNAUTHORIZED', message: '유효하지 않은 인증 토큰입니다.' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
-
-    // 요청 본문 파싱
-    const { patient_id, radius_km } = await req.json();
-
-    if (!patient_id) {
-      return new Response(
-        JSON.stringify({ code: 'BAD_REQUEST', message: 'patient_id는 필수입니다.' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
+    // 입력 검증
+    const body = await parseAndValidate<{ patient_id: string; radius_km?: number }>(req, inputSchema);
+    if (isValidationError(body)) return body;
+    const { patient_id, radius_km } = body;
 
     // 환자 정보 확인
     const { data: patient, error: patientError } = await supabase
@@ -122,10 +95,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (patientError || !patient) {
-      return new Response(
-        JSON.stringify({ code: 'NOT_FOUND', message: '환자 정보를 찾을 수 없습니다.' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return errorResponse('NOT_FOUND', '환자 정보를 찾을 수 없습니다.', 404);
     }
 
     // DB 함수를 호출하여 매칭 실행
@@ -137,10 +107,7 @@ Deno.serve(async (req) => {
 
     if (matchError) {
       console.error('매칭 RPC 호출 실패:', matchError);
-      return new Response(
-        JSON.stringify({ code: 'MATCHING_FAILED', message: '매칭 처리 중 오류가 발생했습니다.' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return errorResponse('MATCHING_FAILED', '매칭 처리 중 오류가 발생했습니다.', 500);
     }
 
     // 결과가 없는 경우
@@ -160,14 +127,11 @@ Deno.serve(async (req) => {
         .select('id')
         .single();
 
-      return new Response(
-        JSON.stringify({
-          request_id: request?.id || null,
-          matches: [],
-          message: '현재 반경 내 매칭 가능한 기관이 없습니다. 반경을 늘려서 다시 시도해주세요.',
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return jsonResponse({
+        request_id: request?.id || null,
+        matches: [],
+        message: '현재 반경 내 매칭 가능한 기관이 없습니다. 반경을 늘려서 다시 시도해주세요.',
+      });
     }
 
     // 각 매칭 결과에 추천 이유 추가
@@ -214,25 +178,16 @@ Deno.serve(async (req) => {
 
     if (reqError) {
       console.error('서비스 요청 생성 실패:', reqError);
-      return new Response(
-        JSON.stringify({ code: 'REQUEST_FAILED', message: '서비스 요청 생성에 실패했습니다.' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return errorResponse('REQUEST_FAILED', '서비스 요청 생성에 실패했습니다.', 500);
     }
 
     // 성공 응답 반환
-    return new Response(
-      JSON.stringify({
-        request_id: serviceRequest.id,
-        matches: formattedMatches,
-      }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return jsonResponse({
+      request_id: serviceRequest.id,
+      matches: formattedMatches,
+    });
   } catch (err) {
     console.error('AI 매칭 처리 중 예외:', err);
-    return new Response(
-      JSON.stringify({ code: 'INTERNAL_ERROR', message: '서버 오류가 발생했습니다.' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return errorResponse('INTERNAL_ERROR', '서버 오류가 발생했습니다.', 500);
   }
 });

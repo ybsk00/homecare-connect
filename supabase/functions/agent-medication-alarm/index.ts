@@ -6,18 +6,14 @@
 // 4. 60분 경과 미응답 → missed 처리 + 간호사 알림
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.0';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
+    // 이 함수는 pg_cron에서 호출되므로 서비스 롤 키로 직접 인증
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
@@ -195,20 +191,14 @@ Deno.serve(async (req) => {
       }
     }
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        reminders_sent: sentCount,
-        re_reminders: reRemindSchedules?.length ?? 0,
-        missed: missedSchedules?.length ?? 0,
-      }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return jsonResponse({
+      success: true,
+      reminders_sent: sentCount,
+      re_reminders: reRemindSchedules?.length ?? 0,
+      missed: missedSchedules?.length ?? 0,
+    });
   } catch (err) {
     console.error('복약 알람 오류:', err);
-    return new Response(
-      JSON.stringify({ error: '서버 오류' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return errorResponse('INTERNAL_ERROR', '서버 오류', 500);
   }
 });

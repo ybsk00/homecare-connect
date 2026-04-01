@@ -3,12 +3,9 @@
 // Input: { patient_id, period_start, period_end, doctor_visit_date }
 // Gemini 2.5 Flash 모델 사용 (비용 효율)
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.0';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
+import { authenticateRequest, isAuthError } from '../_shared/auth.ts';
+import { parseAndValidate, isValidationError, type FieldSchema } from '../_shared/validate.ts';
 
 // Gemini API 호출 헬퍼
 async function callGemini(prompt: string, systemPrompt: string): Promise<string> {
@@ -96,45 +93,32 @@ function calculateVitalsTrend(records: Array<{
   };
 }
 
+const inputSchema: FieldSchema[] = [
+  { name: 'patient_id', type: 'string', required: true },
+  { name: 'period_start', type: 'string', required: true },
+  { name: 'period_end', type: 'string', required: true },
+  { name: 'doctor_visit_date', type: 'string', required: false },
+];
+
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // 인증 확인
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ code: 'UNAUTHORIZED', message: '인증 토큰이 필요합니다.' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
+    const authResult = await authenticateRequest(req);
+    if (isAuthError(authResult)) return authResult;
+    const { supabase } = authResult;
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // 요청자 인증
-    const supabaseAuth = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser();
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ code: 'UNAUTHORIZED', message: '유효하지 않은 인증 토큰입니다.' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
-
-    const { patient_id, period_start, period_end, doctor_visit_date } = await req.json();
-
-    if (!patient_id || !period_start || !period_end) {
-      return new Response(
-        JSON.stringify({ code: 'BAD_REQUEST', message: 'patient_id, period_start, period_end는 필수입니다.' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
-    }
+    // 입력 검증
+    const input = await parseAndValidate<{
+      patient_id: string;
+      period_start: string;
+      period_end: string;
+      doctor_visit_date?: string;
+    }>(req, inputSchema);
+    if (isValidationError(input)) return input;
+    const { patient_id, period_start, period_end, doctor_visit_date } = input;
 
     // 환자 정보 조회
     const { data: patient, error: patientError } = await supabase
@@ -144,10 +128,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (patientError || !patient) {
-      return new Response(
-        JSON.stringify({ code: 'NOT_FOUND', message: '환자 정보를 찾을 수 없습니다.' }),
-        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return errorResponse('NOT_FOUND', '환자 정보를 찾을 수 없습니다.', 404);
     }
 
     // 기관/의사 정보 조회
@@ -176,10 +157,7 @@ Deno.serve(async (req) => {
 
     if (reportInsertError) {
       console.error('리포트 레코드 생성 실패:', reportInsertError);
-      return new Response(
-        JSON.stringify({ code: 'INSERT_FAILED', message: '리포트 생성을 시작할 수 없습니다.' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return errorResponse('INSERT_FAILED', '리포트 생성을 시작할 수 없습니다.', 500);
     }
 
     try {
@@ -323,15 +301,12 @@ ${medicationAdherence.items.map((m) => `- ${m.medication}: ${m.adherence_rate}%`
         throw new Error(`리포트 업데이트 실패: ${updateError.message}`);
       }
 
-      return new Response(
-        JSON.stringify({
-          report_id: report.id,
-          status: 'generated',
-          visit_count: records.length,
-          alerts_count: keyEvents.length,
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return jsonResponse({
+        report_id: report.id,
+        status: 'generated',
+        visit_count: records.length,
+        alerts_count: keyEvents.length,
+      });
     } catch (genError) {
       // 생성 실패 시 상태를 error로 업데이트
       console.error('리포트 생성 실패:', genError);
@@ -340,20 +315,10 @@ ${medicationAdherence.items.map((m) => `- ${m.medication}: ${m.adherence_rate}%`
         .update({ status: 'error' })
         .eq('id', report.id);
 
-      return new Response(
-        JSON.stringify({
-          code: 'GENERATION_FAILED',
-          message: '리포트 생성 중 오류가 발생했습니다.',
-          report_id: report.id,
-        }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-      );
+      return errorResponse('GENERATION_FAILED', '리포트 생성 중 오류가 발생했습니다.', 500);
     }
   } catch (err) {
     console.error('AI 리포트 처리 중 예외:', err);
-    return new Response(
-      JSON.stringify({ code: 'INTERNAL_ERROR', message: '서버 오류가 발생했습니다.' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return errorResponse('INTERNAL_ERROR', '서버 오류가 발생했습니다.', 500);
   }
 });

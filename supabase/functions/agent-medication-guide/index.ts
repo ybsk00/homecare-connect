@@ -8,11 +8,8 @@
 // Trigger: prescriptions 테이블 INSERT 후 호출
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.0';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts';
+import { parseAndValidate, isValidationError, type FieldSchema } from '../_shared/validate.ts';
 
 async function callGemini(prompt: string): Promise<string> {
   const apiKey = Deno.env.get('GEMINI_API_KEY');
@@ -101,22 +98,23 @@ function generateScheduleDates(
   return schedules;
 }
 
+const inputSchema: FieldSchema[] = [
+  { name: 'prescription_id', type: 'string', required: true },
+];
+
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
+    // 이 함수는 내부 트리거로 호출되므로 서비스 롤 키로 직접 인증
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabase = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
-    const { prescription_id } = await req.json();
-    if (!prescription_id) {
-      return new Response(JSON.stringify({ error: 'prescription_id 필요' }), {
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+    // 입력 검증
+    const input = await parseAndValidate<{ prescription_id: string }>(req, inputSchema);
+    if (isValidationError(input)) return input;
+    const { prescription_id } = input;
 
     // 1. 처방 정보 조회
     const { data: rx, error: rxError } = await supabase
@@ -126,10 +124,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (rxError || !rx) {
-      return new Response(JSON.stringify({ error: '처방 정보 없음' }), {
-        status: 404,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+      return errorResponse('NOT_FOUND', '처방 정보 없음', 404);
     }
 
     // 2. e약은요 API로 약품 정보 조회
@@ -310,20 +305,14 @@ ${durWarnings.length > 0 ? `⚠️ 병용금기 경고:\n${JSON.stringify(durWar
       }
     }
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        easy_guide: easyGuide,
-        dur_warnings: durWarnings,
-        schedules_created: schedules.length,
-      }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return jsonResponse({
+      success: true,
+      easy_guide: easyGuide,
+      dur_warnings: durWarnings,
+      schedules_created: schedules.length,
+    });
   } catch (err) {
     console.error('복약지도 생성 오류:', err);
-    return new Response(
-      JSON.stringify({ error: '서버 오류' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
-    );
+    return errorResponse('INTERNAL_ERROR', '서버 오류', 500);
   }
 });
