@@ -19,8 +19,10 @@ packages/
   supabase-client/ # Supabase 클라이언트 + 쿼리 함수
 
 supabase/
-  functions/       # 16개 Edge Functions (AI 매칭, 에이전트, 복약, RAG 등)
-  migrations/      # DB 마이그레이션 SQL (7개)
+  functions/       # 17개 Edge Functions (AI 매칭, 에이전트, 복약, RAG 등)
+    _shared/       # 공통 모듈 (cors, auth, validate, rate-limit, logger)
+  migrations/      # DB 마이그레이션 SQL (8개)
+  tests/           # RLS 격리 테스트 SQL
 
 scripts/
   rag_generator.py       # RAG FAQ 대량 생성기 (PubMed + Gemini)
@@ -45,17 +47,24 @@ scripts/
 - **URL**: https://hviqeyrnstgwumqiacwh.supabase.co
 - **Ref**: hviqeyrnstgwumqiacwh
 - **리전**: ap-northeast-1 (도쿄)
-- **DB**: PostgreSQL 17, 29개 테이블, 45+ RLS 정책, 57+ 인덱스
+- **DB**: PostgreSQL 17, 30개 테이블, 45+ RLS 정책, 57+ 인덱스
 - **확장**: PostGIS, pgvector, pg_trgm, uuid-ossp
-- **Edge Functions**: 16개 (기존 9 + 에이전트 7)
+- **Edge Functions**: 17개 (기존 9 + 에이전트 7 + api-drug-info 1)
 
 ### 에이전트 시스템 테이블 (9개 추가)
 prescriptions, medication_schedules, condition_checks, meal_logs, agent_conversations,
 patient_agent_rag_diseases, patient_agent_rag_emergency, nurse_agent_rag_clinical, nurse_agent_rag_assessment
 
-### Edge Functions (16개)
-기존: ai-matching, red-flag-detect, ai-report, rag-chat, route-optimize, send-notification, speech-to-text, toss-webhook, doctor-opinion-simplify
+### Edge Functions (17개)
+기존: ai-matching, red-flag-detect, ai-report, rag-chat, route-optimize, send-notification, speech-to-text, toss-webhook, doctor-opinion-simplify, api-drug-info
 에이전트: agent-patient-chat, agent-nurse-chat, agent-medication-guide, agent-medication-alarm, agent-meal-analyze, agent-condition-check, rag-pipeline-ingest
+공통: _shared/ (cors.ts, auth.ts, validate.ts, rate-limit.ts, logger.ts)
+
+### Edge Function 보안 (파일럿 하드닝)
+- 활성 9개 함수: _shared/ 공통 모듈 사용 (CORS, 인증, 입력 검증)
+- 입력 검증: Zod 패턴 기반 FieldSchema (타입/필수/범위/최대길이 체크)
+- Rate Limiting: agent-patient-chat, agent-nurse-chat에 사용자당 분당 5회 제한
+- 비활성 8개 함수: 기존 패턴 유지 (파일럿 불필요)
 
 ## 디자인 시스템: "The Digital Sanctuary"
 
@@ -79,6 +88,10 @@ pnpm dev              # 전체 dev 서버 실행
 pnpm build            # 전체 빌드
 pnpm type-check       # TypeScript 타입 체크
 pnpm lint             # ESLint
+pnpm test             # Vitest (shared-utils 105개 테스트)
+
+# Edge Functions 배포 (Supabase CLI)
+KAKAO_CLIENT_ID=dummy KAKAO_SECRET=dummy npx supabase functions deploy <함수명> --project-ref hviqeyrnstgwumqiacwh --no-verify-jwt
 
 # 모바일 앱
 cd apps/homecare-app && npx expo start     # Expo Go 테스트
@@ -103,6 +116,14 @@ python scripts/rag_generator.py --action generate_all
 - **리전**: asia-east1 (타이완)
 - **배포**: GitHub main push → 자동 빌드/배포 (Cloud Run)
 - **설정**: `apps/web/apphosting.yaml`
+
+## 인증 미들웨어
+
+- `apps/web/middleware.ts` — 서버 측 인증 검증
+- 보호 경로: `/patient/*`, `/nurse/*`, `/hospital/*`, `/admin/*`
+- 미인증 시: 307 → `/login?redirect={원래경로}` 리다이렉트
+- 공개 경로: `/`, `/login`, `/auth/*`, `/api/auth/*`
+- env 미설정 시 graceful fallback (로컬 개발 지원)
 
 ## 웹앱 라우팅 (통합)
 
@@ -191,6 +212,8 @@ Navigation, Hero, WhyHomeCare(방문요양 중요성), PlatformValue(Before/Afte
 - 환자/간호사 라우팅: `/patient/...`, `/nurse/...` (절대 `/dashboard/...` 사용 금지)
 - 모바일 필터칩: height 40px 고정, borderRadius 20, 그림자 없음
 - 모바일 탭바: 불투명 흰색 배경 (글래스모피즘 사용 금지)
+- Edge Function 새로 만들 때: `_shared/` 모듈(cors, auth, validate) 반드시 사용
+- Edge Function 입력 검증: FieldSchema 배열로 정의, parseAndValidate() 사용
 
 ## Design System
 Always read DESIGN.md before making any visual or UI decisions.
